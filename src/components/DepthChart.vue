@@ -34,6 +34,9 @@ const props = defineProps<{
 const BID_COLOR = 'oklch(0.62 0.14 155)'
 const ASK_COLOR = 'oklch(0.6 0.18 25)'
 
+// Symmetric x-domain padding: 10% of the larger side's distance from center.
+const X_DOMAIN_PAD = 0.1
+
 // ── Level building ────────────────────────────────────────────────────────────
 interface Level {
   price: number
@@ -80,28 +83,35 @@ const option = computed(() => {
   const hasBids = buyLevels.length > 0
   const hasAsks = sellLevels.length > 0
 
-  // ── Domain calculation (mirrors the SVG impl exactly) ──────────────────────
-  let lo: number, hi: number
+  // ── Domain calculation: mirror around center with padding ──────────────────
+  // Center the chart so the staircase(s) sit on a mirror of equal range.
+  // `center` is the inner edge of available data: the mid for two-sided
+  // books, the best bid (bids-only), or the best ask (asks-only).
+  let center: number
+  let askExtent = 0
+  let bidExtent = 0
 
   if (hasBids && hasAsks) {
-    const prices = allOrders.map((o) => o.price)
-    lo = Math.min(...prices)
-    hi = Math.max(...prices)
+    const maxBid = Math.max(...buyLevels.map((l) => l.price))
+    const minAsk = Math.min(...sellLevels.map((l) => l.price))
+    center = (maxBid + minAsk) / 2
+    askExtent = Math.max(...sellLevels.map((l) => l.price)) - center
+    bidExtent = center - Math.min(...buyLevels.map((l) => l.price))
   } else if (hasBids) {
-    const buyPrices = buyLevels.map((l) => l.price)
-    const minBid = Math.min(...buyPrices)
-    const maxBid = Math.max(...buyPrices)
-    const span = Math.max(maxBid - minBid, maxBid * 0.005)
-    lo = minBid
-    hi = maxBid + span
+    const maxBid = Math.max(...buyLevels.map((l) => l.price))
+    center = maxBid
+    bidExtent = center - Math.min(...buyLevels.map((l) => l.price))
   } else {
-    const sellPrices = sellLevels.map((l) => l.price)
-    const minAsk = Math.min(...sellPrices)
-    const maxAsk = Math.max(...sellPrices)
-    const span = Math.max(maxAsk - minAsk, minAsk * 0.005)
-    lo = minAsk - span
-    hi = maxAsk
+    const minAsk = Math.min(...sellLevels.map((l) => l.price))
+    center = minAsk
+    askExtent = Math.max(...sellLevels.map((l) => l.price)) - center
   }
+
+  // Floor at 0.5% of center so a single-level book doesn't collapse to width 0.
+  const rawHalfSpan = Math.max(askExtent, bidExtent, center * 0.005)
+  const halfSpan = rawHalfSpan * (1 + X_DOMAIN_PAD)
+  const lo = center - halfSpan
+  const hi = center + halfSpan
 
   // ── Series data ────────────────────────────────────────────────────────────
   // Bids: already sorted desc (best-bid first = highest price first).
