@@ -1,5 +1,29 @@
 /* P2P Explorer — modern fintech, light, balanced density */
 
+/* Satoshi Symbol font (from satsymbol.com — CC non-commercial license).
+   The font maps the "!" character to the sat-symbol glyph; consumers
+   should render the SatSymbol component, which wraps a span using this
+   font. */
+@font-face {
+  font-family: "Satoshi Symbol";
+  src: url("./fonts/satsymbol.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  /* Use 'block' so the literal "!" is hidden during the 3s block period
+     instead of leaking through as a fallback glyph. After load it renders
+     the sat-symbol; on cached visits the swap is instant. */
+  font-display: block;
+}
+
+.sat-symbol {
+  font-family: "Satoshi Symbol", sans-serif;
+  display: inline-block;
+  /* The font's natural baseline differs from text fonts; nudge so it
+     visually sits with surrounding numerals. */
+  line-height: 1;
+  vertical-align: baseline;
+}
+
 :root {
   --bg:        oklch(0.985 0.005 80);
   --bg-card:   oklch(1 0 0);

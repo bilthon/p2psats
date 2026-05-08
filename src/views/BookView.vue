@@ -8,6 +8,7 @@ import DepthChart from '@/components/DepthChart.vue'
 import OrderBook from '@/components/OrderBook.vue'
 import CrossedPairsList from '@/components/CrossedPairsList.vue'
 import OrderDetailDialog from '@/components/OrderDetailDialog.vue'
+import SatSymbol from '@/components/SatSymbol.vue'
 import type { Order } from '@/lib/types'
 
 const store = useAppStore()
@@ -114,13 +115,13 @@ watch(
 
     <div class="pb-stat">
       <div class="pb-stat-label">Bid depth</div>
-      <div class="pb-stat-value">{{ fmtSatsCompact(store.totalBidsSats) }}</div>
+      <div class="pb-stat-value">{{ fmtSatsCompact(store.totalBidsSats, { bare: true }) }} <SatSymbol /></div>
       <div class="pb-stat-sub">across all bids</div>
     </div>
 
     <div class="pb-stat">
       <div class="pb-stat-label">Ask depth</div>
-      <div class="pb-stat-value">{{ fmtSatsCompact(store.totalAsksSats) }}</div>
+      <div class="pb-stat-value">{{ fmtSatsCompact(store.totalAsksSats, { bare: true }) }} <SatSymbol /></div>
       <div class="pb-stat-sub">across all asks</div>
     </div>
 

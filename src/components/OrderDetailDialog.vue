@@ -5,6 +5,7 @@ import type { Event } from 'nostr-tools'
 import { fmtFiat, fmtSats, fmtPremium, fmtAge } from '@/lib/data'
 import type { Order } from '@/lib/types'
 import type { RawNip69Order } from '@/lib/nip69/parseOrder'
+import SatSymbol from './SatSymbol.vue'
 
 const props = defineProps<{
   order: Order
@@ -164,7 +165,7 @@ onUnmounted(() => {
             </div>
             <div class="odd-kv">
               <div class="odd-kv-label">Amount</div>
-              <div class="odd-kv-value">{{ fmtSats(order.amountSats) }}</div>
+              <div class="odd-kv-value">{{ fmtSats(order.amountSats, { bare: true }) }} <SatSymbol /></div>
             </div>
           </div>
         </div>

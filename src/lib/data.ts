@@ -178,15 +178,18 @@ export function fmtFiat(n: number, ccy: Currency, opts: { bare?: boolean } = {})
   return opts.bare ? formatted : `${f.symbol}${formatted}`
 }
 
-export function fmtSats(sats: number): string {
-  return Math.round(sats).toLocaleString('en-US') + ' sats'
+export function fmtSats(sats: number, opts: { bare?: boolean } = {}): string {
+  const formatted = Math.round(sats).toLocaleString('en-US')
+  return opts.bare ? formatted : `${formatted} sats`
 }
 
-export function fmtSatsCompact(sats: number): string {
-  if (sats >= 1e8) return (sats / 1e6).toFixed(1) + 'M sats'
-  if (sats >= 1e6) return (sats / 1e6).toFixed(2) + 'M sats'
-  if (sats >= 1e3) return (sats / 1e3).toFixed(0) + 'k sats'
-  return Math.round(sats).toLocaleString('en-US') + ' sats'
+export function fmtSatsCompact(sats: number, opts: { bare?: boolean } = {}): string {
+  let formatted: string
+  if (sats >= 1e8) formatted = (sats / 1e6).toFixed(1) + 'M'
+  else if (sats >= 1e6) formatted = (sats / 1e6).toFixed(2) + 'M'
+  else if (sats >= 1e3) formatted = (sats / 1e3).toFixed(0) + 'k'
+  else formatted = Math.round(sats).toLocaleString('en-US')
+  return opts.bare ? formatted : `${formatted} sats`
 }
 
 export function fmtAge(min: number): string {

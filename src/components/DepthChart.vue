@@ -117,25 +117,30 @@ const option = computed(() => {
   // Bids: already sorted desc (best-bid first = highest price first).
   // For the chart we need ascending price order, so we reverse.
   // The cumulative depth at the worst bid (leftmost) = totalBidCum,
-  // stepping down to A1 at the best bid (rightmost inner edge).
-  // We prepend a baseline point at [bestBid, 0] so the line traces the
-  // inner cliff down to 0 — this makes the inner vertical visible via lineStyle.
+  // stepping down to the best bid (rightmost inner edge).
+  // We prepend [lo, totalBidCum] so the staircase reaches the chart's left
+  // edge at full depth, and append [bestBid, 0] so the line traces the inner
+  // cliff down to 0.
   const bidData: [number, number][] = []
   if (hasBids) {
     const ascending = [...buyLevels].reverse() // worst→best
+    const totalBidCum = ascending[0].cum // cum at lowest bid = total bid volume
+    bidData.push([lo, totalBidCum])
     ascending.forEach((l) => bidData.push([l.price, l.cum]))
-    // Inner cliff anchor: drop to 0 at bestBid price
     const bestBid = buyLevels[0].price
     bidData.push([bestBid, 0])
   }
 
   // Asks: already sorted asc (best-ask first = lowest price first).
-  // We prepend a [bestAsk, 0] baseline anchor for the inner cliff.
+  // We prepend [bestAsk, 0] for the inner cliff, and append [hi, totalAskCum]
+  // so the staircase reaches the chart's right edge at full depth.
   const askData: [number, number][] = []
   if (hasAsks) {
     const bestAsk = sellLevels[0].price
     askData.push([bestAsk, 0])
     sellLevels.forEach((l) => askData.push([l.price, l.cum]))
+    const totalAskCum = sellLevels[sellLevels.length - 1].cum
+    askData.push([hi, totalAskCum])
   }
 
   const maxCum = Math.max(
@@ -358,12 +363,22 @@ const option = computed(() => {
         // Keep the middle three gridlines only — the bottom 0 row collides
         // with the xAxis row, and the topmost is too close to the chart edge.
         interval: (index: number) => index === 1 || index === 2 || index === 3,
-        formatter: (v: number) => (v > 0 ? fmtSatsCompact(v) : ''),
+        // Rich-text segments so the trailing sat symbol renders in the
+        // Satoshi Symbol font even though ECharts draws axis labels via
+        // canvas (no DOM, so no <SatSymbol /> here).
+        formatter: (v: number) => (v > 0 ? `${fmtSatsCompact(v, { bare: true })} {sat|!}` : ''),
         fontFamily: 'Inter Tight, sans-serif',
         fontSize: 10,
         color: 'oklch(0.5 0.005 80)',
         fontVariantNumeric: 'tabular-nums',
         margin: 8,
+        rich: {
+          sat: {
+            fontFamily: 'Satoshi Symbol, sans-serif',
+            fontSize: 10,
+            color: 'oklch(0.5 0.005 80)',
+          },
+        },
       },
       splitLine: {
         show: true,
@@ -412,7 +427,7 @@ const option = computed(() => {
         return [
           `<div style="color:${sideColor};font-weight:600;margin-bottom:3px">${sideLabel}</div>`,
           `<div>Price: <b>${fmtFiat(price, props.currency)}</b></div>`,
-          `<div>Depth: <b>${fmtSatsCompact(cum)}</b></div>`,
+          `<div>Depth: <b>${fmtSatsCompact(cum, { bare: true })} <span class="sat-symbol" aria-label="sats">!</span></b></div>`,
         ].join('')
       },
     },

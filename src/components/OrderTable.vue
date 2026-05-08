@@ -5,6 +5,7 @@ import type { Currency, Order } from '@/lib/types'
 import MethodChips from './MethodChips.vue'
 import SourceDot from './SourceDot.vue'
 import ReputationBar from './ReputationBar.vue'
+import SatSymbol from './SatSymbol.vue'
 
 const emit = defineEmits<{ select: [order: Order] }>()
 
@@ -107,7 +108,7 @@ function premColor(premium: number): string {
               <span class="pb-num-sep"> – </span>
               <span class="pb-num">{{ fmtFiat(o.maxFiat, o.currency, { bare: true }) }}</span>
             </td>
-            <td class="col-sats pb-num pb-num--muted">{{ fmtSatsCompact(o.amountSats) }}</td>
+            <td class="col-sats pb-num pb-num--muted">{{ fmtSatsCompact(o.amountSats, { bare: true }) }} <SatSymbol /></td>
             <td class="col-methods"><MethodChips :methods="o.methods" /></td>
             <td class="col-maker">
               <span class="pb-maker-handle">@{{ o.makerHandle }}</span>
