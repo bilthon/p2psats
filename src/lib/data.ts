@@ -1,6 +1,7 @@
-// data.ts — mock NIP-69 order book aggregator data
-// Faithful port of data.jsx. This module is the data adapter seam:
-// replace buildOrders() with a real nostr subscription adapter in a future pass.
+// data.ts — NIP-69 order book aggregator data and utilities.
+// The data adapter seam has been wired to a real nostr subscription via
+// src/lib/orderAdapter.ts (Phase 2). The mock builder (buildMockOrders) is
+// retained for unit tests and a future ?demo=1 flag.
 // Everything else (formatters, constants) stays stable.
 
 import type { Currency, Order, PaymentMethod, Source, SourceId } from './types'
@@ -49,6 +50,8 @@ export const SOURCES: Source[] = [
   { id: 'lnp2pbot',  label: 'lnp2pbot', relay: 'relay.lnp2pbot.com',     color: '#10B981' },
   { id: 'robosats',  label: 'robosats', relay: 'nostr.robosats.org',     color: '#F59E0B' },
   { id: 'peach',     label: 'peach',    relay: 'relay.peachbitcoin.com', color: '#EC4899' },
+  { id: 'hodlhodl',  label: 'hodlhodl', relay: '—',                      color: '#8B5CF6' },
+  { id: 'nostr',     label: 'nostr',    relay: '—',                      color: '#94A3B8' },
 ]
 
 export const PAYMENT_METHODS: PaymentMethod[] = [
@@ -97,9 +100,9 @@ const MAKER_HANDLES = [
   'kyo', 'ada', 'zk', 'nakamori', 'bramble', 'quill', 'kobold', 'fission',
 ]
 
-// Build the order set for a given currency. Premium is %-deviation from REF.
-// This is the data adapter seam — swap this function for a real nostr subscription.
-export function buildOrders(currency: Currency, count = 22, seed = 42): Order[] {
+// Build a mock order set for a given currency. Premium is %-deviation from REF.
+// Retained for unit tests and the ?demo=1 flag; real orders come via orderAdapter.ts.
+export function buildMockOrders(currency: Currency, count = 22, seed = 42): Order[] {
   const rng = mulberry32(seed + currency.charCodeAt(0) * 7)
   const ref = REF_RATES[currency]
   const orders: Order[] = []

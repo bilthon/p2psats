@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useAppStore } from '@/stores/appStore'
+import { useNostrOrderbookStore } from '@/services/nostrOrderbook'
 import { fmtFiat, fmtSatsCompact, REF_RATES } from '@/lib/data'
 import ArbitrageBanner from '@/components/ArbitrageBanner.vue'
 import DepthChart from '@/components/DepthChart.vue'
@@ -8,6 +9,7 @@ import OrderBook from '@/components/OrderBook.vue'
 import CrossedPairsList from '@/components/CrossedPairsList.vue'
 
 const store = useAppStore()
+const nostr = useNostrOrderbookStore()
 
 // Ref for the crossed-pairs section for smooth scroll
 const crossRef = ref<HTMLElement | null>(null)
@@ -15,6 +17,22 @@ const crossRef = ref<HTMLElement | null>(null)
 function jumpToCrossed() {
   crossRef.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
+
+onMounted(() => {
+  nostr.connect()
+})
+
+onUnmounted(() => {
+  nostr.disconnect()
+})
+
+// Relay status tooltip: "N/M relays connected"
+const relayTooltip = computed(() => {
+  const statuses = Object.values(nostr.relayStatus)
+  const total = statuses.length
+  const openCount = statuses.filter((s) => s === 'open' || s === 'eosed').length
+  return `${openCount}/${total} relays connected`
+})
 </script>
 
 <template>
@@ -85,17 +103,9 @@ function jumpToCrossed() {
       <div class="pb-stat-sub">across all asks</div>
     </div>
 
-    <div class="pb-live-pill" title="Subscribed to relays via NIP-69">
+    <div class="pb-live-pill" :title="relayTooltip">
       <span class="pb-live-dot" />
       live · {{ store.ccyOrders.length }} orders
-      <span
-        v-if="store.demoPhase !== 'full'"
-        :style="{
-          marginLeft: '6px',
-          color: 'oklch(0.5 0.1 55)',
-          fontWeight: 600,
-        }"
-      >· demo: {{ store.demoPhase }}</span>
     </div>
   </section>
 

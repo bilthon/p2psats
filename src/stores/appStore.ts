@@ -3,9 +3,11 @@
 
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { CCY_LIST, buildOrders, methodsForCurrency, midPrice } from '@/lib/data'
+import { CCY_LIST, methodsForCurrency, midPrice } from '@/lib/data'
 import { detectCrosses } from '@/lib/arbitrage'
 import { matchesRule } from '@/lib/alerts'
+import { useNostrOrderbookStore } from '@/services/nostrOrderbook'
+import { toVueOrder } from '@/lib/orderAdapter'
 import type { Alert, Currency, Order, TweakValues } from '@/lib/types'
 
 // pe.page is intentionally omitted — the route URL is the source of truth for
@@ -57,37 +59,21 @@ export const useAppStore = defineStore('app', () => {
     readStorage<TweakValues['bookView']>(PE_KEYS.bookView, 'split'),
   )
 
-  // ── Tick seed (in-memory only — drives mocked refresh) ───────────────────
-  const tickSeed = ref(0)
-
-  // ── DEMO: empty-side rotation ────────────────────────────────────────────
-  // Cycles the active currency's book through {full, bid-only, ask-only,
-  // empty} on every tick so the UI's null-mid / one-sided behavior is visible.
-  // Remove this block (and `demoPhase` from the return) when wiring real nostr.
-  const DEMO_PHASES = ['full', 'bid-only', 'ask-only', 'empty'] as const
-  type DemoPhase = (typeof DEMO_PHASES)[number]
-  const demoPhase = computed<DemoPhase>(
-    () => DEMO_PHASES[tickSeed.value % DEMO_PHASES.length] ?? 'full',
-  )
-
   // ── Derived / computed ───────────────────────────────────────────────────
 
+  // allOrders reads from the live nostr orderbook store.
   const allOrders = computed<Order[]>(() => {
-    const all: Order[] = []
-    const seed = 100 + tickSeed.value
-    const phase = demoPhase.value
-    CCY_LIST.forEach((c) => {
-      const isActive = c === currency.value
-      const count = isActive ? 9 : 2
-      let orders = buildOrders(c, count, seed)
-      if (isActive) {
-        if (phase === 'bid-only') orders = orders.filter((o) => o.side === 'buy')
-        else if (phase === 'ask-only') orders = orders.filter((o) => o.side === 'sell')
-        else if (phase === 'empty') orders = []
-      }
-      orders.forEach((o) => all.push(o))
-    })
-    return all
+    const nostr = useNostrOrderbookStore()
+    const result: Order[] = []
+    // Pinia setup stores auto-unwrap refs via the store proxy, so `nostr.orders`
+    // is the Map directly (no `.value`). Reactivity still fires from
+    // triggerRef() inside the orderbook store.
+    for (const [key, raw] of nostr.orders.entries()) {
+      const relay = nostr.seenOn.get(key) ?? 'nostr'
+      const vue = toVueOrder(raw, relay)
+      if (vue !== null) result.push(vue)
+    }
+    return result
   })
 
   const ccyOrders = computed<Order[]>(() =>
@@ -169,10 +155,6 @@ export const useAppStore = defineStore('app', () => {
     writeStorage(PE_KEYS.alerts, alerts.value)
   }
 
-  function advanceTick() {
-    tickSeed.value++
-  }
-
   // Tweaks setters
   function setDensity(v: TweakValues['density']) {
     density.value = v
@@ -202,8 +184,6 @@ export const useAppStore = defineStore('app', () => {
     currency,
     activeSources,
     alerts,
-    tickSeed,
-    demoPhase,
     density,
     showPremium,
     highlightAccent,
@@ -231,7 +211,6 @@ export const useAppStore = defineStore('app', () => {
     addAlert,
     removeAlert,
     toggleAlert,
-    advanceTick,
     setDensity,
     setShowPremium,
     setHighlightAccent,

@@ -1,6 +1,6 @@
 // Core domain types for P2P Explorer (NIP-69 orderbook)
 
-export type SourceId = 'mostro' | 'lnp2pbot' | 'robosats' | 'peach';
+export type SourceId = 'mostro' | 'lnp2pbot' | 'robosats' | 'peach' | 'hodlhodl' | 'nostr';
 export type Side = 'buy' | 'sell';
 export type Currency = 'USD' | 'EUR' | 'BRL' | 'ARS' | 'MXN' | 'VES' | 'ZAR' | 'RUB' | 'PEN';
 

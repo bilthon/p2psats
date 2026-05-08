@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { RouterView, useRouter, useRoute } from 'vue-router'
 import { useAppStore } from '@/stores/appStore'
-import { useTick } from '@/composables/useTick'
 import CurrencySwitcher from '@/components/CurrencySwitcher.vue'
 import RelayStatus from '@/components/RelayStatus.vue'
 import TweaksPanel from '@/components/TweaksPanel.vue'
@@ -10,9 +9,6 @@ import type { Currency } from '@/lib/types'
 const store = useAppStore()
 const router = useRouter()
 const route = useRoute()
-
-// Start the 12s data tick at the top level so it runs regardless of which view is active.
-useTick()
 
 function navigateTo(page: 'book' | 'alerts') {
   void router.push('/' + page)
