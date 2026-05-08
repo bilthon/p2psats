@@ -361,58 +361,68 @@ button { font-family: inherit; cursor: pointer; }
 
 .pb-table {
   --row-h: 36px;
-  display: flex; flex-direction: column;
   font-size: 13px;
+  max-height: 452px;        /* 420 rows + 32 thead */
+  overflow: auto;           /* shared head+body scroll context */
 }
-.pb-thead, .pb-row {
-  display: grid;
-  grid-template-columns:
-    minmax(110px, 1fr)         /* price */
-    100px                       /* premium */
-    minmax(160px, 1.4fr)        /* amount range */
-    90px                        /* sats */
-    minmax(180px, 1.6fr)        /* methods */
-    minmax(110px, 1fr)          /* maker */
-    100px                       /* rep */
-    110px                       /* source */
-    60px;                       /* age */
-  align-items: center;
-  gap: 12px;
-  padding: 0 16px;
+.pb-table-grid {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: max-content;
+  min-width: 100%;
+  table-layout: fixed;
 }
-.pb-table:not(:has(.col-prem)) .pb-thead,
-.pb-table:not(:has(.col-prem)) .pb-row {
-  grid-template-columns:
-    minmax(110px, 1fr) minmax(160px, 1.4fr) 90px minmax(180px, 1.6fr) minmax(110px, 1fr) 100px 110px 60px;
-}
-.pb-thead {
+.pb-table-grid col.col-price { width: 130px; }
+.pb-table-grid col.col-prem { width: 100px; }
+.pb-table-grid col.col-amount { width: 180px; }
+.pb-table-grid col.col-sats { width: 90px; }
+.pb-table-grid col.col-methods { width: 220px; }
+.pb-table-grid col.col-maker { width: 130px; }
+.pb-table-grid col.col-rep { width: 100px; }
+.pb-table-grid col.col-src { width: 120px; }
+.pb-table-grid col.col-age { width: 60px; }
+.pb-thead th {
   height: 32px;
   background: var(--bg-soft);
   border-bottom: 1px solid var(--line);
   font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em;
   color: var(--ink-mute); font-weight: 600;
+  text-align: left;
+  position: sticky;         /* stays pinned during vertical scroll */
+  top: 0;
+  z-index: 2;
 }
-.pb-tbody { max-height: 420px; overflow-y: auto; }
+.pb-thead th,
+.pb-row td {
+  padding: 0 6px;
+  white-space: nowrap;
+}
+.pb-thead tr > :first-child,
+.pb-row > :first-child {
+  padding-left: 16px;
+}
+.pb-thead tr > :last-child,
+.pb-row > :last-child {
+  padding-right: 16px;
+}
 .pb-row {
   position: relative;
-  height: var(--row-h);
-  border-bottom: 1px solid var(--line-soft);
   font-variant-numeric: tabular-nums;
 }
-.pb-row:last-child { border-bottom: none; }
-.pb-row:hover .pb-row-bg { opacity: 1.6; }
-.pb-row > * { position: relative; z-index: 1; }
-.pb-row-bg {
-  position: absolute; inset: 0; z-index: 0;
-  pointer-events: none;
-  transition: opacity 120ms;
+.pb-row td {
+  height: var(--row-h);
+  border-bottom: 1px solid var(--line-soft);
+  vertical-align: middle;
+  background: transparent;
 }
+.pb-row:last-child td { border-bottom: none; }
+.pb-row:hover td { filter: brightness(0.985); }
 .col-price { font-family: var(--font-mono); font-weight: 600; }
 .col-prem  { font-family: var(--font-mono); }
 .col-amount { font-family: var(--font-mono); font-size: 12.5px; color: var(--ink-soft); }
 .col-amount .pb-num-sep { color: var(--ink-mute); }
 .col-sats { font-family: var(--font-mono); }
-.col-methods { display: flex; align-items: center; }
+.pb-tbody td.col-methods { display: flex; align-items: center; }
 .col-maker { font-family: var(--font-mono); font-size: 12px; color: var(--ink-soft); }
 .col-age { font-family: var(--font-mono); font-size: 12px; }
 
@@ -707,11 +717,8 @@ button { font-family: inherit; cursor: pointer; }
 .pb-arb-cta:hover { background: oklch(0.15 0.01 80); }
 
 /* ── Crossed row marker ───────────────────────────────── */
-.pb-row--crossed { background: oklch(0.97 0.015 65); }
-.pb-row--crossed::before {
-  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
-  width: 2px; background: oklch(0.7 0.08 60);
-}
+.pb-row--crossed td { background-color: oklch(0.97 0.015 65 / 0.7); }
+.pb-row--crossed td:first-child { box-shadow: inset 2px 0 0 oklch(0.7 0.08 60); }
 .pb-cross-mark {
   display: inline-block;
   margin-right: 4px;
@@ -867,10 +874,10 @@ button { font-family: inherit; cursor: pointer; }
   .pb-header { grid-template-columns: 1fr; gap: 16px; }
   .pb-relays { justify-self: start; }
   .pb-header-right { justify-self: start; }
-  .pb-thead, .pb-row {
-    grid-template-columns: 1fr 80px 110px 60px;
-    gap: 8px;
-  }
+  .pb-table-grid col.col-price { width: auto; }
+  .pb-table-grid col.col-prem { width: 80px; }
+  .pb-table-grid col.col-src { width: 110px; }
+  .pb-table-grid col.col-age { width: 60px; }
   .pb-table .col-amount, .pb-table .col-methods, .pb-table .col-maker,
   .pb-table .col-sats, .pb-table .col-rep { display: none; }
   .pb-stats { grid-template-columns: repeat(2, 1fr); }

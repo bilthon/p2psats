@@ -46,68 +46,80 @@ function premColor(premium: number): string {
     </div>
 
     <div class="pb-table" :style="{ '--row-h': rowH + 'px' }">
-      <div class="pb-thead">
-        <div class="col-price">Price</div>
-        <div v-if="showPremium" class="col-prem">Premium</div>
-        <div class="col-amount">Amount range</div>
-        <div class="col-sats">Sats</div>
-        <div class="col-methods">Payment</div>
-        <div class="col-maker">Maker</div>
-        <div class="col-rep">Rep</div>
-        <div class="col-src">Source</div>
-        <div class="col-age">Age</div>
-      </div>
-      <div class="pb-tbody">
-        <div
-          v-for="o in orders"
-          :key="o.id"
-          :class="['pb-row', crossedIds.has(o.id) ? 'pb-row--crossed' : '']"
-          style="cursor: pointer"
-          role="button"
-          tabindex="0"
-          @click="emit('select', o)"
-          @keydown.enter.prevent="emit('select', o)"
-          @keydown.space.prevent="emit('select', o)"
-        >
-          <div
-            class="pb-row-bg"
+      <table class="pb-table-grid">
+        <colgroup>
+          <col class="col-price" />
+          <col v-if="showPremium" class="col-prem" />
+          <col class="col-amount" />
+          <col class="col-sats" />
+          <col class="col-methods" />
+          <col class="col-maker" />
+          <col class="col-rep" />
+          <col class="col-src" />
+          <col class="col-age" />
+        </colgroup>
+        <thead class="pb-thead">
+          <tr>
+            <th class="col-price">Price</th>
+            <th v-if="showPremium" class="col-prem">Premium</th>
+            <th class="col-amount">Amount range</th>
+            <th class="col-sats">Sats</th>
+            <th class="col-methods">Payment</th>
+            <th class="col-maker">Maker</th>
+            <th class="col-rep">Rep</th>
+            <th class="col-src">Source</th>
+            <th class="col-age">Age</th>
+          </tr>
+        </thead>
+        <tbody class="pb-tbody">
+          <tr
+            v-for="o in orders"
+            :key="o.id"
+            :class="['pb-row', crossedIds.has(o.id) ? 'pb-row--crossed' : '']"
+            style="cursor: pointer"
+            role="button"
+            tabindex="0"
             :style="{
               background: `linear-gradient(to ${side === 'buy' ? 'right' : 'left'}, ${sideTint} ${(o.amountSats / maxAmt) * 100}%, transparent ${(o.amountSats / maxAmt) * 100}%)`,
             }"
-          />
-          <div class="col-price" :style="{ color: sideColor, fontWeight: '600' }">
-            <span v-if="crossedIds.has(o.id)" class="pb-cross-mark" title="Price crosses an order on the other side">⚡</span>
-            {{ fmtFiat(o.price, o.currency, { bare: true }) }}
-          </div>
-          <div v-if="showPremium" class="col-prem">
-            <span
-              :style="{
-                fontFamily: 'IBM Plex Mono, monospace',
-                fontSize: '11px',
-                fontWeight: '500',
-                color: premColor(o.premium),
-                fontVariantNumeric: 'tabular-nums',
-              }"
-              >{{ o.premium > 0 ? '+' : '' }}{{ o.premium.toFixed(2) }}%</span
-            >
-          </div>
-          <div class="col-amount">
-            <span class="pb-num">{{ fmtFiat(o.minFiat, o.currency) }}</span>
-            <span class="pb-num-sep"> – </span>
-            <span class="pb-num">{{ fmtFiat(o.maxFiat, o.currency, { bare: true }) }}</span>
-          </div>
-          <div class="col-sats pb-num pb-num--muted">{{ fmtSatsCompact(o.amountSats) }}</div>
-          <div class="col-methods"><MethodChips :methods="o.methods" /></div>
-          <div class="col-maker">
-            <span class="pb-maker-handle">@{{ o.makerHandle }}</span>
-          </div>
-          <div class="col-rep">
-            <ReputationBar :completion="o.completion" :trades="o.trades" />
-          </div>
-          <div class="col-src"><SourceDot :source="o.source" /></div>
-          <div class="col-age pb-num pb-num--muted">{{ fmtTimeShort(o.ageMin) }}</div>
-        </div>
-      </div>
+            @click="emit('select', o)"
+            @keydown.enter.prevent="emit('select', o)"
+            @keydown.space.prevent="emit('select', o)"
+          >
+            <td class="col-price" :style="{ color: sideColor, fontWeight: '600' }">
+              <span v-if="crossedIds.has(o.id)" class="pb-cross-mark" title="Price crosses an order on the other side">⚡</span>
+              {{ fmtFiat(o.price, o.currency, { bare: true }) }}
+            </td>
+            <td v-if="showPremium" class="col-prem">
+              <span
+                :style="{
+                  fontFamily: 'IBM Plex Mono, monospace',
+                  fontSize: '11px',
+                  fontWeight: '500',
+                  color: premColor(o.premium),
+                  fontVariantNumeric: 'tabular-nums',
+                }"
+                >{{ o.premium > 0 ? '+' : '' }}{{ o.premium.toFixed(2) }}%</span
+              >
+            </td>
+            <td class="col-amount">
+              <span class="pb-num">{{ fmtFiat(o.minFiat, o.currency) }}</span>
+              <span class="pb-num-sep"> – </span>
+              <span class="pb-num">{{ fmtFiat(o.maxFiat, o.currency, { bare: true }) }}</span>
+            </td>
+            <td class="col-sats pb-num pb-num--muted">{{ fmtSatsCompact(o.amountSats) }}</td>
+            <td class="col-methods"><MethodChips :methods="o.methods" /></td>
+            <td class="col-maker">
+              <span class="pb-maker-handle">@{{ o.makerHandle }}</span>
+            </td>
+            <td class="col-rep">
+              <ReputationBar :completion="o.completion" :trades="o.trades" />
+            </td>
+            <td class="col-src"><SourceDot :source="o.source" /></td>
+            <td class="col-age pb-num pb-num--muted">{{ fmtTimeShort(o.ageMin) }}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </template>
