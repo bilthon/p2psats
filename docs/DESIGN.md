@@ -34,7 +34,7 @@ Layout (top to bottom, all in a single-column 1440px max-width column with 28px 
 2. **Page nav** — pill-style segmented control with two tabs: "Order book" / "Alerts". Each tab shows a live count badge.
 3. **Stats strip** — 6 stat chips + a "live · N orders" pill: Mid price, Best bid (green), Best ask (red), Spread (turns amber + ⚡ when crossed), Bid depth (sats), Ask depth (sats).
 4. **Arbitrage banner** — full-width card. Green "✓ Book is consistent" state when no crosses; soft cream "N crossed pairs detected" alert state with best-opportunity stats and a "Jump to detail" button when crosses exist.
-5. **Depth chart card** — header has tabs for two styles: Stacked / Heatmap. Crossed orders surfaced as a subtle dashed band ("crossed" label) inside the chart.
+5. **Depth chart card** — cumulative-depth area chart with hover tooltip; surfaces crossed orders as a dashed band overlay ("crossed" label). Built on echarts (tree-shaken) via vue-echarts.
 6. **Order book card** — header has tabs for layout: Tabs (single list with Bids/Asks toggle) / Split (two columns side-by-side) / Stack (bids above asks). Each row: price · amount · sats · payment-method chips · maker name · reputation · age. Crossed rows get a soft amber tint, a 2px left stripe, and a ⚡ marker before the price.
 7. **Crossed pairs detail card** — only shown when crosses exist. Lists each (ASK leg → BID leg) pair with spread (% and absolute), highlighting "tractable" pairs (shared payment method + different platforms).
 8. **Footer** — single-line, muted.
@@ -89,11 +89,19 @@ Three modes (persisted as `bookView` Tweak):
 - `split` — bids and asks side by side in two columns. Default.
 - `stacked` — asks above (descending price), bids below (descending price), classic depth-table feel.
 
-### Depth chart styles (persisted as `depthStyle` Tweak)
-- `stacked` — cumulative volume curves on a shared price axis. Crossed zone shown as a subtle dashed band between best ask and best bid.
-- `heatmap` — price-bucket heatmap, color intensity = volume.
+### Depth chart
 
-> A third `mirrored` style existed in the original handoff (bids and asks as opposing area charts around a vertical mid-price axis). It was removed because each half was independently scaled to its own price range, so the chart couldn't visually represent a crossed book — the crossing collapsed onto the central axis.
+The depth chart is a single-mode cumulative-area visualization built with echarts (tree-shaken) + vue-echarts. Bids render as a green step-line area on the left; asks as a red step-line area on the right, sharing a common price x-axis. Additional features:
+
+- **Mid line**: dashed vertical line at mid price when both sides exist.
+- **Crossed zone**: subtle dashed amber band overlay when `crosses.pairs.length > 0`.
+- **Edge fade**: outer 15% of each side fades to transparency via a horizontal LinearGradient.
+- **Hover tooltip**: shows price (`fmtFiat`) and cumulative depth (`fmtSatsCompact`) for the nearest side.
+- **Domain shifting**: when only one side is present, the domain extends the empty side so the populated side occupies only its own half of the chart.
+
+> A `mirrored` style existed in the original handoff (bids and asks as opposing area charts around a vertical mid-price axis). It was removed because each half was independently scaled to its own price range, so the chart couldn't visually represent a crossed book — the crossing collapsed onto the central axis.
+
+> A `heatmap` style (price-bucket heatmap, color intensity = volume) existed in the SVG implementation. It was removed in favor of a single-mode echarts-based cumulative-area visual.
 
 ### Alert rule semantics
 A rule matches an order when ALL apply:
@@ -112,7 +120,6 @@ The prototype only counts matches in-page. Production needs a backend: persist r
 
 ### Tweaks panel
 A floating panel users open via toolbar toggle, exposing design knobs:
-- Depth chart style (stacked / heatmap)
 - Order book density (compact / balanced / comfy) — adjusts row padding/font-size
 - Order book layout (tabs / split / stack)
 - Show premium column (toggle)
@@ -127,7 +134,7 @@ Persisted to localStorage:
 - `pe.sources` — string[]
 - `pe.alerts` — Alert[]
 - `pe.page` — 'book' | 'alerts'
-- Tweaks panel keys (depthStyle, density, showPremium, highlightAccent, bookView)
+- Tweaks panel keys (density, showPremium, highlightAccent, bookView)
 
 In-memory:
 - `tickSeed` — drives the mocked refresh

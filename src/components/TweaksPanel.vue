@@ -78,29 +78,6 @@ function toOpts(options: Array<string | RadioOption>): RadioOption[] {
         <button class="twk-x" aria-label="Close tweaks" @mousedown.stop @click="open = false">✕</button>
       </div>
       <div class="twk-body">
-        <!-- Depth chart section -->
-        <div class="twk-sect">Depth chart</div>
-        <div class="twk-row">
-          <div class="twk-lbl"><span>Style</span></div>
-          <div class="twk-seg">
-            <button
-              v-for="o in toOpts([{value:'stacked',label:'Stack'},{value:'heatmap',label:'Heat'}])"
-              :key="o.value"
-              type="button"
-              role="radio"
-              :aria-checked="store.depthStyle === o.value"
-              @click="store.setDepthStyle(o.value as 'stacked' | 'heatmap')"
-            >{{ o.label }}</button>
-            <div
-              class="twk-seg-thumb"
-              :style="{
-                left: `calc(2px + ${['stacked','heatmap'].indexOf(store.depthStyle)} * (100% - 4px) / 2)`,
-                width: 'calc((100% - 4px) / 2)',
-              }"
-            />
-          </div>
-        </div>
-
         <!-- Order book section -->
         <div class="twk-sect">Order book</div>
         <div class="twk-row">

@@ -14,7 +14,6 @@ const PE_KEYS = {
   currency: 'pe.currency',
   sources: 'pe.sources',
   alerts: 'pe.alerts',
-  depthStyle: 'pe.depthStyle',
   density: 'pe.density',
   showPremium: 'pe.showPremium',
   highlightAccent: 'pe.highlightAccent',
@@ -47,11 +46,6 @@ export const useAppStore = defineStore('app', () => {
   const alerts = ref<Alert[]>(readStorage<Alert[]>(PE_KEYS.alerts, []))
 
   // Tweaks
-  // The legacy 'mirrored' depth style was removed; coerce stale stored values.
-  const storedDepthStyle = readStorage<string>(PE_KEYS.depthStyle, 'stacked')
-  const depthStyle = ref<TweakValues['depthStyle']>(
-    storedDepthStyle === 'heatmap' ? 'heatmap' : 'stacked',
-  )
   const density = ref<TweakValues['density']>(
     readStorage<TweakValues['density']>(PE_KEYS.density, 'balanced'),
   )
@@ -180,10 +174,6 @@ export const useAppStore = defineStore('app', () => {
   }
 
   // Tweaks setters
-  function setDepthStyle(v: TweakValues['depthStyle']) {
-    depthStyle.value = v
-    writeStorage(PE_KEYS.depthStyle, v)
-  }
   function setDensity(v: TweakValues['density']) {
     density.value = v
     writeStorage(PE_KEYS.density, v)
@@ -214,7 +204,6 @@ export const useAppStore = defineStore('app', () => {
     alerts,
     tickSeed,
     demoPhase,
-    depthStyle,
     density,
     showPremium,
     highlightAccent,
@@ -243,7 +232,6 @@ export const useAppStore = defineStore('app', () => {
     removeAlert,
     toggleAlert,
     advanceTick,
-    setDepthStyle,
     setDensity,
     setShowPremium,
     setHighlightAccent,
