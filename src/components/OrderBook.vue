@@ -14,7 +14,7 @@ const props = defineProps<{
   crossedSellIds: Set<string>
 }>()
 
-const emit = defineEmits<{ changeView: [v: BookView] }>()
+const emit = defineEmits<{ changeView: [v: BookView]; select: [order: Order] }>()
 
 const activeTab = ref<'buy' | 'sell'>('buy')
 
@@ -107,6 +107,7 @@ const VIEW_OPTIONS: Array<{ v: BookView; l: string }> = [
         :side-color="BID_COLOR"
         :side-tint="BID_TINT"
         :embedded="true"
+        @select="emit('select', $event)"
       />
       <OrderTable
         title="Asks"
@@ -119,6 +120,7 @@ const VIEW_OPTIONS: Array<{ v: BookView; l: string }> = [
         :side-color="ASK_COLOR"
         :side-tint="ASK_TINT"
         :embedded="true"
+        @select="emit('select', $event)"
       />
     </div>
 
@@ -135,6 +137,7 @@ const VIEW_OPTIONS: Array<{ v: BookView; l: string }> = [
         :side-color="BID_COLOR"
         :side-tint="BID_TINT"
         :embedded="true"
+        @select="emit('select', $event)"
       />
       <OrderTable
         title="Asks"
@@ -147,6 +150,7 @@ const VIEW_OPTIONS: Array<{ v: BookView; l: string }> = [
         :side-color="ASK_COLOR"
         :side-tint="ASK_TINT"
         :embedded="true"
+        @select="emit('select', $event)"
       />
     </div>
 
@@ -164,6 +168,7 @@ const VIEW_OPTIONS: Array<{ v: BookView; l: string }> = [
       :side-tint="activeTab === 'buy' ? BID_TINT : ASK_TINT"
       :embedded="true"
       :hide-title="true"
+      @select="emit('select', $event)"
     />
   </section>
 </template>

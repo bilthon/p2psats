@@ -6,6 +6,8 @@ import MethodChips from './MethodChips.vue'
 import SourceDot from './SourceDot.vue'
 import ReputationBar from './ReputationBar.vue'
 
+const emit = defineEmits<{ select: [order: Order] }>()
+
 const props = defineProps<{
   title: string
   side: 'buy' | 'sell'
@@ -60,6 +62,12 @@ function premColor(premium: number): string {
           v-for="o in orders"
           :key="o.id"
           :class="['pb-row', crossedIds.has(o.id) ? 'pb-row--crossed' : '']"
+          style="cursor: pointer"
+          role="button"
+          tabindex="0"
+          @click="emit('select', o)"
+          @keydown.enter.prevent="emit('select', o)"
+          @keydown.space.prevent="emit('select', o)"
         >
           <div
             class="pb-row-bg"

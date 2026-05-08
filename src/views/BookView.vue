@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useAppStore } from '@/stores/appStore'
 import { useNostrOrderbookStore } from '@/services/nostrOrderbook'
 import { fmtFiat, fmtSatsCompact, REF_RATES } from '@/lib/data'
@@ -7,6 +7,8 @@ import ArbitrageBanner from '@/components/ArbitrageBanner.vue'
 import DepthChart from '@/components/DepthChart.vue'
 import OrderBook from '@/components/OrderBook.vue'
 import CrossedPairsList from '@/components/CrossedPairsList.vue'
+import OrderDetailDialog from '@/components/OrderDetailDialog.vue'
+import type { Order } from '@/lib/types'
 
 const store = useAppStore()
 const nostr = useNostrOrderbookStore()
@@ -33,6 +35,30 @@ const relayTooltip = computed(() => {
   const openCount = statuses.filter((s) => s === 'open' || s === 'eosed').length
   return `${openCount}/${total} relays connected`
 })
+
+// ── Order detail dialog ──────────────────────────────────────────────────────
+
+const selectedOrder = ref<Order | null>(null)
+
+// Pinia auto-unwraps shallowRefs through the store proxy, so nostr.orders and
+// nostr.events are the Maps directly — no .value needed in computed consumers.
+const rawForSelected = computed(() =>
+  selectedOrder.value
+    ? nostr.orders.get(`${selectedOrder.value.maker}:${selectedOrder.value.id}`)
+    : undefined,
+)
+
+const eventForSelected = computed(() =>
+  selectedOrder.value
+    ? nostr.events.get(`${selectedOrder.value.maker}:${selectedOrder.value.id}`)
+    : undefined,
+)
+
+// Clear stale dialog when the user switches currency.
+watch(
+  () => store.currency,
+  () => { selectedOrder.value = null },
+)
 </script>
 
 <template>
@@ -141,10 +167,20 @@ const relayTooltip = computed(() => {
     :crossed-buy-ids="store.crosses.crossedBuyIds"
     :crossed-sell-ids="store.crosses.crossedSellIds"
     @change-view="store.setBookView"
+    @select="selectedOrder = $event"
   />
 
   <!-- Crossed pairs detail -->
   <div ref="crossRef">
     <CrossedPairsList :crosses="store.crosses" :currency="store.currency" />
   </div>
+
+  <!-- Order detail dialog (teleports to body) -->
+  <OrderDetailDialog
+    v-if="selectedOrder"
+    :order="selectedOrder"
+    :raw="rawForSelected"
+    :event="eventForSelected"
+    @close="selectedOrder = null"
+  />
 </template>

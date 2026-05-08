@@ -37,6 +37,12 @@ export const useNostrOrderbookStore = defineStore('nostrOrderbook', () => {
   // event.
   const orders = shallowRef<Map<string, RawNip69Order>>(new Map())
 
+  // Raw nostr Event objects, keyed identically to `orders`. Consumers that
+  // need the full event (e.g. OrderDetailDialog's JSON view) read from here.
+  // triggerRef(events) is called alongside triggerRef(orders) in scheduleFlush
+  // so both refs fire in the same microtask batch.
+  const events = shallowRef<Map<string, Event>>(new Map())
+
   // First relay URL that delivered each order (same key as `orders`). Powers
   // the per-row "source relay" UI without changing the parsed-order shape.
   const seenOn = shallowRef<Map<string, string>>(new Map())
@@ -58,6 +64,7 @@ export const useNostrOrderbookStore = defineStore('nostrOrderbook', () => {
     flushHandle = setTimeout(() => {
       flushHandle = null
       triggerRef(orders)
+      triggerRef(events)
     }, 50)
   }
 
@@ -93,6 +100,7 @@ export const useNostrOrderbookStore = defineStore('nostrOrderbook', () => {
     }
 
     orders.value.set(key, parsed)
+    events.value.set(key, ev)
     // Attribute the order to the first relay we saw it on. SimplePool
     // populates `seenOn` only when `trackRelays = true` (set in connect()),
     // and does so before calling onevent — so the lookup is safe here.
@@ -109,13 +117,20 @@ export const useNostrOrderbookStore = defineStore('nostrOrderbook', () => {
     const nowSec = Date.now() / 1000
     let mutated = false
     for (const [key, o] of orders.value) {
-      if (o.expiresAt !== undefined && o.expiresAt < nowSec) {
+      // Effective expiry: NIP-69 `expires_at` first, NIP-40 `expiration` as
+      // fallback. Both are unix timestamps in seconds.
+      const exp = o.expiresAt ?? o.expiration
+      if (exp !== undefined && exp < nowSec) {
         orders.value.delete(key)
+        events.value.delete(key)
         seenOn.value.delete(key)
         mutated = true
       }
     }
-    if (mutated) triggerRef(orders)
+    if (mutated) {
+      triggerRef(orders)
+      triggerRef(events)
+    }
   }
 
   // ── Actions ──────────────────────────────────────────────────────────────
@@ -205,6 +220,7 @@ export const useNostrOrderbookStore = defineStore('nostrOrderbook', () => {
   return {
     // state
     orders,
+    events,
     seenOn,
     relayStatus,
     lastEventAt,
