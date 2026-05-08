@@ -87,6 +87,10 @@ function parseRating(rating: unknown): { reputation: number; completion: number;
 }
 
 export function toVueOrder(raw: RawNip69Order, sourceRelay: string): Order | null {
+  // Only live, fillable orders should reach the depth chart and tables.
+  // Canceled / in-progress / success / expired orders are dropped here.
+  if (raw.status !== 'pending') return null
+
   // Filter to known currencies only
   const ccy = raw.fiatCode as Currency
   if (!CCY_LIST.includes(ccy)) return null
