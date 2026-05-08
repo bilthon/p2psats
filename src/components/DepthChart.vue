@@ -267,7 +267,11 @@ const option = computed(() => {
     name: 'bids',
     type: 'line' as const,
     data: bidData,
-    step: 'end' as const,
+    // Bid cumulative depth at price P = sum of bids with price >= P.
+    // bidData is ordered ascending (worst→best); 'start' makes each plateau
+    // take the higher-priced (right) point's y-value, which is the correct
+    // cumulative for any price between two adjacent bid levels.
+    step: 'start' as const,
     smooth: false,
     symbol: 'none',
     areaStyle: { color: bidAreaGrad },
@@ -286,7 +290,11 @@ const option = computed(() => {
     name: 'asks',
     type: 'line' as const,
     data: askData,
-    step: 'start' as const,
+    // Ask cumulative depth at price P = sum of asks with price <= P.
+    // askData is ordered ascending (best→worst); 'end' makes each plateau
+    // carry the earlier (left) point's y-value forward to the next x, which
+    // is the correct cumulative for any price between two adjacent ask levels.
+    step: 'end' as const,
     smooth: false,
     symbol: 'none',
     areaStyle: { color: askAreaGrad },
