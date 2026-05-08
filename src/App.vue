@@ -1,14 +1,31 @@
 <script setup lang="ts">
+import { onMounted, onUnmounted } from 'vue'
 import { RouterView, useRouter, useRoute } from 'vue-router'
 import { useAppStore } from '@/stores/appStore'
+import { useNostrOrderbookStore } from '@/services/nostrOrderbook'
+import { useBtcRatesStore } from '@/services/btcRates'
 import CurrencySwitcher from '@/components/CurrencySwitcher.vue'
 import RelayStatus from '@/components/RelayStatus.vue'
 import TweaksPanel from '@/components/TweaksPanel.vue'
 import type { Currency } from '@/lib/types'
 
 const store = useAppStore()
+const nostr = useNostrOrderbookStore()
+const btcRates = useBtcRatesStore()
 const router = useRouter()
 const route = useRoute()
+
+// App-level data lifecycle — both the relay subscription and the rate poller
+// stay alive across route changes (alerts page also consumes orders + prices).
+onMounted(() => {
+  nostr.connect()
+  btcRates.start()
+})
+
+onUnmounted(() => {
+  nostr.disconnect()
+  btcRates.stop()
+})
 
 function navigateTo(page: 'book' | 'alerts') {
   void router.push('/' + page)

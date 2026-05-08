@@ -3,10 +3,11 @@
 
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { CCY_LIST, methodsForCurrency, midPrice } from '@/lib/data'
+import { methodsForCurrency, midPrice } from '@/lib/data'
 import { detectCrosses } from '@/lib/arbitrage'
 import { matchesRule } from '@/lib/alerts'
 import { useNostrOrderbookStore } from '@/services/nostrOrderbook'
+import { useBtcRatesStore } from '@/services/btcRates'
 import { toVueOrder } from '@/lib/orderAdapter'
 import type { Alert, Currency, Order, TweakValues } from '@/lib/types'
 
@@ -61,16 +62,17 @@ export const useAppStore = defineStore('app', () => {
 
   // ── Derived / computed ───────────────────────────────────────────────────
 
-  // allOrders reads from the live nostr orderbook store.
+  // allOrders reads from the live nostr orderbook store and resolves each
+  // order's price using the live yadio rate (or the static fallback until the
+  // rates store has fetched).
   const allOrders = computed<Order[]>(() => {
     const nostr = useNostrOrderbookStore()
+    const btcRates = useBtcRatesStore()
     const result: Order[] = []
-    // Pinia setup stores auto-unwrap refs via the store proxy, so `nostr.orders`
-    // is the Map directly (no `.value`). Reactivity still fires from
-    // triggerRef() inside the orderbook store.
     for (const [key, raw] of nostr.orders.entries()) {
       const relay = nostr.seenOn.get(key) ?? 'nostr'
-      const vue = toVueOrder(raw, relay)
+      const liveRate = btcRates.rates[raw.fiatCode]
+      const vue = toVueOrder(raw, relay, liveRate)
       if (vue !== null) result.push(vue)
     }
     return result

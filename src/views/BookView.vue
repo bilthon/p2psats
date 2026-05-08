@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useAppStore } from '@/stores/appStore'
 import { useNostrOrderbookStore } from '@/services/nostrOrderbook'
 import { fmtFiat, fmtSatsCompact, REF_RATES } from '@/lib/data'
@@ -11,6 +11,9 @@ import OrderDetailDialog from '@/components/OrderDetailDialog.vue'
 import type { Order } from '@/lib/types'
 
 const store = useAppStore()
+// Connect/disconnect lifecycle is handled in App.vue (app-level so subscription
+// + rate polling persist across route changes). The store is read here only
+// for the dialog's per-event lookups and the relay-status tooltip.
 const nostr = useNostrOrderbookStore()
 
 // Ref for the crossed-pairs section for smooth scroll
@@ -19,14 +22,6 @@ const crossRef = ref<HTMLElement | null>(null)
 function jumpToCrossed() {
   crossRef.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
-
-onMounted(() => {
-  nostr.connect()
-})
-
-onUnmounted(() => {
-  nostr.disconnect()
-})
 
 // Relay status tooltip: "N/M relays connected"
 const relayTooltip = computed(() => {

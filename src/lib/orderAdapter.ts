@@ -86,7 +86,14 @@ function parseRating(rating: unknown): { reputation: number; completion: number;
   return fallback
 }
 
-export function toVueOrder(raw: RawNip69Order, sourceRelay: string): Order | null {
+export function toVueOrder(
+  raw: RawNip69Order,
+  sourceRelay: string,
+  // Live BTC reference rate for this order's fiat code, from the rates store.
+  // Falls back to the static REF_RATES baked into data.ts when the live rate
+  // hasn't loaded yet so the UI always has something to render.
+  liveRate?: number,
+): Order | null {
   // Only live, fillable orders should reach the depth chart and tables.
   // Canceled / in-progress / success / expired orders are dropped here.
   if (raw.status !== 'pending') return null
@@ -102,8 +109,9 @@ export function toVueOrder(raw: RawNip69Order, sourceRelay: string): Order | nul
 
   const sourceLabel = SOURCE_LABEL_MAP[sourceId] ?? sourceId
 
-  // Derive price from reference rate + premium
-  const refRate = REF_RATES[ccy]
+  // Derive price from reference rate + premium. Prefer the live rate (yadio
+  // via the btcRates store), fall back to the static REF_RATES on first load.
+  const refRate = liveRate ?? REF_RATES[ccy]
   const price = Math.round(refRate * (1 + raw.premium / 100))
 
   // Payment method resolution — tolerant
