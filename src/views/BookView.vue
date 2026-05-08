@@ -110,26 +110,11 @@ function jumpToCrossed() {
   <section class="pb-depth-card">
     <div class="pb-card-hd">
       <h2 class="pb-card-title">Order book depth</h2>
-      <div class="pb-depth-styles">
-        <button
-          v-for="o in [
-            { v: 'stacked', l: 'Stacked' },
-            { v: 'heatmap', l: 'Heatmap' },
-          ]"
-          :key="o.v"
-          type="button"
-          :class="['pb-tab', store.depthStyle === o.v ? 'pb-tab--on' : '']"
-          @click="store.setDepthStyle(o.v as 'stacked' | 'heatmap')"
-        >
-          {{ o.l }}
-        </button>
-      </div>
     </div>
     <div class="pb-depth-canvas">
       <DepthChart
         :orders="store.ccyOrders"
         :currency="store.currency"
-        :style="store.depthStyle"
         :crosses="store.crosses"
       />
     </div>

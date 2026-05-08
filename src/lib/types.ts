@@ -73,12 +73,10 @@ export interface CrossResult {
   minSell: Order | null;
 }
 
-export type DepthStyle = 'stacked' | 'heatmap';
 export type Density = 'compact' | 'balanced' | 'comfy';
 export type BookView = 'tabs' | 'split' | 'stacked';
 
 export interface TweakValues {
-  depthStyle: DepthStyle;
   density: Density;
   showPremium: boolean;
   highlightAccent: string;

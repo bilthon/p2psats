@@ -10,9 +10,11 @@
     "type-check": "vue-tsc --noEmit"
   },
   "dependencies": {
+    "echarts": "^5.6.0",
     "nostr-tools": "^2.10.0",
     "pinia": "^2.2.4",
     "vue": "^3.5.13",
+    "vue-echarts": "^7.0.3",
     "vue-router": "^4.4.5",
     "ws": "^8.18.0"
   },

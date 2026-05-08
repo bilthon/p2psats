@@ -1,21 +1,43 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { midPrice } from '@/lib/data'
-import type { CrossResult, Currency, DepthStyle, Order } from '@/lib/types'
+import { use } from 'echarts/core'
+import { CanvasRenderer } from 'echarts/renderers'
+import { LineChart } from 'echarts/charts'
+import {
+  GridComponent,
+  TooltipComponent,
+  MarkLineComponent,
+  MarkAreaComponent,
+  GraphicComponent,
+} from 'echarts/components'
+import VChart from 'vue-echarts'
+import { midPrice, fmtFiat, fmtSatsCompact } from '@/lib/data'
+import type { CrossResult, Currency, Order } from '@/lib/types'
+
+use([
+  CanvasRenderer,
+  LineChart,
+  GridComponent,
+  TooltipComponent,
+  MarkLineComponent,
+  MarkAreaComponent,
+  GraphicComponent,
+])
 
 const props = defineProps<{
   orders: Order[]
   currency: Currency
-  style: DepthStyle
   crosses: CrossResult
 }>()
 
-// ── shared helpers ────────────────────────────────────────────────────────────
+// ── Colors ────────────────────────────────────────────────────────────────────
+const BID_COLOR = 'oklch(0.62 0.14 155)'
+const ASK_COLOR = 'oklch(0.6 0.18 25)'
 
+// ── Level building ────────────────────────────────────────────────────────────
 interface Level {
   price: number
   sats: number
-  count: number
   cum: number
 }
 
@@ -34,55 +56,46 @@ function buildLevels(orders: Order[], side: 'buy' | 'sell', currency: Currency):
   const map = new Map<number, Level>()
   filtered.forEach((o) => {
     const k = round(o.price)
-    if (!map.has(k)) map.set(k, { price: k, sats: 0, count: 0, cum: 0 })
+    if (!map.has(k)) map.set(k, { price: k, sats: 0, cum: 0 })
     const entry = map.get(k)!
     entry.sats += o.amountSats
-    entry.count += 1
   })
   let arr = [...map.values()]
+  // Sort bids descending (best first), asks ascending (best first)
   arr.sort((a, b) => (side === 'buy' ? b.price - a.price : a.price - b.price))
   let cum = 0
   arr = arr.map((l) => { cum += l.sats; return { ...l, cum } })
   return arr
 }
 
-// ── mid price ─────────────────────────────────────────────────────────────────
-const mid = computed(() => midPrice(props.orders, props.currency))
+// ── Computed option ───────────────────────────────────────────────────────────
+const option = computed(() => {
+  const allOrders = props.orders.filter((o) => o.currency === props.currency)
 
-const W = 720, H = 240
+  if (!allOrders.length) return null
 
-// ── 1. Stacked depth ──────────────────────────────────────────────────────────
-const stackedData = computed(() => {
-  // Horizontal padding is 0 so polygons span the full viewBox width, matching
-  // the grid lines. The edge-fade masks then soften the outermost edges.
-  const SP = { l: 0, r: 0, t: 16, b: 28 }
-  const all = props.orders.filter((o) => o.currency === props.currency)
-  if (!all.length) return null
+  const buyLevels = buildLevels(props.orders, 'buy', props.currency)
+  const sellLevels = buildLevels(props.orders, 'sell', props.currency)
 
-  const buys = props.orders
-    .filter((o) => o.side === 'buy' && o.currency === props.currency)
-    .sort((a, b) => b.price - a.price)
-  const sells = props.orders
-    .filter((o) => o.side === 'sell' && o.currency === props.currency)
-    .sort((a, b) => a.price - b.price)
+  const hasBids = buyLevels.length > 0
+  const hasAsks = sellLevels.length > 0
 
-  // Price domain. When both sides exist, span the actual data extent. When
-  // only one side exists, extend the missing side so the populated side
-  // occupies just its own half of the chart.
+  // ── Domain calculation (mirrors the SVG impl exactly) ──────────────────────
   let lo: number, hi: number
-  if (buys.length > 0 && sells.length > 0) {
-    const prices = all.map((o) => o.price)
+
+  if (hasBids && hasAsks) {
+    const prices = allOrders.map((o) => o.price)
     lo = Math.min(...prices)
     hi = Math.max(...prices)
-  } else if (buys.length > 0) {
-    const buyPrices = buys.map((o) => o.price)
+  } else if (hasBids) {
+    const buyPrices = buyLevels.map((l) => l.price)
     const minBid = Math.min(...buyPrices)
     const maxBid = Math.max(...buyPrices)
     const span = Math.max(maxBid - minBid, maxBid * 0.005)
     lo = minBid
     hi = maxBid + span
   } else {
-    const sellPrices = sells.map((o) => o.price)
+    const sellPrices = sellLevels.map((l) => l.price)
     const minAsk = Math.min(...sellPrices)
     const maxAsk = Math.max(...sellPrices)
     const span = Math.max(maxAsk - minAsk, minAsk * 0.005)
@@ -90,274 +103,317 @@ const stackedData = computed(() => {
     hi = maxAsk
   }
 
-  const stepSeries = (list: Order[]) => {
-    let cum = 0
-    const pts = list.map((o) => { cum += o.amountSats; return { p: o.price, cum } })
-    return { pts, max: cum }
-  }
-  const b = stepSeries(buys)
-  const s = stepSeries(sells)
-  const maxCum = Math.max(b.max, s.max, 1)
-
-  const x = (p: number) => SP.l + ((p - lo) / (hi - lo)) * (W - SP.l - SP.r)
-  const y = (v: number) => SP.t + (1 - v / maxCum) * (H - SP.t - SP.b)
-  const baseY = H - SP.b
-
-  // Filled polygon: closed path with baseline + outer cliffs. Used with fill only.
-  const stepPath = (pts: { p: number; cum: number }[]) => {
-    if (!pts.length) return ''
-    const sorted = [...pts].sort((a, bv) => a.p - bv.p)
-    let d = `M ${x(sorted[0].p)} ${baseY}`
-    let prevY = baseY
-    sorted.forEach((pt) => {
-      const px = x(pt.p), py = y(pt.cum)
-      d += ` L ${px} ${prevY} L ${px} ${py}`
-      prevY = py
-    })
-    d += ` L ${x(sorted[sorted.length - 1].p)} ${baseY} Z`
-    return d
+  // ── Series data ────────────────────────────────────────────────────────────
+  // Bids: already sorted desc (best-bid first = highest price first).
+  // For the chart we need ascending price order, so we reverse.
+  // The cumulative depth at the worst bid (leftmost) = totalBidCum,
+  // stepping down to A1 at the best bid (rightmost inner edge).
+  // We prepend a baseline point at [bestBid, 0] so the line traces the
+  // inner cliff down to 0 — this makes the inner vertical visible via lineStyle.
+  const bidData: [number, number][] = []
+  if (hasBids) {
+    const ascending = [...buyLevels].reverse() // worst→best
+    ascending.forEach((l) => bidData.push([l.price, l.cum]))
+    // Inner cliff anchor: drop to 0 at bestBid price
+    const bestBid = buyLevels[0].price
+    bidData.push([bestBid, 0])
   }
 
-  // Top step contour: open polyline tracing the cumulative-volume curve,
-  // including the inner cliff (toward the spread) but excluding the outer
-  // cliff (toward the chart edge) and the bottom baseline.
-  const topStepPath = (pts: { p: number; cum: number }[], side: 'buy' | 'sell') => {
-    if (!pts.length) return ''
-    const sorted = [...pts].sort((a, bv) => a.p - bv.p)
-    let d: string
-    let prevY: number
-    if (side === 'buy') {
-      // Bids: top-left → step down through data → drop to baseline at best-bid.
-      d = `M ${x(sorted[0].p)} ${y(sorted[0].cum)}`
-      prevY = y(sorted[0].cum)
-      for (let i = 1; i < sorted.length; i++) {
-        const px = x(sorted[i].p), py = y(sorted[i].cum)
-        d += ` L ${px} ${prevY} L ${px} ${py}`
-        prevY = py
+  // Asks: already sorted asc (best-ask first = lowest price first).
+  // We prepend a [bestAsk, 0] baseline anchor for the inner cliff.
+  const askData: [number, number][] = []
+  if (hasAsks) {
+    const bestAsk = sellLevels[0].price
+    askData.push([bestAsk, 0])
+    sellLevels.forEach((l) => askData.push([l.price, l.cum]))
+  }
+
+  const maxCum = Math.max(
+    hasBids ? buyLevels[buyLevels.length - 1].cum : 0,
+    hasAsks ? sellLevels[sellLevels.length - 1].cum : 0,
+    1,
+  )
+
+  // ── Gradients (horizontal edge fade) ─────────────────────────────────────
+  // Bid: fade left edge (0→15%), full opacity right (15→100%).
+  // Ask: fade right edge (85→100%), full opacity left (0→85%).
+  // globalCoord: true means stops are relative to full chart width.
+  const bidAreaGrad = {
+    type: 'linear' as const,
+    x: 0, y: 0, x2: 1, y2: 0,
+    global: false,
+    colorStops: [
+      { offset: 0,    color: 'oklch(0.62 0.14 155 / 0)' },
+      { offset: 0.15, color: 'oklch(0.62 0.14 155 / 0.25)' },
+      { offset: 1,    color: 'oklch(0.62 0.14 155 / 0.25)' },
+    ],
+  }
+  const bidLineGrad = {
+    type: 'linear' as const,
+    x: 0, y: 0, x2: 1, y2: 0,
+    global: false,
+    colorStops: [
+      { offset: 0,    color: 'oklch(0.62 0.14 155 / 0)' },
+      { offset: 0.15, color: 'oklch(0.62 0.14 155 / 1)' },
+      { offset: 1,    color: 'oklch(0.62 0.14 155 / 1)' },
+    ],
+  }
+  const askAreaGrad = {
+    type: 'linear' as const,
+    x: 0, y: 0, x2: 1, y2: 0,
+    global: false,
+    colorStops: [
+      { offset: 0,    color: 'oklch(0.6 0.18 25 / 0.25)' },
+      { offset: 0.85, color: 'oklch(0.6 0.18 25 / 0.25)' },
+      { offset: 1,    color: 'oklch(0.6 0.18 25 / 0)' },
+    ],
+  }
+  const askLineGrad = {
+    type: 'linear' as const,
+    x: 0, y: 0, x2: 1, y2: 0,
+    global: false,
+    colorStops: [
+      { offset: 0,    color: 'oklch(0.6 0.18 25 / 1)' },
+      { offset: 0.85, color: 'oklch(0.6 0.18 25 / 1)' },
+      { offset: 1,    color: 'oklch(0.6 0.18 25 / 0)' },
+    ],
+  }
+
+  // ── Mid price markLine ─────────────────────────────────────────────────────
+  const mid = midPrice(props.orders, props.currency)
+  const midMarkLine = mid != null
+    ? {
+        silent: true,
+        symbol: 'none',
+        lineStyle: {
+          color: 'oklch(0.45 0.005 80)',
+          type: 'dashed' as const,
+          dashOffset: 0,
+          width: 1,
+        },
+        label: {
+          show: true,
+          position: 'insideStartTop' as const,
+          formatter: `mid ${Math.round(mid).toLocaleString()}`,
+          fontFamily: 'Inter Tight, sans-serif',
+          fontSize: 10,
+          color: 'oklch(0.4 0.005 80)',
+        },
+        data: [{ xAxis: mid }],
       }
-      d += ` L ${x(sorted[sorted.length - 1].p)} ${baseY}`
-    } else {
-      // Asks: rise from baseline at best-ask → step up through data → top-right.
-      d = `M ${x(sorted[0].p)} ${baseY} L ${x(sorted[0].p)} ${y(sorted[0].cum)}`
-      prevY = y(sorted[0].cum)
-      for (let i = 1; i < sorted.length; i++) {
-        const px = x(sorted[i].p), py = y(sorted[i].cum)
-        d += ` L ${px} ${prevY} L ${px} ${py}`
-        prevY = py
-      }
-    }
-    return d
-  }
+    : undefined
 
-  const crossZone =
-    props.crosses.maxBuy && props.crosses.minSell && props.crosses.pairs.length > 0
+  // ── Crossed zone markArea ──────────────────────────────────────────────────
+  const crossedMarkArea =
+    props.crosses.pairs.length > 0 && props.crosses.maxBuy && props.crosses.minSell
       ? {
-          x1: x(props.crosses.minSell.price),
-          x2: x(props.crosses.maxBuy.price),
-          midX:
-            (x(props.crosses.minSell.price) + x(props.crosses.maxBuy.price)) / 2,
+          silent: true,
+          itemStyle: {
+            color: 'oklch(0.7 0.06 60 / 0.1)',
+            borderColor: 'oklch(0.7 0.06 60 / 0.4)',
+            borderWidth: 0.5,
+            borderType: [2, 2] as [number, number],
+          },
+          label: {
+            show: true,
+            position: 'insideTop' as const,
+            formatter: 'crossed',
+            fontFamily: 'Inter Tight, sans-serif',
+            fontSize: 9,
+            color: 'oklch(0.55 0.06 60)',
+            fontWeight: 600,
+            letterSpacing: '0.06em',
+          },
+          data: [
+            [
+              { xAxis: props.crosses.minSell.price },
+              { xAxis: props.crosses.maxBuy.price },
+            ],
+          ],
         }
-      : null
+      : undefined
+
+  // ── Graphic elements: BIDS/ASKS labels + lo/hi price labels ───────────────
+  const graphicElements = [
+    // BIDS label — top left
+    {
+      type: 'text' as const,
+      left: 8,
+      top: 4,
+      style: {
+        text: 'BIDS',
+        font: '600 10px "Inter Tight", sans-serif',
+        fill: BID_COLOR,
+        letterSpacing: '0.06em',
+      },
+    },
+    // ASKS label — top right
+    {
+      type: 'text' as const,
+      right: 8,
+      top: 4,
+      style: {
+        text: 'ASKS',
+        font: '600 10px "Inter Tight", sans-serif',
+        fill: 'oklch(0.55 0.18 25)',
+        letterSpacing: '0.06em',
+      },
+    },
+    // Lo price — bottom left
+    {
+      type: 'text' as const,
+      left: 6,
+      bottom: 4,
+      style: {
+        text: Math.round(lo).toLocaleString(),
+        font: '11px "Inter Tight", sans-serif',
+        fill: 'oklch(0.5 0.005 80)',
+        fontVariantNumeric: 'tabular-nums',
+      },
+    },
+    // Hi price — bottom right
+    {
+      type: 'text' as const,
+      right: 6,
+      bottom: 4,
+      style: {
+        text: Math.round(hi).toLocaleString(),
+        font: '11px "Inter Tight", sans-serif',
+        fill: 'oklch(0.5 0.005 80)',
+        fontVariantNumeric: 'tabular-nums',
+      },
+    },
+  ]
+
+  // ── Series ─────────────────────────────────────────────────────────────────
+  const bidSeries = {
+    name: 'bids',
+    type: 'line' as const,
+    data: bidData,
+    step: 'end' as const,
+    smooth: false,
+    symbol: 'none',
+    areaStyle: { color: bidAreaGrad },
+    lineStyle: { color: bidLineGrad, width: 1.2 },
+    // Disable hover emphasis: the default emphasis state recomputes the area
+    // gradient and fails to interpolate the alpha-0 endpoint stops, making
+    // the series visually disappear on mouseover. Tooltip stays via 'axis'
+    // trigger (chart-level, not series-level).
+    emphasis: { disabled: true },
+    z: 2,
+    markLine: midMarkLine,
+    markArea: crossedMarkArea,
+  }
+
+  const askSeries = {
+    name: 'asks',
+    type: 'line' as const,
+    data: askData,
+    step: 'start' as const,
+    smooth: false,
+    symbol: 'none',
+    areaStyle: { color: askAreaGrad },
+    lineStyle: { color: askLineGrad, width: 1.2 },
+    emphasis: { disabled: true },
+    z: 2,
+  }
+
+  const series = []
+  if (hasBids) series.push(bidSeries)
+  if (hasAsks) series.push(askSeries)
 
   return {
-    bidPath: stepPath(b.pts),
-    askPath: stepPath(s.pts),
-    bidTopPath: topStepPath(b.pts, 'buy'),
-    askTopPath: topStepPath(s.pts, 'sell'),
-    lo, hi, mid: mid.value,
-    crossZone, SP,
+    animation: false,
+    grid: {
+      top: 16,
+      right: 0,
+      bottom: 28,
+      left: 0,
+      containLabel: false,
+    },
+    xAxis: {
+      type: 'value' as const,
+      min: lo,
+      max: hi,
+      show: false,
+    },
+    yAxis: {
+      type: 'value' as const,
+      min: 0,
+      max: maxCum * 1.05,
+      show: true,
+      axisLine: { show: false },
+      axisTick: { show: false },
+      axisLabel: { show: false },
+      splitLine: {
+        show: true,
+        interval: (index: number) => index === 1 || index === 2 || index === 3,
+        lineStyle: {
+          color: 'oklch(0.92 0.005 80)',
+          width: 1,
+        },
+      },
+      splitNumber: 4,
+    },
+    tooltip: {
+      trigger: 'axis' as const,
+      axisPointer: {
+        type: 'line' as const,
+        lineStyle: {
+          color: 'oklch(0.6 0.005 80)',
+          width: 1,
+          type: 'solid' as const,
+        },
+      },
+      backgroundColor: 'oklch(1 0 0 / 0.96)',
+      borderColor: 'oklch(0.92 0.005 80)',
+      borderRadius: 8,
+      extraCssText: 'box-shadow: 0 4px 12px rgba(20,18,10,0.06); font-family: "Inter Tight", sans-serif; font-size: 12px;',
+      formatter: (params: unknown) => {
+        const items = params as Array<{ seriesName: string; data: [number, number]; axisValue: number }>
+        if (!items || !items.length) return ''
+        const price = items[0].axisValue
+        // Find the closest series to show
+        // If only one series, show it; if both, pick the one where price is in its range
+        let chosen: (typeof items)[0] | null = null
+        for (const item of items) {
+          if (item.data && item.data[1] > 0) {
+            chosen = item
+            break
+          }
+        }
+        if (!chosen) chosen = items[0]
+
+        const isBid = chosen.seriesName === 'bids'
+        const sideColor = isBid ? BID_COLOR : ASK_COLOR
+        const sideLabel = isBid ? 'BID' : 'ASK'
+        const cum = chosen.data ? chosen.data[1] : 0
+
+        return [
+          `<div style="color:${sideColor};font-weight:600;margin-bottom:3px">${sideLabel}</div>`,
+          `<div>Price: <b>${fmtFiat(price, props.currency)}</b></div>`,
+          `<div>Depth: <b>${fmtSatsCompact(cum)}</b></div>`,
+        ].join('')
+      },
+    },
+    graphic: graphicElements,
+    series,
   }
-})
-
-// ── 2. Heatmap ────────────────────────────────────────────────────────────────
-const heatmapData = computed(() => {
-  const HP = { l: 8, r: 8, t: 30, b: 28 }
-  const cellH = (H - HP.t - HP.b) / 2
-  const buckets = [-6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6]
-  const bw = (W - HP.l - HP.r) / (buckets.length - 1)
-
-  const grid: { buy: Map<number, number>; sell: Map<number, number> } = {
-    buy: new Map(),
-    sell: new Map(),
-  }
-  buckets.forEach((b) => { grid.buy.set(b, 0); grid.sell.set(b, 0) })
-
-  props.orders
-    .filter((o) => o.currency === props.currency)
-    .forEach((o) => {
-      const b = Math.max(buckets[0], Math.min(buckets[buckets.length - 1], Math.round(o.premium)))
-      grid[o.side].set(b, (grid[o.side].get(b) ?? 0) + o.amountSats)
-    })
-
-  const maxV = Math.max(...[...grid.buy.values()], ...[...grid.sell.values()], 1)
-
-  const cells: Array<{
-    x: number; y: number; w: number; h: number
-    opacity: number; side: 'buy' | 'sell'
-    showLabel: boolean; labelText: string
-  }> = []
-
-  buckets.forEach((b, bi) => {
-    if (bi === 0) return
-    const cx = HP.l + bi * bw - bw / 2
-    for (const side of ['buy', 'sell'] as const) {
-      const v = (grid[side].get(b) ?? 0) / maxV
-      const rowY = side === 'sell' ? HP.t : HP.t + cellH
-      const opacity = 0.04 + v * 0.95
-      const showLabel = v > 0.15
-      cells.push({
-        x: cx, y: rowY, w: bw, h: cellH - 2,
-        opacity, side, showLabel,
-        labelText: ((grid[side].get(b) ?? 0) / 1e8).toFixed(2),
-      })
-    }
-  })
-
-  const x0 = HP.l + buckets.indexOf(0) * bw
-
-  return { cells, buckets, bw, HP, cellH, x0 }
 })
 </script>
 
 <template>
-  <!-- 1. Stacked -->
-  <svg
-    v-if="style === 'stacked' && stackedData"
-    :viewBox="`0 0 ${W} ${H}`"
-    width="100%"
-    height="100%"
-    preserveAspectRatio="none"
-    style="display: block; font-variant-numeric: tabular-nums"
+  <v-chart
+    v-if="option"
+    class="pb-depth-canvas"
+    :option="option"
+    :autoresize="true"
+  />
+  <div
+    v-else
+    class="pb-depth-empty"
+    style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--ink-mute);font-size:13px"
   >
-    <defs>
-      <linearGradient id="bidGrad2" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="oklch(0.62 0.14 155)" stop-opacity=".4" />
-        <stop offset="100%" stop-color="oklch(0.62 0.14 155)" stop-opacity=".05" />
-      </linearGradient>
-      <linearGradient id="askGrad2" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="oklch(0.6 0.18 25)" stop-opacity=".4" />
-        <stop offset="100%" stop-color="oklch(0.6 0.18 25)" stop-opacity=".05" />
-      </linearGradient>
-      <linearGradient id="bidEdgeFadeGrad" gradientUnits="userSpaceOnUse" x1="0" y1="0" :x2="W" y2="0">
-        <stop offset="0" stop-color="black" />
-        <stop offset="0.15" stop-color="white" />
-        <stop offset="1" stop-color="white" />
-      </linearGradient>
-      <linearGradient id="askEdgeFadeGrad" gradientUnits="userSpaceOnUse" x1="0" y1="0" :x2="W" y2="0">
-        <stop offset="0" stop-color="white" />
-        <stop offset="0.85" stop-color="white" />
-        <stop offset="1" stop-color="black" />
-      </linearGradient>
-      <mask id="bidEdgeFade" maskUnits="userSpaceOnUse" x="0" y="0" :width="W" :height="H">
-        <rect x="0" y="0" :width="W" :height="H" fill="url(#bidEdgeFadeGrad)" />
-      </mask>
-      <mask id="askEdgeFade" maskUnits="userSpaceOnUse" x="0" y="0" :width="W" :height="H">
-        <rect x="0" y="0" :width="W" :height="H" fill="url(#askEdgeFadeGrad)" />
-      </mask>
-    </defs>
-    <line
-      v-for="f in [0.25, 0.5, 0.75]"
-      :key="f"
-      x1="0" :x2="W"
-      :y1="stackedData.SP.t + f * (H - stackedData.SP.t - stackedData.SP.b)"
-      :y2="stackedData.SP.t + f * (H - stackedData.SP.t - stackedData.SP.b)"
-      stroke="oklch(0.92 0.005 80)" stroke-width="1"
-    />
-    <path :d="stackedData.bidPath" fill="url(#bidGrad2)" stroke="none" mask="url(#bidEdgeFade)" />
-    <path :d="stackedData.askPath" fill="url(#askGrad2)" stroke="none" mask="url(#askEdgeFade)" />
-    <path :d="stackedData.bidTopPath" fill="none" stroke="oklch(0.62 0.14 155)" stroke-width="1.2" stroke-linejoin="miter" mask="url(#bidEdgeFade)" />
-    <path :d="stackedData.askTopPath" fill="none" stroke="oklch(0.6 0.18 25)" stroke-width="1.2" stroke-linejoin="miter" mask="url(#askEdgeFade)" />
-
-    <!-- Crossover zone -->
-    <g v-if="stackedData.crossZone">
-      <rect
-        :x="stackedData.crossZone.x1"
-        :y="stackedData.SP.t"
-        :width="Math.max(2, stackedData.crossZone.x2 - stackedData.crossZone.x1)"
-        :height="H - stackedData.SP.t - stackedData.SP.b"
-        fill="oklch(0.7 0.06 60 / 0.1)"
-        stroke="oklch(0.7 0.06 60 / 0.4)" stroke-width="0.5" stroke-dasharray="2 2"
-      />
-      <text
-        :x="stackedData.crossZone.midX"
-        :y="stackedData.SP.t + 12"
-        text-anchor="middle" font-size="9"
-        fill="oklch(0.55 0.06 60)" font-family="Inter Tight, sans-serif"
-        font-weight="600" letter-spacing=".06em"
-      >crossed</text>
-    </g>
-
-    <g v-if="stackedData.mid">
-      <line
-        :x1="stackedData.SP.l + ((stackedData.mid - stackedData.lo) / (stackedData.hi - stackedData.lo)) * (W - stackedData.SP.l - stackedData.SP.r)"
-        :x2="stackedData.SP.l + ((stackedData.mid - stackedData.lo) / (stackedData.hi - stackedData.lo)) * (W - stackedData.SP.l - stackedData.SP.r)"
-        :y1="stackedData.SP.t" :y2="H - stackedData.SP.b"
-        stroke="oklch(0.45 0.005 80)" stroke-width="1" stroke-dasharray="3 3"
-      />
-      <text
-        :x="stackedData.SP.l + ((stackedData.mid - stackedData.lo) / (stackedData.hi - stackedData.lo)) * (W - stackedData.SP.l - stackedData.SP.r)"
-        :y="stackedData.SP.t - 4"
-        text-anchor="middle" font-size="10" fill="oklch(0.4 0.005 80)"
-        font-family="Inter Tight, sans-serif"
-      >mid {{ Math.round(stackedData.mid).toLocaleString() }}</text>
-    </g>
-
-    <text x="6" :y="H - 8" font-size="11" fill="oklch(0.5 0.005 80)"
-          font-family="Inter Tight, sans-serif">{{ Math.round(stackedData.lo).toLocaleString() }}</text>
-    <text :x="W - 6" :y="H - 8" text-anchor="end" font-size="11"
-          fill="oklch(0.5 0.005 80)" font-family="Inter, sans-serif">{{ Math.round(stackedData.hi).toLocaleString() }}</text>
-  </svg>
-
-  <!-- 2. Heatmap -->
-  <svg
-    v-else-if="style === 'heatmap'"
-    :viewBox="`0 0 ${W} ${H}`"
-    width="100%"
-    height="100%"
-    preserveAspectRatio="none"
-    style="display: block; font-variant-numeric: tabular-nums"
-  >
-    <text :x="heatmapData.HP.l" y="20" font-size="10" fill="oklch(0.55 0.18 25)"
-          font-family="Inter Tight, sans-serif" font-weight="600" letter-spacing=".06em">ASKS  ↑</text>
-    <text :x="heatmapData.HP.l" :y="H - 8" font-size="10" fill="oklch(0.6 0.14 155)"
-          font-family="Inter Tight, sans-serif" font-weight="600" letter-spacing=".06em">BIDS  ↓</text>
-
-    <g v-for="(cell, ci) in heatmapData.cells" :key="ci">
-      <rect
-        :x="cell.x" :y="cell.y" :width="cell.w" :height="cell.h"
-        :fill="`oklch(${cell.side === 'buy' ? '0.62 0.14 155' : '0.6 0.18 25'} / ${cell.opacity})`"
-        rx="2"
-      />
-      <text
-        v-if="cell.showLabel"
-        :x="cell.x + cell.w / 2"
-        :y="cell.y + cell.h / 2 + 3"
-        text-anchor="middle" font-size="10"
-        fill="white" font-family="Inter Tight, sans-serif" font-weight="600"
-      >{{ cell.labelText }}</text>
-    </g>
-
-    <text
-      v-for="(b, i) in heatmapData.buckets"
-      v-show="i % 2 === 0"
-      :key="b"
-      :x="heatmapData.HP.l + i * heatmapData.bw"
-      :y="H - 12"
-      text-anchor="middle" font-size="10"
-      :fill="b === 0 ? 'oklch(0.35 0.005 80)' : 'oklch(0.55 0.005 80)'"
-      font-family="Inter Tight, sans-serif"
-      :font-weight="b === 0 ? '600' : '400'"
-    >{{ b > 0 ? '+' : '' }}{{ b }}%</text>
-
-    <line
-      :x1="heatmapData.x0" :x2="heatmapData.x0"
-      :y1="heatmapData.HP.t - 4" :y2="H - heatmapData.HP.b"
-      stroke="oklch(0.45 0.005 80)" stroke-width="1" stroke-dasharray="3 3"
-    />
-  </svg>
-
-  <!-- Fallback empty -->
-  <div v-else style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--ink-mute);font-size:13px">
     No data
   </div>
 </template>
