@@ -114,6 +114,18 @@ export function toVueOrder(
   const refRate = liveRate ?? REF_RATES[ccy]
   const price = Math.round(refRate * (1 + raw.premium / 100))
 
+  // Market-priced orders (lnp2pbot) publish `amt: 0` and only commit a fiat
+  // range. Derive an effective max-sats from the order's post-premium price:
+  //   sats = (fiatAmount.max ?? fiatAmount.min) / price * 1e8
+  // Fixed-sats orders (raw.satsAmount > 0) keep the wire value unchanged.
+  const effectiveSats = (() => {
+    if (raw.satsAmount > 0) return raw.satsAmount
+    const fiat = raw.fiatAmount.max ?? raw.fiatAmount.min
+    if (price <= 0 || !Number.isFinite(price)) return 0
+    if (fiat <= 0 || !Number.isFinite(fiat)) return 0
+    return Math.round((fiat / price) * 1e8)
+  })()
+
   // Payment method resolution — tolerant
   const methods: PaymentMethod[] = raw.paymentMethods.map(resolvePaymentMethod)
 
@@ -135,7 +147,7 @@ export function toVueOrder(
     currency: ccy,
     premium: raw.premium,
     price,
-    amountSats: raw.satsAmount,
+    amountSats: effectiveSats,
     minFiat: raw.fiatAmount.min,
     maxFiat: raw.fiatAmount.max ?? raw.fiatAmount.min,
     methods,
