@@ -233,7 +233,8 @@ const option = computed(() => {
         }
       : undefined
 
-  // ── Graphic elements: BIDS/ASKS labels + lo/hi price labels ───────────────
+  // ── Graphic elements: BIDS/ASKS corner labels ─────────────────────────────
+  // Lo/hi price labels are now provided by the xAxis tick labels.
   const graphicElements = [
     // BIDS label — top left
     {
@@ -257,30 +258,6 @@ const option = computed(() => {
         font: '600 10px "Inter Tight", sans-serif',
         fill: 'oklch(0.55 0.18 25)',
         letterSpacing: '0.06em',
-      },
-    },
-    // Lo price — bottom left
-    {
-      type: 'text' as const,
-      left: 6,
-      bottom: 4,
-      style: {
-        text: Math.round(lo).toLocaleString(),
-        font: '11px "Inter Tight", sans-serif',
-        fill: 'oklch(0.5 0.005 80)',
-        fontVariantNumeric: 'tabular-nums',
-      },
-    },
-    // Hi price — bottom right
-    {
-      type: 'text' as const,
-      right: 6,
-      bottom: 4,
-      style: {
-        text: Math.round(hi).toLocaleString(),
-        font: '11px "Inter Tight", sans-serif',
-        fill: 'oklch(0.5 0.005 80)',
-        fontVariantNumeric: 'tabular-nums',
       },
     },
   ]
@@ -325,17 +302,30 @@ const option = computed(() => {
   return {
     animation: false,
     grid: {
-      top: 16,
+      top: 24,               // room for BIDS/ASKS corner badges above the canvas
       right: 0,
-      bottom: 28,
-      left: 0,
+      bottom: 34,            // room for xAxis tick labels
+      left: 52,              // gutter for yAxis tick labels (e.g. "1.2M sats")
       containLabel: false,
     },
     xAxis: {
       type: 'value' as const,
       min: lo,
       max: hi,
-      show: false,
+      show: true,
+      axisLine: { show: false },
+      axisTick: { show: false },
+      splitLine: { show: false },
+      axisLabel: {
+        show: true,
+        formatter: (v: number) => fmtFiat(v, props.currency, { bare: true }),
+        fontFamily: 'Inter Tight, sans-serif',
+        fontSize: 10,
+        color: 'oklch(0.5 0.005 80)',
+        fontVariantNumeric: 'tabular-nums',
+        margin: 8,
+        hideOverlap: true,
+      },
     },
     yAxis: {
       type: 'value' as const,
@@ -344,7 +334,19 @@ const option = computed(() => {
       show: true,
       axisLine: { show: false },
       axisTick: { show: false },
-      axisLabel: { show: false },
+      axisLabel: {
+        show: true,
+        // Render outside the canvas in the reserved left gutter (grid.left).
+        // Keep the middle three gridlines only — the bottom 0 row collides
+        // with the xAxis row, and the topmost is too close to the chart edge.
+        interval: (index: number) => index === 1 || index === 2 || index === 3,
+        formatter: (v: number) => (v > 0 ? fmtSatsCompact(v) : ''),
+        fontFamily: 'Inter Tight, sans-serif',
+        fontSize: 10,
+        color: 'oklch(0.5 0.005 80)',
+        fontVariantNumeric: 'tabular-nums',
+        margin: 8,
+      },
       splitLine: {
         show: true,
         interval: (index: number) => index === 1 || index === 2 || index === 3,
