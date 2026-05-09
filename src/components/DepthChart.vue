@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
 import { LineChart } from 'echarts/charts'
@@ -13,6 +13,7 @@ import {
 import VChart from 'vue-echarts'
 import { midPrice, fmtFiat, fmtSatsCompact } from '@/lib/data'
 import type { CrossResult, Currency, Order } from '@/lib/types'
+import SatSymbol from './SatSymbol.vue'
 
 use([
   CanvasRenderer,
@@ -29,6 +30,74 @@ const props = defineProps<{
   currency: Currency
   crosses: CrossResult
 }>()
+
+// ── Custom cursor tracking (replaces ECharts tooltip for accuracy) ───────────
+// ECharts' built-in tooltip throttles renders at the data-point level, so the
+// price field appeared to step across plateaus. We listen to mousemove on the
+// chart wrapper, convert the pixel x to an axis value via convertFromPixel,
+// and render a Vue overlay so price updates per-pixel.
+const chartRef = ref<InstanceType<typeof VChart> | null>(null)
+const cursorPrice = ref<number | null>(null)
+const cursorPx = ref<{ x: number; y: number } | null>(null)
+
+interface ChartLike {
+  // When the finder targets a single axis (xAxisIndex only), ECharts' grid
+  // coordinate system resolves to axis.coordToData(axis.toLocalCoord(value)).
+  // toLocalCoord expects a scalar pixel coordinate, NOT an [x, y] array.
+  // Passing an array produces NaN and the method returns null.
+  convertFromPixel(finder: { xAxisIndex: number }, value: number): number | null
+}
+
+function onChartMove(e: MouseEvent) {
+  const chart = chartRef.value as unknown as ChartLike | null
+  if (!chart) return
+  const target = e.currentTarget as HTMLElement
+  const rect = target.getBoundingClientRect()
+  const x = e.clientX - rect.left
+  const y = e.clientY - rect.top
+  // Pass only the x pixel value — ECharts' single-axis path in Grid.convertFromPixel
+  // calls axis.toLocalCoord(value) which treats value as a scalar.
+  const axisVal = chart.convertFromPixel({ xAxisIndex: 0 }, x)
+  if (typeof axisVal === 'number' && Number.isFinite(axisVal)) {
+    cursorPrice.value = axisVal
+    cursorPx.value = { x, y }
+  } else {
+    cursorPrice.value = null
+    cursorPx.value = null
+  }
+}
+
+function onChartLeave() {
+  cursorPrice.value = null
+  cursorPx.value = null
+}
+
+// Cumulative depth at a given price. For bids: sum of bids with price >= P.
+// For asks: sum of asks with price <= P. O(n) per call which is fine at our
+// orderbook scale.
+function depthAt(price: number, side: 'buy' | 'sell'): number {
+  let sats = 0
+  for (const o of props.orders) {
+    if (o.currency !== props.currency || o.side !== side) continue
+    if (side === 'buy' && o.price >= price) sats += o.amountSats
+    if (side === 'sell' && o.price <= price) sats += o.amountSats
+  }
+  return sats
+}
+
+// Side and depth at the cursor's current price. `side` is null when the
+// cursor is in the spread region (no depth on either side at that price).
+type CursorInfo = { price: number; side: 'buy' | 'sell' | null; depth: number }
+
+const cursorInfo = computed<CursorInfo | null>(() => {
+  const price = cursorPrice.value
+  if (price === null) return null
+  const bidDepth = depthAt(price, 'buy')
+  if (bidDepth > 0) return { price, side: 'buy', depth: bidDepth }
+  const askDepth = depthAt(price, 'sell')
+  if (askDepth > 0) return { price, side: 'sell', depth: askDepth }
+  return { price, side: null, depth: 0 }
+})
 
 // ── Colors ────────────────────────────────────────────────────────────────────
 const BID_COLOR = 'oklch(0.62 0.14 155)'
@@ -349,6 +418,20 @@ const option = computed(() => {
         margin: 8,
         hideOverlap: true,
       },
+      // Standalone axis pointer for the vertical line. The tooltip popup is
+      // a Vue overlay (see template), so triggerTooltip stays off.
+      axisPointer: {
+        show: true,
+        snap: false,
+        type: 'line' as const,
+        triggerTooltip: false,
+        lineStyle: {
+          color: 'oklch(0.6 0.005 80)',
+          width: 1,
+          type: 'solid' as const,
+        },
+        label: { show: false },
+      },
     },
     yAxis: {
       type: 'value' as const,
@@ -390,47 +473,9 @@ const option = computed(() => {
       },
       splitNumber: 4,
     },
-    tooltip: {
-      trigger: 'axis' as const,
-      axisPointer: {
-        type: 'line' as const,
-        lineStyle: {
-          color: 'oklch(0.6 0.005 80)',
-          width: 1,
-          type: 'solid' as const,
-        },
-      },
-      backgroundColor: 'oklch(1 0 0 / 0.96)',
-      borderColor: 'oklch(0.92 0.005 80)',
-      borderRadius: 8,
-      extraCssText: 'box-shadow: 0 4px 12px rgba(20,18,10,0.06); font-family: "Inter Tight", sans-serif; font-size: 12px;',
-      formatter: (params: unknown) => {
-        const items = params as Array<{ seriesName: string; data: [number, number]; axisValue: number }>
-        if (!items || !items.length) return ''
-        const price = items[0].axisValue
-        // Find the closest series to show
-        // If only one series, show it; if both, pick the one where price is in its range
-        let chosen: (typeof items)[0] | null = null
-        for (const item of items) {
-          if (item.data && item.data[1] > 0) {
-            chosen = item
-            break
-          }
-        }
-        if (!chosen) chosen = items[0]
-
-        const isBid = chosen.seriesName === 'bids'
-        const sideColor = isBid ? BID_COLOR : ASK_COLOR
-        const sideLabel = isBid ? 'BID' : 'ASK'
-        const cum = chosen.data ? chosen.data[1] : 0
-
-        return [
-          `<div style="color:${sideColor};font-weight:600;margin-bottom:3px">${sideLabel}</div>`,
-          `<div>Price: <b>${fmtFiat(price, props.currency)}</b></div>`,
-          `<div>Depth: <b>${fmtSatsCompact(cum, { bare: true })} <span class="sat-symbol" aria-label="sats">!</span></b></div>`,
-        ].join('')
-      },
-    },
+    // Built-in tooltip disabled — see the Vue overlay in the template that
+    // tracks cursor moves with per-pixel resolution.
+    tooltip: { show: false },
     graphic: graphicElements,
     series,
   }
@@ -438,17 +483,57 @@ const option = computed(() => {
 </script>
 
 <template>
-  <v-chart
-    v-if="option"
-    class="pb-depth-canvas"
-    :option="option"
-    :autoresize="true"
-  />
   <div
-    v-else
-    class="pb-depth-empty"
-    style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--ink-mute);font-size:13px"
+    class="pb-depth-host"
+    style="position:relative;width:100%;height:100%"
+    @mousemove="onChartMove"
+    @mouseleave="onChartLeave"
   >
-    No data
+    <v-chart
+      v-if="option"
+      ref="chartRef"
+      class="pb-depth-canvas"
+      :option="option"
+      :autoresize="true"
+    />
+    <div
+      v-else
+      class="pb-depth-empty"
+      style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--ink-mute);font-size:13px"
+    >
+      No data
+    </div>
+    <div
+      v-if="cursorInfo && cursorPx"
+      class="pb-depth-tip"
+      :style="{
+        position: 'absolute',
+        left: cursorPx.x + 14 + 'px',
+        top: cursorPx.y + 14 + 'px',
+        pointerEvents: 'none',
+        background: 'oklch(1 0 0 / 0.96)',
+        border: '1px solid oklch(0.92 0.005 80)',
+        borderRadius: '8px',
+        padding: '8px 10px',
+        boxShadow: '0 4px 12px rgba(20,18,10,0.06)',
+        fontFamily: '\'Inter Tight\', sans-serif',
+        fontSize: '12px',
+        whiteSpace: 'nowrap',
+        zIndex: 5,
+      }"
+    >
+      <div
+        v-if="cursorInfo.side"
+        :style="{
+          color: cursorInfo.side === 'buy' ? BID_COLOR : ASK_COLOR,
+          fontWeight: 600,
+          marginBottom: '3px',
+        }"
+      >{{ cursorInfo.side === 'buy' ? 'BID' : 'ASK' }}</div>
+      <div>Price: <b>{{ fmtFiat(cursorInfo.price, currency) }}</b></div>
+      <div v-if="cursorInfo.side">
+        Depth: <b>{{ fmtSatsCompact(cursorInfo.depth, { bare: true }) }} <SatSymbol /></b>
+      </div>
+    </div>
   </div>
 </template>
