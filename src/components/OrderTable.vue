@@ -109,7 +109,7 @@ function premColor(premium: number): string {
             <td class="col-sats pb-num pb-num--muted">{{ fmtSatsCompact(o.amountSats, { bare: true }) }} <SatSymbol /></td>
             <td class="col-methods"><MethodChips :methods="o.methods" /></td>
             <td class="col-rep">
-              <ReputationBar :completion="o.completion" :trades="o.trades" />
+              <ReputationBar v-bind="o.rep" />
             </td>
             <td class="col-src"><SourceDot :source="o.source" /></td>
             <td class="col-age pb-num pb-num--muted">{{ fmtTimeShort(o.ageMin) }}</td>

@@ -6,6 +6,7 @@ import { fmtFiat, fmtSats, fmtPremium, fmtAge } from '@/lib/data'
 import type { Order } from '@/lib/types'
 import type { RawNip69Order } from '@/lib/nip69/parseOrder'
 import SatSymbol from './SatSymbol.vue'
+import ReputationBar from './ReputationBar.vue'
 
 const props = defineProps<{
   order: Order
@@ -63,11 +64,6 @@ const methodsLabel = computed<string>(() =>
   props.order.methods.map((m) => m.label).join(', '),
 )
 
-const ratingDisplay = computed<string>(() => {
-  if (props.raw?.rating === undefined || props.raw.rating === null) return '—'
-  if (typeof props.raw.rating === 'string') return props.raw.rating
-  return JSON.stringify(props.raw.rating, null, 2)
-})
 
 // ── Clipboard ─────────────────────────────────────────────────────────────────
 
@@ -300,9 +296,26 @@ onUnmounted(() => {
               <span class="odd-meta-label">Name</span>
               <span class="odd-meta-value">{{ raw.name }}</span>
             </div>
-            <div v-if="raw.rating !== undefined && raw.rating !== null" class="odd-meta-row">
-              <span class="odd-meta-label">Rating</span>
-              <span class="odd-meta-value odd-mono">{{ ratingDisplay }}</span>
+            <template v-if="order.rep.kind === 'stars'">
+              <div class="odd-meta-row">
+                <span class="odd-meta-label">Reputation</span>
+                <span class="odd-meta-value odd-rep-row">
+                  <ReputationBar v-bind="order.rep" />
+                  <span class="odd-rep-num">{{ order.rep.rating.toFixed(2) }} / 5</span>
+                </span>
+              </div>
+              <div class="odd-meta-row">
+                <span class="odd-meta-label">Trades</span>
+                <span class="odd-meta-value odd-mono">{{ order.rep.count }}</span>
+              </div>
+              <div v-if="order.rep.days !== undefined" class="odd-meta-row">
+                <span class="odd-meta-label">Days on platform</span>
+                <span class="odd-meta-value odd-mono">{{ order.rep.days }}</span>
+              </div>
+            </template>
+            <div v-else class="odd-meta-row">
+              <span class="odd-meta-label">Reputation</span>
+              <span class="odd-meta-value">{{ order.rep.tooltip }}</span>
             </div>
           </div>
         </div>
@@ -573,6 +586,19 @@ onUnmounted(() => {
 .odd-meta-value {
   font-size: 12.5px;
   color: oklch(0.82 0.006 250);
+}
+
+.odd-rep-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.odd-rep-num {
+  font-family: 'IBM Plex Mono', 'JetBrains Mono', 'Fira Mono', monospace;
+  font-size: 11.5px;
+  color: oklch(0.6 0.006 250);
+  font-variant-numeric: tabular-nums;
 }
 
 /* ── E. Raw event ──────────────────────────────────────────────────────────── */

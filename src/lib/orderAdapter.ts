@@ -4,7 +4,7 @@
 // Returns null when the order cannot be meaningfully represented in the UI
 // (e.g. unknown fiat currency).
 
-import type { Order, PaymentMethod, SourceId } from './types'
+import type { Order, PaymentMethod, RepProps, SourceId } from './types'
 import type { RawNip69Order } from './nip69/parseOrder'
 import { CCY_LIST, PAYMENT_METHODS, REF_RATES, SOURCES } from './data'
 import type { Currency } from './types'
@@ -46,44 +46,57 @@ function resolvePaymentMethod(raw: string): PaymentMethod {
 }
 
 /**
- * Parse the lnp2pbot positional rating tuple.
+ * Derive the per-platform reputation summary for the Rep cell in the
+ * order tables. Each platform encodes reputation differently:
  *
- * The rating tag may be:
- *   - A positional string array (from parseOrder rest branch): ["0.97", "42", "30"]
- *   - A JSON object/scalar (unlikely in practice but handled)
- *   - Something else entirely
- *
- * When it looks like ["score", "total", ...]:
- *   score is a 0..1 fraction (or occasionally already 0..100 for legacy data).
- *   total is the number of trades.
+ *   lnp2pbot — positional string array `[stars, days, trades]` (1–5 stars)
+ *   mostro   — object `{ days, total_rating: 1–5, total_reviews }`
+ *   peach    — object `{ total_rating: 1–5, total_reviews }` (rating is a
+ *              sentinel `1` when total_reviews is 0)
+ *   robosats — no rating tag at all
  */
-function parseRating(rating: unknown): { reputation: number; completion: number; trades: number } {
-  const fallback = { reputation: 0, completion: 100, trades: 0 }
-
-  if (!rating) return fallback
-
-  // Array variant — positional tuple from parseOrder
-  if (Array.isArray(rating) && rating.length >= 2) {
-    const score = Number(rating[0])
-    const total = Number(rating[1])
-    if (!Number.isFinite(score) || !Number.isFinite(total)) return fallback
-
-    const trades = Math.round(total) || 0
-
-    // Determine whether score is a 0..1 fraction or a 0..100 integer.
-    // If it's greater than 1, treat as already-percentaged.
-    let completionRaw: number
-    if (score > 1) {
-      completionRaw = score
-    } else {
-      completionRaw = score * 100
+function deriveRep(rating: unknown, platform: string): RepProps {
+  // lnp2pbot: positional string array [stars, days, trades]
+  if (platform === 'lnp2pbot' && Array.isArray(rating) && rating.length >= 1) {
+    const stars = Number(rating[0])
+    const days = rating.length >= 2 ? Number(rating[1]) : NaN
+    const trades = rating.length >= 3 ? Number(rating[2]) : NaN
+    if (Number.isFinite(stars)) {
+      const count = Number.isFinite(trades) ? Math.round(trades) : 0
+      const daysRounded = Number.isFinite(days) ? Math.round(days) : undefined
+      const parts = [`${stars.toFixed(2)} stars`, `${count} trades`]
+      if (daysRounded !== undefined) parts.push(`${daysRounded} days on platform`)
+      return { kind: 'stars', rating: stars, count, days: daysRounded, tooltip: parts.join(' · ') }
     }
-    const completion = Math.min(100, Math.max(0, Math.round(completionRaw)))
-
-    return { reputation: trades, completion, trades }
   }
 
-  return fallback
+  // mostro / peach: object with total_rating + total_reviews (mostro also has days)
+  if ((platform === 'mostro' || platform === 'peach') && rating && typeof rating === 'object') {
+    const r = rating as { total_rating?: unknown; total_reviews?: unknown; days?: unknown }
+    const reviews = Number(r.total_reviews)
+    const stars = Number(r.total_rating)
+    // Peach defaults rating to 1 when there are zero reviews — sentinel, not data.
+    if (Number.isFinite(reviews) && reviews > 0 && Number.isFinite(stars)) {
+      const days = Number(r.days)
+      const daysRounded = Number.isFinite(days) ? Math.round(days) : undefined
+      const parts = [`${stars.toFixed(2)} stars`, `${reviews} reviews`]
+      if (daysRounded !== undefined) parts.push(`${daysRounded} days on platform`)
+      return {
+        kind: 'stars',
+        rating: stars,
+        count: reviews,
+        days: daysRounded,
+        tooltip: parts.join(' · '),
+      }
+    }
+    if (platform === 'peach') return { kind: 'empty', tooltip: 'No reviews yet' }
+  }
+
+  // robosats and unknowns: no signal
+  if (platform === 'robosats') {
+    return { kind: 'empty', tooltip: 'Robosats does not publish reputation data' }
+  }
+  return { kind: 'empty', tooltip: 'No reputation data' }
 }
 
 export function toVueOrder(
@@ -129,8 +142,8 @@ export function toVueOrder(
   // Payment method resolution — tolerant
   const methods: PaymentMethod[] = raw.paymentMethods.map(resolvePaymentMethod)
 
-  // Rating extraction
-  const { reputation, completion, trades } = parseRating(raw.rating)
+  // Per-platform reputation summary
+  const rep = deriveRep(raw.rating, raw.platform)
 
   // Age in minutes since the event was created
   const ageMin = Math.max(0, Math.floor((Date.now() / 1000 - raw.createdAt) / 60))
@@ -153,9 +166,7 @@ export function toVueOrder(
     methods,
     maker: raw.pubkey,
     makerHandle: raw.name ?? 'N/A',
-    reputation,
-    completion,
-    trades,
+    rep,
     ageMin,
     kind: 38383,
     expiresIn,

@@ -18,6 +18,15 @@ export interface Source {
   color: string;
 }
 
+// Per-platform reputation summary, derived in orderAdapter.deriveRep().
+// `kind: 'stars'` covers lnp2pbot/mostro/peach orders that have actual review
+// data; `kind: 'empty'` covers robosats (no rating tag) and the peach-zero
+// sentinel (`total_reviews: 0`, `total_rating: 1`). The tooltip carries the
+// platform-specific disambiguation for the empty cases.
+export type RepProps =
+  | { kind: 'stars'; rating: number; count: number; days?: number; tooltip: string }
+  | { kind: 'empty'; tooltip: string };
+
 export interface Order {
   id: string;
   source: SourceId;
@@ -31,9 +40,7 @@ export interface Order {
   methods: PaymentMethod[];
   maker: string;
   makerHandle: string;
-  reputation: number;
-  completion: number;
-  trades: number;
+  rep: RepProps;
   ageMin: number;
   relay: string;
   sourceLabel: string;
