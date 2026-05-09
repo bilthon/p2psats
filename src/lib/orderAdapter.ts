@@ -152,7 +152,7 @@ export function toVueOrder(
     maxFiat: raw.fiatAmount.max ?? raw.fiatAmount.min,
     methods,
     maker: raw.pubkey,
-    makerHandle: raw.name ?? raw.pubkey.slice(0, 8),
+    makerHandle: raw.name ?? 'N/A',
     reputation,
     completion,
     trades,

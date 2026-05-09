@@ -54,7 +54,6 @@ function premColor(premium: number): string {
           <col class="col-amount" />
           <col class="col-sats" />
           <col class="col-methods" />
-          <col class="col-maker" />
           <col class="col-rep" />
           <col class="col-src" />
           <col class="col-age" />
@@ -66,7 +65,6 @@ function premColor(premium: number): string {
             <th class="col-amount">Amount range</th>
             <th class="col-sats">Sats</th>
             <th class="col-methods">Payment</th>
-            <th class="col-maker">Maker</th>
             <th class="col-rep">Rep</th>
             <th class="col-src">Source</th>
             <th class="col-age">Age</th>
@@ -110,9 +108,6 @@ function premColor(premium: number): string {
             </td>
             <td class="col-sats pb-num pb-num--muted">{{ fmtSatsCompact(o.amountSats, { bare: true }) }} <SatSymbol /></td>
             <td class="col-methods"><MethodChips :methods="o.methods" /></td>
-            <td class="col-maker">
-              <span class="pb-maker-handle">@{{ o.makerHandle }}</span>
-            </td>
             <td class="col-rep">
               <ReputationBar :completion="o.completion" :trades="o.trades" />
             </td>
