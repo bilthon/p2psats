@@ -291,24 +291,30 @@ const option = computed(() => {
   // because it added clutter without new information now that yadio sits at
   // the chart's center.
   // `yadioRate` is already declared above in the domain block; reuse it here.
-  const YADIO_COLOR = 'oklch(0.55 0.13 245)'
+  const YADIO_COLOR = 'oklch(0.7 0.17 55)' // warm orange
 
   type MarkLineEntry = {
     xAxis: number
     label: {
       formatter: string
-      position: 'insideStartTop' | 'insideEndTop'
-      color?: string
+      position: 'end'
+      rotate: 0
+      distance: number
+      color: string
     }
-    lineStyle?: { color: string }
+    lineStyle: { color: string }
   }
   const markLineData: MarkLineEntry[] = []
   if (typeof yadioRate === 'number' && Number.isFinite(yadioRate)) {
     markLineData.push({
       xAxis: yadioRate,
       label: {
-        formatter: `yadio ${Math.round(yadioRate).toLocaleString()}`,
-        position: 'insideEndTop',
+        formatter: `yadio · ${Math.round(yadioRate).toLocaleString()}`,
+        // 'end' = top of the vertical line (above the chart's plot area).
+        // rotate: 0 forces horizontal text instead of the default 90° perp.
+        position: 'end',
+        rotate: 0,
+        distance: 4,
         color: YADIO_COLOR,
       },
       lineStyle: { color: YADIO_COLOR },
