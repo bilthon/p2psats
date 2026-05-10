@@ -11,8 +11,9 @@ import {
   GraphicComponent,
 } from 'echarts/components'
 import VChart from 'vue-echarts'
-import { midPrice, fmtFiat, fmtSatsCompact } from '@/lib/data'
+import { fmtFiat, fmtSatsCompact } from '@/lib/data'
 import type { CrossResult, Currency, Order } from '@/lib/types'
+import { useBtcRatesStore } from '@/services/btcRates'
 import SatSymbol from './SatSymbol.vue'
 
 use([
@@ -30,6 +31,8 @@ const props = defineProps<{
   currency: Currency
   crosses: CrossResult
 }>()
+
+const btcRates = useBtcRatesStore()
 
 // ── Custom cursor tracking (replaces ECharts tooltip for accuracy) ───────────
 // ECharts' built-in tooltip throttles renders at the data-point level, so the
@@ -152,32 +155,52 @@ const option = computed(() => {
   const hasBids = buyLevels.length > 0
   const hasAsks = sellLevels.length > 0
 
-  // ── Domain calculation: mirror around center with padding ──────────────────
-  // Center the chart so the staircase(s) sit on a mirror of equal range.
-  // `center` is the inner edge of available data: the mid for two-sided
-  // books, the best bid (bids-only), or the best ask (asks-only).
-  let center: number
-  let askExtent = 0
-  let bidExtent = 0
+  // ── Domain calculation: yadio-centered with padding ────────────────────────
+  // When yadio has resolved a rate for this currency, center the chart on it
+  // (P2P platforms price their premiums against yadio, so it's the natural
+  // reference). Otherwise fall back to the legacy mirror-around-mid algorithm
+  // so the chart still works during the startup window or when yadio doesn't
+  // carry the currency.
+  const yadioRate = btcRates.rates[props.currency]
+  const yadioUsable =
+    typeof yadioRate === 'number' && Number.isFinite(yadioRate) && yadioRate > 0
 
-  if (hasBids && hasAsks) {
-    const maxBid = Math.max(...buyLevels.map((l) => l.price))
-    const minAsk = Math.min(...sellLevels.map((l) => l.price))
-    center = (maxBid + minAsk) / 2
-    askExtent = Math.max(...sellLevels.map((l) => l.price)) - center
-    bidExtent = center - Math.min(...buyLevels.map((l) => l.price))
-  } else if (hasBids) {
-    const maxBid = Math.max(...buyLevels.map((l) => l.price))
-    center = maxBid
-    bidExtent = center - Math.min(...buyLevels.map((l) => l.price))
+  let center: number
+  let rawHalfSpan: number
+
+  if (yadioUsable) {
+    // Yadio path — single expression covers two-sided / one-sided / inverted
+    // cases. Drawing from buyLevels/sellLevels (not raw orders) keeps `lo` and
+    // `hi` aligned with the rounded staircase anchors for ARS/VES/etc.
+    center = yadioRate
+    const allLevelPrices = [
+      ...buyLevels.map((l) => l.price),
+      ...sellLevels.map((l) => l.price),
+    ]
+    const maxDistance = Math.max(...allLevelPrices.map((p) => Math.abs(p - center)))
+    rawHalfSpan = Math.max(maxDistance, center * 0.005)
   } else {
-    const minAsk = Math.min(...sellLevels.map((l) => l.price))
-    center = minAsk
-    askExtent = Math.max(...sellLevels.map((l) => l.price)) - center
+    // Fallback path — the legacy mirror-around-mid algorithm.
+    let askExtent = 0
+    let bidExtent = 0
+    if (hasBids && hasAsks) {
+      const maxBid = Math.max(...buyLevels.map((l) => l.price))
+      const minAsk = Math.min(...sellLevels.map((l) => l.price))
+      center = (maxBid + minAsk) / 2
+      askExtent = Math.max(...sellLevels.map((l) => l.price)) - center
+      bidExtent = center - Math.min(...buyLevels.map((l) => l.price))
+    } else if (hasBids) {
+      const maxBid = Math.max(...buyLevels.map((l) => l.price))
+      center = maxBid
+      bidExtent = center - Math.min(...buyLevels.map((l) => l.price))
+    } else {
+      const minAsk = Math.min(...sellLevels.map((l) => l.price))
+      center = minAsk
+      askExtent = Math.max(...sellLevels.map((l) => l.price)) - center
+    }
+    rawHalfSpan = Math.max(askExtent, bidExtent, center * 0.005)
   }
 
-  // Floor at 0.5% of center so a single-level book doesn't collapse to width 0.
-  const rawHalfSpan = Math.max(askExtent, bidExtent, center * 0.005)
   const halfSpan = rawHalfSpan * (1 + X_DOMAIN_PAD)
   const lo = center - halfSpan
   const hi = center + halfSpan
@@ -263,12 +286,39 @@ const option = computed(() => {
     ],
   }
 
-  // ── Mid price markLine ─────────────────────────────────────────────────────
-  const mid = midPrice(props.orders, props.currency)
-  const midMarkLine = mid != null
+  // ── Yadio reference markLine ───────────────────────────────────────────────
+  // Yadio is the only reference line shown — the mid-price line was removed
+  // because it added clutter without new information now that yadio sits at
+  // the chart's center.
+  // `yadioRate` is already declared above in the domain block; reuse it here.
+  const YADIO_COLOR = 'oklch(0.55 0.13 245)'
+
+  type MarkLineEntry = {
+    xAxis: number
+    label: {
+      formatter: string
+      position: 'insideStartTop' | 'insideEndTop'
+      color?: string
+    }
+    lineStyle?: { color: string }
+  }
+  const markLineData: MarkLineEntry[] = []
+  if (typeof yadioRate === 'number' && Number.isFinite(yadioRate)) {
+    markLineData.push({
+      xAxis: yadioRate,
+      label: {
+        formatter: `yadio ${Math.round(yadioRate).toLocaleString()}`,
+        position: 'insideEndTop',
+        color: YADIO_COLOR,
+      },
+      lineStyle: { color: YADIO_COLOR },
+    })
+  }
+  const midMarkLine = markLineData.length
     ? {
         silent: true,
         symbol: 'none',
+        // Default style applies to entries that don't override lineStyle.
         lineStyle: {
           color: 'oklch(0.45 0.005 80)',
           type: 'dashed' as const,
@@ -277,13 +327,11 @@ const option = computed(() => {
         },
         label: {
           show: true,
-          position: 'insideStartTop' as const,
-          formatter: `mid ${Math.round(mid).toLocaleString()}`,
           fontFamily: 'Inter Tight, sans-serif',
           fontSize: 10,
           color: 'oklch(0.4 0.005 80)',
         },
-        data: [{ xAxis: mid }],
+        data: markLineData,
       }
     : undefined
 
@@ -385,6 +433,9 @@ const option = computed(() => {
     lineStyle: { color: askLineGrad, width: 1.2 },
     emphasis: { disabled: true },
     z: 2,
+    // Mid + yadio markLines are owned by bidSeries when bids exist; if the
+    // book is asks-only, attach them here so the lines still render.
+    markLine: !hasBids ? midMarkLine : undefined,
   }
 
   const series = []
