@@ -19,17 +19,28 @@ export const REF_RATES: Record<Currency, number> = {
   PEN: 343_700,
 }
 
-export const FIAT_FORMAT: Record<Currency, { symbol: string; decimals: number; locale: string }> = {
-  USD: { symbol: '$',   decimals: 0, locale: 'en-US' },
-  EUR: { symbol: '€',   decimals: 0, locale: 'de-DE' },
-  BRL: { symbol: 'R$',  decimals: 0, locale: 'pt-BR' },
-  ARS: { symbol: 'AR$', decimals: 0, locale: 'es-AR' },
-  MXN: { symbol: 'MX$', decimals: 0, locale: 'es-MX' },
-  VES: { symbol: 'Bs.', decimals: 0, locale: 'es-VE' },
-  ZAR: { symbol: 'R',   decimals: 0, locale: 'en-ZA' },
-  RUB: { symbol: '₽',   decimals: 0, locale: 'ru-RU' },
-  PEN: { symbol: 'S/',  decimals: 0, locale: 'es-PE' },
+// Symbol and decimal precision per currency. Number separators (thousands /
+// decimal) follow the user's locale (USER_LOCALE below), not the currency's
+// home country, so all numbers in the app read consistently to the viewer.
+export const FIAT_FORMAT: Record<Currency, { symbol: string; decimals: number }> = {
+  USD: { symbol: '$',   decimals: 0 },
+  EUR: { symbol: '€',   decimals: 0 },
+  BRL: { symbol: 'R$',  decimals: 0 },
+  ARS: { symbol: 'AR$', decimals: 0 },
+  MXN: { symbol: 'MX$', decimals: 0 },
+  VES: { symbol: 'Bs.', decimals: 0 },
+  ZAR: { symbol: 'R',   decimals: 0 },
+  RUB: { symbol: '₽',   decimals: 0 },
+  PEN: { symbol: 'S/',  decimals: 0 },
 }
+
+// Single source of truth for locale-sensitive formatting (number separators,
+// date strings, etc.). Reads navigator.language at module load and falls back
+// to en-US when unavailable (older runtimes, SSR contexts). To make this
+// user-configurable later, lift it into the app store and pass through to
+// callers — no API change required at the call sites.
+export const USER_LOCALE: string =
+  typeof navigator !== 'undefined' && navigator.language ? navigator.language : 'en-US'
 
 export const CCY_LIST: Currency[] = ['USD', 'EUR', 'BRL', 'ARS', 'MXN', 'VES', 'ZAR', 'RUB', 'PEN']
 
@@ -174,12 +185,12 @@ export function buildMockOrders(currency: Currency, count = 22, seed = 42): Orde
 export function fmtFiat(n: number, ccy: Currency, opts: { bare?: boolean } = {}): string {
   const f = FIAT_FORMAT[ccy] ?? FIAT_FORMAT['USD']
   const v = Math.round(n)
-  const formatted = v.toLocaleString(f.locale, { maximumFractionDigits: f.decimals })
+  const formatted = v.toLocaleString(USER_LOCALE, { maximumFractionDigits: f.decimals })
   return opts.bare ? formatted : `${f.symbol}${formatted}`
 }
 
 export function fmtSats(sats: number, opts: { bare?: boolean } = {}): string {
-  const formatted = Math.round(sats).toLocaleString('en-US')
+  const formatted = Math.round(sats).toLocaleString(USER_LOCALE)
   return opts.bare ? formatted : `${formatted} sats`
 }
 
@@ -188,16 +199,17 @@ export function fmtSatsCompact(sats: number, opts: { bare?: boolean } = {}): str
   if (sats >= 1e8) formatted = (sats / 1e6).toFixed(1) + 'M'
   else if (sats >= 1e6) formatted = (sats / 1e6).toFixed(2) + 'M'
   else if (sats >= 1e3) formatted = (sats / 1e3).toFixed(0) + 'k'
-  else formatted = Math.round(sats).toLocaleString('en-US')
+  else formatted = Math.round(sats).toLocaleString(USER_LOCALE)
   return opts.bare ? formatted : `${formatted} sats`
 }
 
 export function fmtAge(min: number): string {
   if (min < 1) return 'just now'
-  if (min < 60) return min + 'm ago'
+  const nf = new Intl.NumberFormat(USER_LOCALE)
+  if (min < 60) return nf.format(Math.floor(min)) + 'm ago'
   const h = Math.floor(min / 60)
-  if (h < 24) return h + 'h ' + (min % 60) + 'm ago'
-  return Math.floor(h / 24) + 'd ago'
+  if (h < 24) return h + 'h ' + nf.format(Math.floor(min % 60)) + 'm ago'
+  return nf.format(Math.floor(h / 24)) + 'd ago'
 }
 
 export function fmtPremium(p: number): string {

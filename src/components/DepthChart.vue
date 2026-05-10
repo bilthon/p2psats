@@ -11,7 +11,7 @@ import {
   GraphicComponent,
 } from 'echarts/components'
 import VChart from 'vue-echarts'
-import { fmtFiat, fmtSatsCompact } from '@/lib/data'
+import { fmtFiat, fmtSatsCompact, USER_LOCALE } from '@/lib/data'
 import type { CrossResult, Currency, Order } from '@/lib/types'
 import { useBtcRatesStore } from '@/services/btcRates'
 import SatSymbol from './SatSymbol.vue'
@@ -309,7 +309,7 @@ const option = computed(() => {
     markLineData.push({
       xAxis: yadioRate,
       label: {
-        formatter: `yadio · ${Math.round(yadioRate).toLocaleString()}`,
+        formatter: `yadio · ${Math.round(yadioRate).toLocaleString(USER_LOCALE)}`,
         // 'end' = top of the vertical line (above the chart's plot area).
         // rotate: 0 forces horizontal text instead of the default 90° perp.
         position: 'end',
