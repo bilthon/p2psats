@@ -1,28 +1,34 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import type { BookView, Currency, Density, Order } from '@/lib/types'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import type { Currency, Order } from '@/lib/types'
 import OrderTable from './OrderTable.vue'
 
 const props = defineProps<{
   buys: Order[]
   sells: Order[]
   currency: Currency
-  density: Density
-  showPremium: boolean
-  view: BookView
   crossedBuyIds: Set<string>
   crossedSellIds: Set<string>
 }>()
 
-const emit = defineEmits<{ changeView: [v: BookView]; select: [order: Order] }>()
+// Comfy density everywhere (the previous tweakable density setting was retired
+// along with the TweaksPanel). 44 px matches the prior `comfy` row height.
+const rowH = 44
+
+const emit = defineEmits<{ select: [order: Order] }>()
 
 const activeTab = ref<'buy' | 'sell'>('buy')
 
-const rowH = computed(() => {
-  if (props.density === 'compact') return 30
-  if (props.density === 'comfy') return 44
-  return 36
-})
+// Split layout on desktop (≥ 768 px), tabbed list on narrower viewports.
+// Reactive via matchMedia so resizing the window swaps live without reload.
+const mql = window.matchMedia('(min-width: 768px)')
+const isDesktop = ref(mql.matches)
+function onMqlChange(e: MediaQueryListEvent) {
+  isDesktop.value = e.matches
+}
+onMounted(() => mql.addEventListener('change', onMqlChange))
+onUnmounted(() => mql.removeEventListener('change', onMqlChange))
+const view = computed<'split' | 'tabs'>(() => (isDesktop.value ? 'split' : 'tabs'))
 
 const crossedBuyN = computed(() => props.crossedBuyIds.size)
 const crossedSellN = computed(() => props.crossedSellIds.size)
@@ -38,18 +44,13 @@ const BID_COLOR = 'oklch(0.62 0.14 155)'
 const ASK_COLOR = 'oklch(0.6 0.18 25)'
 const BID_TINT = 'oklch(0.62 0.14 155 / 0.07)'
 const ASK_TINT = 'oklch(0.6 0.18 25 / 0.07)'
-
-const VIEW_OPTIONS: Array<{ v: BookView; l: string }> = [
-  { v: 'tabs', l: 'Tabs' },
-  { v: 'split', l: 'Split' },
-  { v: 'stacked', l: 'Stack' },
-]
 </script>
 
 <template>
   <section class="pb-book-card">
-    <!-- Header -->
-    <div class="pb-book-hd">
+    <!-- Header (tabs mode only — in split mode each OrderTable renders its
+         own Bids/Asks title with count, so the header would just duplicate). -->
+    <div v-if="view === 'tabs'" class="pb-book-hd">
       <div class="pb-book-tabs" role="tablist" aria-label="Order book side">
         <button
           role="tab"
@@ -81,20 +82,9 @@ const VIEW_OPTIONS: Array<{ v: BookView; l: string }> = [
           >
         </button>
       </div>
-      <div class="pb-book-view">
-        <button
-          v-for="o in VIEW_OPTIONS"
-          :key="o.v"
-          type="button"
-          :class="['pb-tab', view === o.v ? 'pb-tab--on' : '']"
-          @click="emit('changeView', o.v)"
-        >
-          {{ o.l }}
-        </button>
-      </div>
     </div>
 
-    <!-- Split view: two columns -->
+    <!-- Split layout (desktop) — two columns -->
     <div v-if="view === 'split'" class="pb-book-grid">
       <OrderTable
         title="Bids"
@@ -102,7 +92,7 @@ const VIEW_OPTIONS: Array<{ v: BookView; l: string }> = [
         :orders="sortedBuys"
         :currency="currency"
         :row-h="rowH"
-        :show-premium="showPremium"
+        :show-premium="true"
         :crossed-ids="crossedBuyIds"
         :side-color="BID_COLOR"
         :side-tint="BID_TINT"
@@ -115,7 +105,7 @@ const VIEW_OPTIONS: Array<{ v: BookView; l: string }> = [
         :orders="sortedSells"
         :currency="currency"
         :row-h="rowH"
-        :show-premium="showPremium"
+        :show-premium="true"
         :crossed-ids="crossedSellIds"
         :side-color="ASK_COLOR"
         :side-tint="ASK_TINT"
@@ -124,37 +114,7 @@ const VIEW_OPTIONS: Array<{ v: BookView; l: string }> = [
       />
     </div>
 
-    <!-- Stacked view: bids above asks -->
-    <div v-else-if="view === 'stacked'" class="pb-book-stack">
-      <OrderTable
-        title="Bids"
-        side="buy"
-        :orders="sortedBuys"
-        :currency="currency"
-        :row-h="rowH"
-        :show-premium="showPremium"
-        :crossed-ids="crossedBuyIds"
-        :side-color="BID_COLOR"
-        :side-tint="BID_TINT"
-        :embedded="true"
-        @select="emit('select', $event)"
-      />
-      <OrderTable
-        title="Asks"
-        side="sell"
-        :orders="sortedSells"
-        :currency="currency"
-        :row-h="rowH"
-        :show-premium="showPremium"
-        :crossed-ids="crossedSellIds"
-        :side-color="ASK_COLOR"
-        :side-tint="ASK_TINT"
-        :embedded="true"
-        @select="emit('select', $event)"
-      />
-    </div>
-
-    <!-- Tabs view: single list -->
+    <!-- Tabs layout (mobile) — single list driven by activeTab -->
     <OrderTable
       v-else
       :title="activeTab === 'buy' ? 'Bids' : 'Asks'"
@@ -162,7 +122,7 @@ const VIEW_OPTIONS: Array<{ v: BookView; l: string }> = [
       :orders="activeTab === 'buy' ? sortedBuys : sortedSells"
       :currency="currency"
       :row-h="rowH"
-      :show-premium="showPremium"
+      :show-premium="true"
       :crossed-ids="activeTab === 'buy' ? crossedBuyIds : crossedSellIds"
       :side-color="activeTab === 'buy' ? BID_COLOR : ASK_COLOR"
       :side-tint="activeTab === 'buy' ? BID_TINT : ASK_TINT"

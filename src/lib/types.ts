@@ -80,12 +80,3 @@ export interface CrossResult {
   minSell: Order | null;
 }
 
-export type Density = 'compact' | 'balanced' | 'comfy';
-export type BookView = 'tabs' | 'split' | 'stacked';
-
-export interface TweakValues {
-  density: Density;
-  showPremium: boolean;
-  highlightAccent: string;
-  bookView: BookView;
-}

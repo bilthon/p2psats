@@ -334,7 +334,6 @@ button { font-family: inherit; cursor: pointer; }
   background: oklch(1 0 0 / 0.6);
   color: inherit; opacity: 0.75;
 }
-.pb-book-view { display: flex; gap: 2px; padding: 2px; background: var(--bg-soft); border-radius: 8px; }
 .pb-book-grid {
   display: grid; grid-template-columns: 1fr 1fr;
   gap: 16px;
@@ -348,7 +347,6 @@ button { font-family: inherit; cursor: pointer; }
   overflow: hidden;
 }
 .pb-book-grid > * + * { border-left: 1px solid var(--line); }
-.pb-book-stack > * + * { border-top: 1px solid var(--line); }
 .pb-table-wrap--embedded {
   background: transparent; border: none; border-radius: 0;
   box-shadow: none;

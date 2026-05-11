@@ -157,12 +157,8 @@ watch(
     :buys="store.buys"
     :sells="store.sells"
     :currency="store.currency"
-    :density="store.density"
-    :show-premium="store.showPremium"
-    :view="store.bookView"
     :crossed-buy-ids="store.crosses.crossedBuyIds"
     :crossed-sell-ids="store.crosses.crossedSellIds"
-    @change-view="store.setBookView"
     @select="selectedOrder = $event"
   />
 

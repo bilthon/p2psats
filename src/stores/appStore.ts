@@ -9,7 +9,7 @@ import { matchesRule } from '@/lib/alerts'
 import { useNostrOrderbookStore } from '@/services/nostrOrderbook'
 import { useBtcRatesStore } from '@/services/btcRates'
 import { toVueOrder } from '@/lib/orderAdapter'
-import type { Alert, Currency, Order, TweakValues } from '@/lib/types'
+import type { Alert, Currency, Order } from '@/lib/types'
 
 // pe.page is intentionally omitted — the route URL is the source of truth for
 // the active page; persisting it redundantly would risk drift on cross-tab use.
@@ -17,10 +17,6 @@ const PE_KEYS = {
   currency: 'pe.currency',
   sources: 'pe.sources',
   alerts: 'pe.alerts',
-  density: 'pe.density',
-  showPremium: 'pe.showPremium',
-  highlightAccent: 'pe.highlightAccent',
-  bookView: 'pe.bookView',
 } as const
 
 function readStorage<T>(key: string, fallback: T): T {
@@ -47,18 +43,6 @@ export const useAppStore = defineStore('app', () => {
     readStorage<string[]>(PE_KEYS.sources, ['mostro', 'lnp2pbot', 'robosats', 'peach']),
   )
   const alerts = ref<Alert[]>(readStorage<Alert[]>(PE_KEYS.alerts, []))
-
-  // Tweaks
-  const density = ref<TweakValues['density']>(
-    readStorage<TweakValues['density']>(PE_KEYS.density, 'balanced'),
-  )
-  const showPremium = ref<boolean>(readStorage<boolean>(PE_KEYS.showPremium, true))
-  const highlightAccent = ref<string>(
-    readStorage<string>(PE_KEYS.highlightAccent, '#5B5BD6'),
-  )
-  const bookView = ref<TweakValues['bookView']>(
-    readStorage<TweakValues['bookView']>(PE_KEYS.bookView, 'split'),
-  )
 
   // ── Derived / computed ───────────────────────────────────────────────────
 
@@ -157,39 +141,11 @@ export const useAppStore = defineStore('app', () => {
     writeStorage(PE_KEYS.alerts, alerts.value)
   }
 
-  // Tweaks setters
-  function setDensity(v: TweakValues['density']) {
-    density.value = v
-    writeStorage(PE_KEYS.density, v)
-  }
-  function setShowPremium(v: boolean) {
-    showPremium.value = v
-    writeStorage(PE_KEYS.showPremium, v)
-  }
-  function setHighlightAccent(v: string) {
-    highlightAccent.value = v
-    writeStorage(PE_KEYS.highlightAccent, v)
-    document.documentElement.style.setProperty('--pe-accent', v)
-  }
-  function setBookView(v: TweakValues['bookView']) {
-    bookView.value = v
-    writeStorage(PE_KEYS.bookView, v)
-  }
-
-  // Apply accent on store creation
-  if (highlightAccent.value !== '#5B5BD6') {
-    document.documentElement.style.setProperty('--pe-accent', highlightAccent.value)
-  }
-
   return {
     // state
     currency,
     activeSources,
     alerts,
-    density,
-    showPremium,
-    highlightAccent,
-    bookView,
     // derived
     allOrders,
     ccyOrders,
@@ -213,9 +169,5 @@ export const useAppStore = defineStore('app', () => {
     addAlert,
     removeAlert,
     toggleAlert,
-    setDensity,
-    setShowPremium,
-    setHighlightAccent,
-    setBookView,
   }
 })
