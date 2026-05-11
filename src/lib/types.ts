@@ -2,7 +2,9 @@
 
 export type SourceId = 'mostro' | 'lnp2pbot' | 'robosats' | 'peach' | 'hodlhodl' | 'nostr';
 export type Side = 'buy' | 'sell';
-export type Currency = 'USD' | 'EUR' | 'BRL' | 'ARS' | 'MXN' | 'VES' | 'ZAR' | 'RUB' | 'PEN';
+export type Currency =
+  | 'USD' | 'EUR' | 'BRL' | 'ARS' | 'MXN' | 'VES' | 'ZAR' | 'RUB' | 'PEN'
+  | 'CLP' | 'COP' | 'PYG';
 
 export interface PaymentMethod {
   id: string;

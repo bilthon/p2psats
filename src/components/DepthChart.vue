@@ -118,8 +118,11 @@ interface Level {
 
 function buildLevels(orders: Order[], side: 'buy' | 'sell', currency: Currency): Level[] {
   const filtered = orders.filter((o) => o.side === side && o.currency === currency)
+  // High-nominal-per-BTC currencies (millions/billions per BTC) bucket to the
+  // nearest 1000; mid-nominal ones to the nearest 10; the rest to the nearest 1.
   const decimals =
-    currency === 'ARS' || currency === 'VES'
+    currency === 'ARS' || currency === 'VES' || currency === 'PYG'
+      || currency === 'COP' || currency === 'CLP'
       ? -3
       : currency === 'BRL' || currency === 'MXN' || currency === 'RUB'
         ? -1

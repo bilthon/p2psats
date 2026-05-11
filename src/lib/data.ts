@@ -23,15 +23,18 @@ export const REF_RATES: Record<Currency, number> = {
 // decimal) follow the user's locale (USER_LOCALE below), not the currency's
 // home country, so all numbers in the app read consistently to the viewer.
 export const FIAT_FORMAT: Record<Currency, { symbol: string; decimals: number }> = {
-  USD: { symbol: '$',   decimals: 0 },
-  EUR: { symbol: '€',   decimals: 0 },
-  BRL: { symbol: 'R$',  decimals: 0 },
-  ARS: { symbol: 'AR$', decimals: 0 },
-  MXN: { symbol: 'MX$', decimals: 0 },
-  VES: { symbol: 'Bs.', decimals: 0 },
-  ZAR: { symbol: 'R',   decimals: 0 },
-  RUB: { symbol: '₽',   decimals: 0 },
-  PEN: { symbol: 'S/',  decimals: 0 },
+  USD: { symbol: '$',    decimals: 0 },
+  EUR: { symbol: '€',    decimals: 0 },
+  BRL: { symbol: 'R$',   decimals: 0 },
+  ARS: { symbol: 'AR$',  decimals: 0 },
+  MXN: { symbol: 'MX$',  decimals: 0 },
+  VES: { symbol: 'Bs.',  decimals: 0 },
+  ZAR: { symbol: 'R',    decimals: 0 },
+  RUB: { symbol: '₽',    decimals: 0 },
+  PEN: { symbol: 'S/',   decimals: 0 },
+  CLP: { symbol: 'CL$',  decimals: 0 },
+  COP: { symbol: 'COL$', decimals: 0 },
+  PYG: { symbol: '₲',    decimals: 0 },
 }
 
 // Single source of truth for locale-sensitive formatting (number separators,
@@ -42,7 +45,10 @@ export const FIAT_FORMAT: Record<Currency, { symbol: string; decimals: number }>
 export const USER_LOCALE: string =
   typeof navigator !== 'undefined' && navigator.language ? navigator.language : 'en-US'
 
-export const CCY_LIST: Currency[] = ['USD', 'EUR', 'BRL', 'ARS', 'MXN', 'VES', 'ZAR', 'RUB', 'PEN']
+export const CCY_LIST: Currency[] = [
+  'USD', 'EUR', 'BRL', 'ARS', 'MXN', 'VES', 'ZAR', 'RUB', 'PEN',
+  'CLP', 'COP', 'PYG',
+]
 
 export const CCY_LABEL: Record<Currency, string> = {
   USD: 'US Dollar',
@@ -54,6 +60,9 @@ export const CCY_LABEL: Record<Currency, string> = {
   ZAR: 'South African Rand',
   RUB: 'Russian Ruble',
   PEN: 'Peruvian Sol',
+  CLP: 'Chilean Peso',
+  COP: 'Colombian Peso',
+  PYG: 'Paraguayan Guaraní',
 }
 
 export const SOURCES: Source[] = [
@@ -71,7 +80,7 @@ export const PAYMENT_METHODS: PaymentMethod[] = [
   { id: 'ach',           label: 'ACH',           group: 'bank',   regions: ['USD'] },
   { id: 'pix',           label: 'PIX',           group: 'bank',   regions: ['BRL'] },
   { id: 'spei',          label: 'SPEI',          group: 'bank',   regions: ['MXN'] },
-  { id: 'transferencia', label: 'Transferencia', group: 'bank',   regions: ['ARS', 'VES', 'PEN'] },
+  { id: 'transferencia', label: 'Transferencia', group: 'bank',   regions: ['ARS', 'VES', 'PEN', 'CLP', 'COP', 'PYG'] },
   { id: 'eft',           label: 'EFT',           group: 'bank',   regions: ['ZAR'] },
   { id: 'sbp',           label: 'SBP',           group: 'bank',   regions: ['RUB'] },
   { id: 'cash',          label: 'Cash',          group: 'cash',   regions: '*' },
