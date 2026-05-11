@@ -17,6 +17,9 @@ export const REF_RATES: Record<Currency, number> = {
   ZAR: 1_692_000,
   RUB: 8_415_000,
   PEN: 343_700,
+  CLP: 135_000,
+  COP: 1_000_000,
+  PYG: 1_000_000,
 }
 
 // Symbol and decimal precision per currency. Number separators (thousands /
@@ -160,8 +163,8 @@ export function buildMockOrders(currency: Currency, count = 22, seed = 42): Orde
 
     const source = SOURCES[Math.floor(rng() * SOURCES.length)]
     const ageMin = Math.floor(rng() * 720)
-    const rep = Math.floor(rng() * 200)
-    const completion = 80 + Math.floor(rng() * 21)
+    const repRating = +(3 + rng() * 2).toFixed(2)
+    const repCount = Math.floor(rng() * 400)
 
     orders.push({
       id: 'evt_' + (seed + i).toString(16).padStart(6, '0') + Math.floor(rng() * 1e6).toString(16),
@@ -179,9 +182,12 @@ export function buildMockOrders(currency: Currency, count = 22, seed = 42): Orde
       maker: makeNpub(rng),
       makerHandle:
         MAKER_HANDLES[Math.floor(rng() * MAKER_HANDLES.length)] + Math.floor(rng() * 99),
-      reputation: rep,
-      completion,
-      trades: Math.floor(rng() * 400),
+      rep: {
+        kind: 'stars',
+        rating: repRating,
+        count: repCount,
+        tooltip: `${repRating.toFixed(2)} stars · ${repCount} trades`,
+      },
       ageMin,
       kind: 38383,
       expiresIn: 60 + Math.floor(rng() * 540),
