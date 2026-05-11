@@ -1,12 +1,14 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from "vue-router";
 
 const routes: RouteRecordRaw[] = [
-  { path: "/", redirect: "/book" },
   {
-    path: "/book",
-    name: "book",
-    component: () => import("./views/BookView.vue"),
+    path: "/",
+    name: "home",
+    component: () => import("./views/HomeView.vue"),
   },
+  // Permanent redirect from the legacy /book path so older bookmarks still
+  // land on the home page.
+  { path: "/book", redirect: "/" },
   {
     path: "/alerts",
     name: "alerts",

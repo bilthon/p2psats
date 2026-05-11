@@ -26,8 +26,8 @@ onUnmounted(() => {
   btcRates.stop()
 })
 
-function navigateTo(page: 'book' | 'alerts') {
-  void router.push('/' + page)
+function goHome() {
+  void router.push('/')
 }
 
 function onCurrencyChange(c: Currency) {
@@ -74,8 +74,8 @@ function onCurrencyChange(c: Currency) {
     <nav class="pb-nav" aria-label="Primary">
       <button
         type="button"
-        :class="['pb-nav-item', route.path === '/book' ? 'pb-nav-item--on' : '']"
-        @click="navigateTo('book')"
+        :class="['pb-nav-item', route.path === '/' ? 'pb-nav-item--on' : '']"
+        @click="goHome"
       >
         <svg
           width="16"
@@ -127,7 +127,7 @@ function onCurrencyChange(c: Currency) {
           P2P Explorer<span class="pb-foot-tag">nostr · NIP-69</span>
         </div>
         <nav class="pb-foot-links" aria-label="Footer">
-          <RouterLink to="/book" class="pb-foot-link">Home</RouterLink>
+          <RouterLink to="/" class="pb-foot-link">Home</RouterLink>
           <RouterLink to="/about" class="pb-foot-link">About</RouterLink>
           <RouterLink to="/contact" class="pb-foot-link">Contact</RouterLink>
         </nav>
