@@ -94,8 +94,10 @@ function onCurrencyChange(c: Currency) {
       </button>
       <button
         type="button"
-        :class="['pb-nav-item', route.path === '/alerts' ? 'pb-nav-item--on' : '']"
-        @click="navigateTo('alerts')"
+        class="pb-nav-item pb-nav-item--disabled"
+        disabled
+        aria-disabled="true"
+        title="Alerts are coming soon"
       >
         <svg
           width="16"
@@ -111,9 +113,7 @@ function onCurrencyChange(c: Currency) {
           <path d="M13.73 21a2 2 0 0 1-3.46 0" />
         </svg>
         <span>Alerts</span>
-        <span v-if="store.alerts.length > 0" class="pb-nav-count">{{
-          store.activeAlerts
-        }}</span>
+        <span class="pb-nav-soon">coming soon</span>
       </button>
     </nav>
 
