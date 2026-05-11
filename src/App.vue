@@ -122,9 +122,21 @@ function onCurrencyChange(c: Currency) {
 
     <!-- ── Footer ──────────────────────────────────────────── -->
     <footer class="pb-foot">
-      <span>Aggregated from public nostr relays. Read-only — this site doesn't take orders.</span>
-      <span class="pb-foot-sep">·</span>
-      <span>Reference rate from Kraken spot.</span>
+      <div class="pb-foot-row pb-foot-row--top">
+        <div class="pb-foot-brand">
+          P2P Explorer<span class="pb-foot-tag">nostr · NIP-69</span>
+        </div>
+        <nav class="pb-foot-links" aria-label="Footer">
+          <RouterLink to="/book" class="pb-foot-link">Home</RouterLink>
+          <RouterLink to="/about" class="pb-foot-link">About</RouterLink>
+          <RouterLink to="/contact" class="pb-foot-link">Contact</RouterLink>
+        </nav>
+      </div>
+      <div class="pb-foot-row pb-foot-row--bottom">
+        <span>Aggregated from public nostr relays. Read-only — this site doesn't take orders.</span>
+        <span class="pb-foot-sep">·</span>
+        <span>Reference rate from yadio.</span>
+      </div>
     </footer>
   </div>
 </template>
