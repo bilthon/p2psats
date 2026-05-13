@@ -13,7 +13,7 @@
     "home": "Inicio",
     "about": "Acerca de",
     "contact": "Contacto",
-    "aggregated": "Agregado desde relés nostr públicos. Solo lectura — este sitio no toma órdenes.",
+    "aggregated": "Agregado desde relés nostr públicos. Solo lectura (este sitio no toma órdenes).",
     "referenceRate": "Tasa de referencia de yadio."
   },
   "home": {
@@ -38,10 +38,10 @@
   },
   "about": {
     "title": "Acerca de",
-    "lead": "La privacidad es un requisito previo de la libertad. Poder operar sin ser observado, perfilado ni controlado por intermediarios ávidos de datos no es un lujo: es la base de cualquier mercado libre y, en última instancia, de cualquier sociedad libre.",
-    "p1": "P2P sats es una herramienta para el mercado de Bitcoin peer-to-peer. Toma datos de órdenes en vivo desde relés públicos de Nostr, donde plataformas como Mostro, lnp2pbot, RoboSats y Peach publican sus ofertas bajo NIP-69, y los reúne en una vista única y unificada.",
-    "p2": "Hoy este mercado está fragmentado. La liquidez, los precios y los métodos de pago se reparten entre aplicaciones y bots distintos, cada uno con su propia porción aislada del flujo de órdenes. Esa fragmentación nos cuesta a todos: peores ejecuciones, emparejamientos más lentos y oportunidades de arbitraje desaprovechadas. Al unificar la vista, P2P sats ayuda a que los traders se encuentren y comparen precios entre plataformas, con el objetivo de lograr más liquidez y un mercado más eficiente en su conjunto.",
-    "p3": "Este sitio no maneja cuentas, no toma órdenes ni custodia fondos. Es solo una ventana de solo lectura a lo que ya es público en los relés. Para operar de verdad, ve a la plataforma que publicó la orden que te interesa."
+    "lead": "Sin privacidad no hay libertad. Poder mover valor sin que te vigilen, te perfilen ni te dejen afuera por capricho de un intermediario ávido de datos no es un lujo: es el cimiento de cualquier mercado libre y, a fin de cuentas, de cualquier sociedad libre.",
+    "p1": "P2P sats es una herramienta para el mercado de Bitcoin peer-to-peer. Toma órdenes en vivo desde relés públicos de Nostr (donde plataformas como Mostro, lnp2pbot, RoboSats y Peach publican sus ofertas usando NIP-69) y las reúne todas en un solo libro de órdenes.",
+    "p2": "Hoy ese mercado está pulverizado: la liquidez, los precios y los métodos de pago se reparten entre apps y bots, cada uno con su porción aislada del flujo. Y esa fragmentación nos sale cara a todos (peores precios, órdenes que tardan en cruzarse, arbitrajes que se quedan en el aire). Al juntar todo en un mismo lugar, P2P sats ayuda a que los traders se encuentren y comparen precios entre plataformas, con la meta clara de sumar liquidez y hacer el mercado más eficiente en conjunto.",
+    "p3": "Aquí no hay cuentas, no hay órdenes, no hay fondos pasando por nuestras manos. Es solo una ventana a lo que ya es público en los relés (lectura y nada más). Para operar en serio, hay que ir a la plataforma que publicó la orden."
   },
   "contact": {
     "title": "Contacto",
@@ -53,11 +53,11 @@
   "arbitrage": {
     "clean": {
       "title": "El libro es consistente",
-      "sub": "No hay órdenes cruzadas ahora mismo — cada oferta está por debajo de cada venta."
+      "sub": "No hay órdenes cruzadas ahora mismo (cada oferta está por debajo de cada venta)."
     },
     "detected": "ningún par cruzado detectado | {count} par cruzado detectado | {count} pares cruzados detectados",
     "shared": "{count} con método de pago compartido",
-    "best": "Mejor oportunidad: comprar en {ask} ({askSrc}), vender en {bid} ({bidSrc}) — diferencial {spread} ({fiat} por BTC)",
+    "best": "Mejor oportunidad: comprar en {ask} ({askSrc}), vender en {bid} ({bidSrc}), diferencial {spread} ({fiat} por BTC)",
     "cta": "Ver todos"
   },
   "currencySwitcher": {
@@ -138,19 +138,19 @@
   },
   "seo": {
     "home": {
-      "title": "Libro de órdenes P2P de Bitcoin en vivo — P2P sats",
+      "title": "Libro de órdenes P2P de Bitcoin en vivo | P2P sats",
       "description": "Libro de órdenes peer-to-peer de Bitcoin agregado desde relés Nostr vía NIP-69. Compara precios entre Mostro, lnp2pbot, RoboSats y Peach."
     },
     "alerts": {
-      "title": "Alertas de órdenes P2P — P2P sats",
+      "title": "Alertas de órdenes P2P | P2P sats",
       "description": "Configura alertas de precio y diferencial para órdenes P2P de Bitcoin en Nostr. Recibe notificaciones al instante cuando aparezca una orden NIP-69 que coincida."
     },
     "about": {
-      "title": "Acerca de — P2P sats",
-      "description": "P2P sats es un agregador de órdenes de Bitcoin sin custodia que prioriza la privacidad. Lee órdenes NIP-69 de relés públicos de Nostr — sin cuentas ni rastreo de datos."
+      "title": "Acerca de | P2P sats",
+      "description": "P2P sats es un agregador de órdenes de Bitcoin sin custodia que prioriza la privacidad. Lee órdenes NIP-69 de relés públicos de Nostr (sin cuentas ni rastreo de datos)."
     },
     "contact": {
-      "title": "Contacto — P2P sats",
+      "title": "Contacto | P2P sats",
       "description": "Contáctanos vía Nostr o correo electrónico. Reporta errores, comparte sugerencias o conversa sobre Bitcoin peer-to-peer."
     }
   },

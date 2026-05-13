@@ -13,7 +13,7 @@
     "home": "Início",
     "about": "Sobre",
     "contact": "Contato",
-    "aggregated": "Agregado de relays nostr públicos. Somente leitura — este site não aceita ordens.",
+    "aggregated": "Agregado de relays nostr públicos. Somente leitura (este site não aceita ordens).",
     "referenceRate": "Taxa de referência do yadio."
   },
   "home": {
@@ -38,10 +38,10 @@
   },
   "about": {
     "title": "Sobre",
-    "lead": "A privacidade é um pré-requisito para a liberdade. Poder transacionar sem ser vigiado, perfilado ou barrado por intermediários ávidos por dados não é luxo — é o alicerce de qualquer mercado livre e, em última instância, de qualquer sociedade livre.",
-    "p1": "O P2P sats é uma ferramenta para o mercado de Bitcoin peer-to-peer. Ele obtém dados de ordens ao vivo de relays públicos do Nostr, onde plataformas como Mostro, lnp2pbot, RoboSats e Peach publicam suas ofertas sob o NIP-69, e reúne tudo em uma visão única e unificada.",
-    "p2": "Hoje esse mercado é fragmentado. Liquidez, preços e formas de pagamento estão espalhados entre apps e bots distintos, cada um com sua fatia isolada do fluxo de ordens. Essa fragmentação custa caro para todo mundo: execuções piores, casamentos mais lentos e oportunidades de arbitragem que ficam na mesa. Ao unificar a visão, o P2P sats ajuda traders a se encontrarem e a comparar preços entre plataformas, com o objetivo de mais liquidez e um mercado mais eficiente no geral.",
-    "p3": "Este site não administra contas, não recebe ordens nem custodia fundos. É apenas uma janela somente leitura para o que já é público nos relays. Para negociar de verdade, vá até a plataforma que publicou a ordem que te interessa."
+    "lead": "Sem privacidade não existe liberdade. Poder transacionar sem ser vigiado, fichado ou barrado por intermediários sedentos por dados não é capricho: é o que sustenta um mercado livre e, no fim das contas, uma sociedade livre.",
+    "p1": "O P2P sats é uma ferramenta pensada para o mercado peer-to-peer de Bitcoin. Ele coleta as ordens ao vivo publicadas em relays públicos do Nostr (onde plataformas como Mostro, lnp2pbot, RoboSats e Peach divulgam suas ofertas via NIP-69) e junta tudo num único livro de ordens.",
+    "p2": "Hoje esse mercado é fragmentado: liquidez, preços e formas de pagamento ficam espalhados entre aplicativos e bots, cada um com sua fatia isolada do fluxo. E essa fragmentação sai cara para todo mundo (preços piores, ordens que demoram para casar, oportunidades de arbitragem que ninguém aproveita). Reunindo tudo num só lugar, o P2P sats ajuda traders a se encontrarem e a comparar preços entre plataformas, com a meta clara de aumentar a liquidez e tornar o mercado mais eficiente como um todo.",
+    "p3": "Aqui não tem conta, não tem ordem, não tem dinheiro passando. É só uma janela para o que já está público nos relays (leitura, nada além disso). Para fechar negócio, é direto na plataforma que publicou a ordem."
   },
   "contact": {
     "title": "Contato",
@@ -53,11 +53,11 @@
   "arbitrage": {
     "clean": {
       "title": "Livro é consistente",
-      "sub": "Sem ordens cruzadas agora — cada oferta está abaixo de cada venda."
+      "sub": "Sem ordens cruzadas agora (cada oferta está abaixo de cada venda)."
     },
     "detected": "nenhum par cruzado detectado | {count} par cruzado detectado | {count} pares cruzados detectados",
     "shared": "{count} com método de pagamento compartilhado",
-    "best": "Melhor oportunidade: comprar em {ask} ({askSrc}), vender em {bid} ({bidSrc}) — spread {spread} ({fiat} por BTC)",
+    "best": "Melhor oportunidade: comprar em {ask} ({askSrc}), vender em {bid} ({bidSrc}), spread {spread} ({fiat} por BTC)",
     "cta": "Ver todos"
   },
   "currencySwitcher": {
@@ -138,19 +138,19 @@
   },
   "seo": {
     "home": {
-      "title": "Livro de ordens P2P de Bitcoin ao vivo — P2P sats",
+      "title": "Livro de ordens P2P de Bitcoin ao vivo | P2P sats",
       "description": "Livro de ordens peer-to-peer de Bitcoin em tempo real, agregado de relays Nostr via NIP-69. Compare preços entre Mostro, lnp2pbot, RoboSats e Peach."
     },
     "alerts": {
-      "title": "Alertas de ordens P2P — P2P sats",
+      "title": "Alertas de ordens P2P | P2P sats",
       "description": "Configure alertas de preço e spread para ordens P2P de Bitcoin no Nostr. Seja notificado assim que uma ordem NIP-69 compatível aparecer em qualquer relay monitorado."
     },
     "about": {
-      "title": "Sobre — P2P sats",
-      "description": "O P2P sats é um agregador de ordens de Bitcoin não custodial com foco em privacidade. Lê ordens NIP-69 de relays públicos do Nostr — sem cadastro, sem coleta de dados."
+      "title": "Sobre | P2P sats",
+      "description": "O P2P sats é um agregador de ordens de Bitcoin não custodial com foco em privacidade. Lê ordens NIP-69 de relays públicos do Nostr (sem cadastro, sem coleta de dados)."
     },
     "contact": {
-      "title": "Contato — P2P sats",
+      "title": "Contato | P2P sats",
       "description": "Fale com a equipe do P2P sats via Nostr ou e-mail. Reporte bugs, envie sugestões ou converse sobre Bitcoin peer-to-peer."
     }
   },
