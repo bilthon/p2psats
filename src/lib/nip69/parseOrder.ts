@@ -4,7 +4,7 @@
 //   1. Browser-safe: imports Event from 'nostr-tools' only — no 'ws' dependency,
 //      no useWebSocketImplementation. The browser supplies globalThis.WebSocket.
 //   2. The exported interface is renamed `Order` → `RawNip69Order` to avoid
-//      collision with p2pexplorer's existing UI-layer `Order` type at
+//      collision with p2psats's existing UI-layer `Order` type at
 //      src/lib/types.ts.
 //
 // The lnp2pbot quirks (newline-separated `pm`, positional `rating` tuple) and

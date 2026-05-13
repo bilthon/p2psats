@@ -54,7 +54,7 @@ function onCurrencyChange(c: Currency) {
           </svg>
         </div>
         <div class="pb-brand-text">
-          <div class="pb-brand-name">P2P Explorer</div>
+          <div class="pb-brand-name">P2P sats</div>
           <div class="pb-brand-tag">{{ t('app.brandTag') }}</div>
         </div>
       </div>
