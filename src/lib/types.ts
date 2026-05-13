@@ -1,4 +1,4 @@
-// Core domain types for P2P Explorer (NIP-69 orderbook)
+// Core domain types for P2P sats (NIP-69 orderbook)
 
 export type SourceId = 'mostro' | 'lnp2pbot' | 'robosats' | 'peach' | 'hodlhodl' | 'nostr';
 export type Side = 'buy' | 'sell';

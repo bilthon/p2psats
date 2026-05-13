@@ -8,7 +8,7 @@
     "alertsComingSoon": "em breve"
   },
   "footer": {
-    "brand": "P2P Explorer",
+    "brand": "P2P sats",
     "tag": "nostr · NIP-69",
     "home": "Início",
     "about": "Sobre",
@@ -39,7 +39,7 @@
   "about": {
     "title": "Sobre",
     "lead": "Não pode haver liberdade sem privacidade. Poder realizar transações de forma privada, longe dos olhos curiosos de entidades centralizadas que coletam dados, é extremamente importante.",
-    "p1": "O P2P Explorer exibe os livros de ordens ao vivo de mercados de bitcoin peer-to-peer sem permissão. Ele extrai dados de ordens em tempo real de relays públicos do Nostr, onde plataformas como Mostro, lnp2pbot, RoboSats e Peach transmitem suas ofertas sob o NIP-69.",
+    "p1": "O P2P sats exibe os livros de ordens ao vivo de mercados de bitcoin peer-to-peer sem permissão. Ele extrai dados de ordens em tempo real de relays públicos do Nostr, onde plataformas como Mostro, lnp2pbot, RoboSats e Peach transmitem suas ofertas sob o NIP-69.",
     "p2": "O objetivo é mostrar o que está acontecendo nesses mercados para que as pessoas possam se encontrar e comparar preços entre plataformas. Esperamos que isso ajude a tornar esses mercados mais fortes e eficientes.",
     "p3": "Este site não aceita contas ou ordens, é apenas uma fonte de informação. As negociações devem ser publicadas em suas respectivas plataformas."
   },
