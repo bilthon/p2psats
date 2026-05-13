@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted } from 'vue'
+import { computed, onMounted, onUnmounted } from 'vue'
 import { RouterView, useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { useHead } from '@unhead/vue'
 import { useAppStore } from '@/stores/appStore'
 import { useNostrOrderbookStore } from '@/services/nostrOrderbook'
 import { useBtcRatesStore } from '@/services/btcRates'
@@ -10,9 +11,22 @@ import LanguageSwitcher from '@/components/LanguageSwitcher.vue'
 import RelayStatus from '@/components/RelayStatus.vue'
 import type { Currency } from '@/lib/types'
 import logoUrl from '@/assets/img/p2psats.png'
+import { OG_LOCALE } from '@/i18n'
 
 const { t } = useI18n()
 const store = useAppStore()
+
+// Site-wide head defaults. Individual views override title/description/canonical.
+// TODO: add og:image / twitter:image once a card image is designed
+useHead(computed(() => ({
+  htmlAttrs: { lang: store.locale },
+  meta: [
+    { property: 'og:site_name', content: 'P2P sats' },
+    { property: 'og:type', content: 'website' },
+    { property: 'og:locale', content: OG_LOCALE[store.locale] ?? 'en_US' },
+    { name: 'twitter:card', content: 'summary_large_image' },
+  ],
+})))
 const nostr = useNostrOrderbookStore()
 const btcRates = useBtcRatesStore()
 const router = useRouter()

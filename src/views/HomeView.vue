@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useHead } from '@unhead/vue'
 import { useAppStore } from '@/stores/appStore'
+import { useRoute } from 'vue-router'
 import { useNostrOrderbookStore } from '@/services/nostrOrderbook'
 import { fmtFiat, fmtSatsCompact, REF_RATES } from '@/lib/data'
 import ArbitrageBanner from '@/components/ArbitrageBanner.vue'
@@ -13,6 +15,26 @@ import SatSymbol from '@/components/SatSymbol.vue'
 import type { Order } from '@/lib/types'
 
 const { t } = useI18n()
+const route = useRoute()
+const siteUrl = import.meta.env.VITE_SITE_URL ?? 'https://p2psats.com'
+
+useHead(computed(() => {
+  const title = t('seo.home.title')
+  const description = t('seo.home.description')
+  const canonical = siteUrl + route.path
+  return {
+    title,
+    meta: [
+      { name: 'description', content: description },
+      { property: 'og:title', content: title },
+      { property: 'og:description', content: description },
+      { property: 'og:url', content: canonical },
+      { name: 'twitter:title', content: title },
+      { name: 'twitter:description', content: description },
+    ],
+    link: [{ rel: 'canonical', href: canonical }],
+  }
+}))
 const store = useAppStore()
 const nostr = useNostrOrderbookStore()
 

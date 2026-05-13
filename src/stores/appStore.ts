@@ -19,6 +19,7 @@ const PE_KEYS = {
 } as const
 
 function readStorage<T>(key: string, fallback: T): T {
+  if (typeof window === 'undefined') return fallback
   try {
     const raw = localStorage.getItem(key)
     return raw != null ? (JSON.parse(raw) as T) : fallback
@@ -28,6 +29,7 @@ function readStorage<T>(key: string, fallback: T): T {
 }
 
 function writeStorage(key: string, value: unknown): void {
+  if (typeof window === 'undefined') return
   try {
     localStorage.setItem(key, JSON.stringify(value))
   } catch {

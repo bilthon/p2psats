@@ -5,7 +5,7 @@ import type { CrossResult, Currency } from '@/lib/types'
 import MethodChips from './MethodChips.vue'
 import SourceDot from './SourceDot.vue'
 
-const props = defineProps<{
+defineProps<{
   crosses: CrossResult
   currency: Currency
 }>()

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Alert } from '@/lib/types'
 
-const props = defineProps<{
+defineProps<{
   alerts: Alert[]
   currentMatches: Record<string, number>
 }>()

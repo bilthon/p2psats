@@ -24,13 +24,16 @@ const activeTab = ref<'buy' | 'sell'>('buy')
 
 // Split layout on desktop (≥ 768 px), tabbed list on narrower viewports.
 // Reactive via matchMedia so resizing the window swaps live without reload.
-const mql = window.matchMedia('(min-width: 768px)')
-const isDesktop = ref(mql.matches)
+// Guard: during SSG prerender window is mocked but matchMedia is absent.
+const mql = typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+  ? window.matchMedia('(min-width: 768px)')
+  : null
+const isDesktop = ref(mql ? mql.matches : true)
 function onMqlChange(e: MediaQueryListEvent) {
   isDesktop.value = e.matches
 }
-onMounted(() => mql.addEventListener('change', onMqlChange))
-onUnmounted(() => mql.removeEventListener('change', onMqlChange))
+onMounted(() => mql?.addEventListener('change', onMqlChange))
+onUnmounted(() => mql?.removeEventListener('change', onMqlChange))
 const view = computed<'split' | 'tabs'>(() => (isDesktop.value ? 'split' : 'tabs'))
 
 const crossedBuyN = computed(() => props.crossedBuyIds.size)

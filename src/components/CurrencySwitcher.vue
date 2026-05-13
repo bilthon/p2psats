@@ -6,7 +6,7 @@ import type { Currency } from '@/lib/types'
 
 const { t } = useI18n()
 
-const props = defineProps<{ modelValue: Currency }>()
+defineProps<{ modelValue: Currency }>()
 const emit = defineEmits<{ 'update:modelValue': [c: Currency] }>()
 
 const open = ref(false)

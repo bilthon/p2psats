@@ -5,15 +5,17 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc -b && vite build",
+    "build": "vue-tsc -b && vite-ssg build",
     "preview": "vite preview",
     "type-check": "vue-tsc --noEmit"
   },
   "dependencies": {
+    "@unhead/vue": "^2.1.15",
     "echarts": "^5.6.0",
     "nostr-tools": "^2.10.0",
     "pinia": "^2.2.4",
-    "vue": "^3.5.13",
+    "vite-ssg": "^28.3.0",
+    "vue": "^3.5.34",
     "vue-echarts": "^7.0.3",
     "vue-i18n": "^9.14.5",
     "vue-router": "^4.4.5",

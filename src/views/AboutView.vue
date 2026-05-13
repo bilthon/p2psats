@@ -1,7 +1,30 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useHead } from '@unhead/vue'
+import { useRoute } from 'vue-router'
 
 const { t } = useI18n()
+const route = useRoute()
+const siteUrl = import.meta.env.VITE_SITE_URL ?? 'https://p2psats.com'
+
+useHead(computed(() => {
+  const title = t('seo.about.title')
+  const description = t('seo.about.description')
+  const canonical = siteUrl + route.path
+  return {
+    title,
+    meta: [
+      { name: 'description', content: description },
+      { property: 'og:title', content: title },
+      { property: 'og:description', content: description },
+      { property: 'og:url', content: canonical },
+      { name: 'twitter:title', content: title },
+      { name: 'twitter:description', content: description },
+    ],
+    link: [{ rel: 'canonical', href: canonical }],
+  }
+}))
 </script>
 
 <template>
