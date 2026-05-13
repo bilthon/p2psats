@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useAppStore } from '@/stores/appStore'
 import { useNostrOrderbookStore } from '@/services/nostrOrderbook'
 import { fmtFiat, fmtSatsCompact, REF_RATES } from '@/lib/data'
@@ -11,33 +12,25 @@ import OrderDetailDialog from '@/components/OrderDetailDialog.vue'
 import SatSymbol from '@/components/SatSymbol.vue'
 import type { Order } from '@/lib/types'
 
+const { t } = useI18n()
 const store = useAppStore()
-// Connect/disconnect lifecycle is handled in App.vue (app-level so subscription
-// + rate polling persist across route changes). The store is read here only
-// for the dialog's per-event lookups and the relay-status tooltip.
 const nostr = useNostrOrderbookStore()
 
-// Ref for the crossed-pairs section for smooth scroll
 const crossRef = ref<HTMLElement | null>(null)
 
 function jumpToCrossed() {
   crossRef.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
-// Relay status tooltip: "N/M relays connected"
 const relayTooltip = computed(() => {
   const statuses = Object.values(nostr.relayStatus)
   const total = statuses.length
   const openCount = statuses.filter((s) => s === 'open' || s === 'eosed').length
-  return `${openCount}/${total} relays connected`
+  return t('home.relaysConnected', { open: openCount, total })
 })
-
-// ── Order detail dialog ──────────────────────────────────────────────────────
 
 const selectedOrder = ref<Order | null>(null)
 
-// Pinia auto-unwraps shallowRefs through the store proxy, so nostr.orders and
-// nostr.events are the Maps directly — no .value needed in computed consumers.
 const rawForSelected = computed(() =>
   selectedOrder.value
     ? nostr.orders.get(`${selectedOrder.value.maker}:${selectedOrder.value.id}`)
@@ -50,7 +43,6 @@ const eventForSelected = computed(() =>
     : undefined,
 )
 
-// Clear stale dialog when the user switches currency.
 watch(
   () => store.currency,
   () => { selectedOrder.value = null },
@@ -61,32 +53,32 @@ watch(
   <!-- Stats strip -->
   <section class="pb-stats">
     <div class="pb-stat">
-      <div class="pb-stat-label">Mid price</div>
+      <div class="pb-stat-label">{{ t('home.stats.midPrice') }}</div>
       <div class="pb-stat-value">
         {{ store.mid ? fmtFiat(store.mid, store.currency) : '—' }}
       </div>
-      <div class="pb-stat-sub">vs ref {{ fmtFiat(REF_RATES[store.currency], store.currency) }}</div>
+      <div class="pb-stat-sub">{{ t('home.stats.vsRef', { ref: fmtFiat(REF_RATES[store.currency], store.currency) }) }}</div>
     </div>
 
     <div class="pb-stat">
-      <div class="pb-stat-label">Best bid</div>
+      <div class="pb-stat-label">{{ t('home.stats.bestBid') }}</div>
       <div class="pb-stat-value" style="color: oklch(0.55 0.14 155)">
         {{ store.bestBid ? fmtFiat(store.bestBid, store.currency) : '—' }}
       </div>
-      <div class="pb-stat-sub">{{ store.buys.length }} buy orders</div>
+      <div class="pb-stat-sub">{{ t('home.stats.buyOrders', store.buys.length) }}</div>
     </div>
 
     <div class="pb-stat">
-      <div class="pb-stat-label">Best ask</div>
+      <div class="pb-stat-label">{{ t('home.stats.bestAsk') }}</div>
       <div class="pb-stat-value" style="color: oklch(0.55 0.18 25)">
         {{ store.bestAsk ? fmtFiat(store.bestAsk, store.currency) : '—' }}
       </div>
-      <div class="pb-stat-sub">{{ store.sells.length }} sell orders</div>
+      <div class="pb-stat-sub">{{ t('home.stats.sellOrders', store.sells.length) }}</div>
     </div>
 
     <div class="pb-stat">
       <div class="pb-stat-label">
-        {{ store.spread !== null && store.spread < 0 ? 'Spread (crossed)' : 'Spread' }}
+        {{ store.spread !== null && store.spread < 0 ? t('home.stats.spreadCrossed') : t('home.stats.spread') }}
       </div>
       <div
         class="pb-stat-value"
@@ -106,7 +98,7 @@ watch(
       <div class="pb-stat-sub">
         <template v-if="store.spreadPct !== null">
           <template v-if="store.spread !== null && store.spread < 0">
-            −{{ Math.abs(store.spreadPct).toFixed(2) }}% inverted
+            −{{ Math.abs(store.spreadPct).toFixed(2) }}% {{ t('home.invertedSpread') }}
           </template>
           <template v-else>{{ store.spreadPct.toFixed(2) }}%</template>
         </template>
@@ -114,20 +106,20 @@ watch(
     </div>
 
     <div class="pb-stat">
-      <div class="pb-stat-label">Bid depth</div>
+      <div class="pb-stat-label">{{ t('home.stats.bidDepth') }}</div>
       <div class="pb-stat-value">{{ fmtSatsCompact(store.totalBidsSats, { bare: true }) }} <SatSymbol /></div>
-      <div class="pb-stat-sub">across all bids</div>
+      <div class="pb-stat-sub">{{ t('home.stats.acrossAllBids') }}</div>
     </div>
 
     <div class="pb-stat">
-      <div class="pb-stat-label">Ask depth</div>
+      <div class="pb-stat-label">{{ t('home.stats.askDepth') }}</div>
       <div class="pb-stat-value">{{ fmtSatsCompact(store.totalAsksSats, { bare: true }) }} <SatSymbol /></div>
-      <div class="pb-stat-sub">across all asks</div>
+      <div class="pb-stat-sub">{{ t('home.stats.acrossAllAsks') }}</div>
     </div>
 
     <div class="pb-live-pill" :title="relayTooltip">
       <span class="pb-live-dot" />
-      live · {{ store.ccyOrders.length }} orders
+      {{ t('home.live', { count: store.ccyOrders.length }) }}
     </div>
   </section>
 
@@ -141,7 +133,7 @@ watch(
   <!-- Depth chart card -->
   <section class="pb-depth-card">
     <div class="pb-card-hd">
-      <h2 class="pb-card-title">Order book depth</h2>
+      <h2 class="pb-card-title">{{ t('home.depthCardTitle') }}</h2>
     </div>
     <div class="pb-depth-canvas">
       <DepthChart

@@ -11,7 +11,8 @@ import {
   GraphicComponent,
 } from 'echarts/components'
 import VChart from 'vue-echarts'
-import { fmtFiat, fmtSatsCompact, USER_LOCALE } from '@/lib/data'
+import { fmtFiat, fmtSatsCompact, getUserLocale } from '@/lib/data'
+import { useIntlLocale } from '@/i18n/composables'
 import type { CrossResult, Currency, Order } from '@/lib/types'
 import { useBtcRatesStore } from '@/services/btcRates'
 import SatSymbol from './SatSymbol.vue'
@@ -33,6 +34,7 @@ const props = defineProps<{
 }>()
 
 const btcRates = useBtcRatesStore()
+const intl = useIntlLocale()
 
 // ── Custom cursor tracking (replaces ECharts tooltip for accuracy) ───────────
 // ECharts' built-in tooltip throttles renders at the data-point level, so the
@@ -148,6 +150,7 @@ function buildLevels(orders: Order[], side: 'buy' | 'sell', currency: Currency):
 
 // ── Computed option ───────────────────────────────────────────────────────────
 const option = computed(() => {
+  void intl.value
   const allOrders = props.orders.filter((o) => o.currency === props.currency)
 
   if (!allOrders.length) return null
@@ -312,7 +315,7 @@ const option = computed(() => {
     markLineData.push({
       xAxis: yadioRate,
       label: {
-        formatter: `yadio · ${Math.round(yadioRate).toLocaleString(USER_LOCALE)}`,
+        formatter: `yadio · ${Math.round(yadioRate).toLocaleString(getUserLocale())}`,
         // 'end' = top of the vertical line (above the chart's plot area).
         // rotate: 0 forces horizontal text instead of the default 90° perp.
         position: 'end',

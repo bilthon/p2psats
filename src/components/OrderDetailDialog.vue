@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { nip19 } from 'nostr-tools'
 import type { Event } from 'nostr-tools'
 import { fmtFiat, fmtSats, fmtPremium, fmtAge } from '@/lib/data'
@@ -7,6 +8,8 @@ import type { Order } from '@/lib/types'
 import type { RawNip69Order } from '@/lib/nip69/parseOrder'
 import SatSymbol from './SatSymbol.vue'
 import ReputationBar from './ReputationBar.vue'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   order: Order
@@ -49,7 +52,7 @@ const effectiveExpiry = computed<number | undefined>(
 
 const expiresRelative = computed<string>(() => {
   const exp = effectiveExpiry.value
-  if (!exp) return 'no expiry'
+  if (!exp) return t('order.detail.labels.noExpiry')
   const ageMin = (Date.now() / 1000 - exp) / 60
   return fmtAge(ageMin)
 })
@@ -101,7 +104,7 @@ onUnmounted(() => {
   <Teleport to="body">
     <!-- Backdrop — click outside the panel to close -->
     <div class="odd-backdrop" @click.self="emit('close')">
-      <div class="odd-panel" role="dialog" aria-modal="true" aria-label="Order detail">
+      <div class="odd-panel" role="dialog" aria-modal="true" :aria-label="t('order.detail.aria.dialog')">
 
         <!-- ── A. Header ──────────────────────────────────────────────────── -->
         <div class="odd-header">
@@ -117,7 +120,7 @@ onUnmounted(() => {
           <button
             ref="closeBtn"
             class="odd-close"
-            aria-label="Close"
+            :aria-label="t('order.detail.aria.close')"
             @click="emit('close')"
           >
             <svg
@@ -139,20 +142,20 @@ onUnmounted(() => {
 
         <!-- ── B. Pricing block ───────────────────────────────────────────── -->
         <div class="odd-section">
-          <div class="odd-section-title">Pricing</div>
+          <div class="odd-section-title">{{ t('order.detail.sections.pricing') }}</div>
           <div class="odd-price-grid">
             <div class="odd-kv">
-              <div class="odd-kv-label">Price</div>
+              <div class="odd-kv-label">{{ t('order.detail.labels.price') }}</div>
               <div class="odd-kv-value odd-kv-value--price">
                 {{ fmtFiat(order.price, order.currency) }}
               </div>
             </div>
             <div class="odd-kv">
-              <div class="odd-kv-label">Premium</div>
+              <div class="odd-kv-label">{{ t('order.detail.labels.premium') }}</div>
               <div class="odd-kv-value">{{ fmtPremium(order.premium) }}</div>
             </div>
             <div class="odd-kv">
-              <div class="odd-kv-label">Fiat range</div>
+              <div class="odd-kv-label">{{ t('order.detail.labels.fiatRange') }}</div>
               <div class="odd-kv-value">
                 {{ fmtFiat(order.minFiat, order.currency) }}
                 –
@@ -160,7 +163,7 @@ onUnmounted(() => {
               </div>
             </div>
             <div class="odd-kv">
-              <div class="odd-kv-label">Amount</div>
+              <div class="odd-kv-label">{{ t('order.detail.labels.amount') }}</div>
               <div class="odd-kv-value">{{ fmtSats(order.amountSats, { bare: true }) }} <SatSymbol /></div>
             </div>
           </div>
@@ -168,47 +171,47 @@ onUnmounted(() => {
 
         <!-- ── C. Identity block ─────────────────────────────────────────── -->
         <div class="odd-section">
-          <div class="odd-section-title">Identity (dupe diagnostic)</div>
+          <div class="odd-section-title">{{ t('order.detail.sections.identity') }}</div>
           <div class="odd-id-list">
 
             <div class="odd-id-row">
-              <div class="odd-id-label">d-tag (offer id)</div>
+              <div class="odd-id-label">{{ t('order.detail.labels.dTag') }}</div>
               <div class="odd-id-value-wrap">
                 <span class="odd-mono">{{ order.id }}</span>
-                <button class="odd-copy" title="Copy" @click="copy(order.id)">
+                <button class="odd-copy" :title="t('order.detail.aria.copy')" @click="copy(order.id)">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                 </button>
               </div>
             </div>
 
             <div class="odd-id-row">
-              <div class="odd-id-label">Maker pubkey (hex)</div>
+              <div class="odd-id-label">{{ t('order.detail.labels.makerPubkey') }}</div>
               <div class="odd-id-value-wrap">
                 <span class="odd-mono odd-mono--break">{{ order.maker }}</span>
-                <button class="odd-copy" title="Copy" @click="copy(order.maker)">
+                <button class="odd-copy" :title="t('order.detail.aria.copy')" @click="copy(order.maker)">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                 </button>
               </div>
             </div>
 
             <div class="odd-id-row">
-              <div class="odd-id-label">Maker npub</div>
+              <div class="odd-id-label">{{ t('order.detail.labels.makerNpub') }}</div>
               <div class="odd-id-value-wrap">
                 <span class="odd-mono odd-mono--break">{{ npub }}</span>
-                <button class="odd-copy" title="Copy" @click="copy(npub)">
+                <button class="odd-copy" :title="t('order.detail.aria.copy')" @click="copy(npub)">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                 </button>
               </div>
             </div>
 
             <div class="odd-id-row">
-              <div class="odd-id-label">Raw event id</div>
+              <div class="odd-id-label">{{ t('order.detail.labels.rawEventId') }}</div>
               <div class="odd-id-value-wrap">
                 <span class="odd-mono odd-mono--break">{{ raw?.rawEventId ?? '—' }}</span>
                 <button
                   v-if="raw?.rawEventId"
                   class="odd-copy"
-                  title="Copy"
+                  :title="t('order.detail.aria.copy')"
                   @click="copy(raw!.rawEventId)"
                 >
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
@@ -217,20 +220,20 @@ onUnmounted(() => {
             </div>
 
             <div class="odd-id-row">
-              <div class="odd-id-label">Source platform (y tag)</div>
+              <div class="odd-id-label">{{ t('order.detail.labels.sourcePlatform') }}</div>
               <div class="odd-id-value-wrap">
                 <span class="odd-mono">{{ raw?.platform ?? order.source }}</span>
               </div>
             </div>
 
             <div class="odd-id-row">
-              <div class="odd-id-label">Source relay</div>
+              <div class="odd-id-label">{{ t('order.detail.labels.sourceRelay') }}</div>
               <div class="odd-id-value-wrap">
                 <span class="odd-mono odd-mono--break">{{ order.relay }}</span>
                 <button
                   v-if="order.relay && order.relay !== 'nostr'"
                   class="odd-copy"
-                  title="Copy"
+                  :title="t('order.detail.aria.copy')"
                   @click="copy(order.relay)"
                 >
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
@@ -239,14 +242,14 @@ onUnmounted(() => {
             </div>
 
             <div class="odd-id-row">
-              <div class="odd-id-label">Status</div>
+              <div class="odd-id-label">{{ t('order.detail.labels.status') }}</div>
               <div class="odd-id-value-wrap">
                 <span class="odd-mono">{{ raw?.status ?? '—' }}</span>
               </div>
             </div>
 
             <div class="odd-id-row">
-              <div class="odd-id-label">Created</div>
+              <div class="odd-id-label">{{ t('order.detail.labels.created') }}</div>
               <div class="odd-id-value-wrap odd-id-value-wrap--col">
                 <span class="odd-relative">{{ createdRelative }}</span>
                 <span v-if="createdIso" class="odd-mono odd-mono--dim">{{ createdIso }}</span>
@@ -254,7 +257,7 @@ onUnmounted(() => {
             </div>
 
             <div class="odd-id-row">
-              <div class="odd-id-label">Expires</div>
+              <div class="odd-id-label">{{ t('order.detail.labels.expires') }}</div>
               <div class="odd-id-value-wrap odd-id-value-wrap--col">
                 <span class="odd-relative">{{ expiresRelative }}</span>
                 <span v-if="expiresIso" class="odd-mono odd-mono--dim">{{ expiresIso }}</span>
@@ -266,55 +269,55 @@ onUnmounted(() => {
 
         <!-- ── D. NIP-69 metadata ─────────────────────────────────────────── -->
         <div v-if="raw" class="odd-section">
-          <div class="odd-section-title">NIP-69 metadata</div>
+          <div class="odd-section-title">{{ t('order.detail.sections.meta') }}</div>
           <div class="odd-meta-list">
             <div class="odd-meta-row">
-              <span class="odd-meta-label">Payment methods</span>
+              <span class="odd-meta-label">{{ t('order.detail.labels.paymentMethods') }}</span>
               <span class="odd-meta-value">{{ methodsLabel || '—' }}</span>
             </div>
             <div v-if="raw.network" class="odd-meta-row">
-              <span class="odd-meta-label">Network</span>
+              <span class="odd-meta-label">{{ t('order.detail.labels.network') }}</span>
               <span class="odd-meta-value">{{ raw.network }}</span>
             </div>
             <div v-if="raw.layer" class="odd-meta-row">
-              <span class="odd-meta-label">Layer</span>
+              <span class="odd-meta-label">{{ t('order.detail.labels.layer') }}</span>
               <span class="odd-meta-value">{{ raw.layer }}</span>
             </div>
             <div v-if="raw.geohash" class="odd-meta-row">
-              <span class="odd-meta-label">Geohash</span>
+              <span class="odd-meta-label">{{ t('order.detail.labels.geohash') }}</span>
               <span class="odd-meta-value odd-mono">{{ raw.geohash }}</span>
             </div>
             <div v-if="raw.bond" class="odd-meta-row">
-              <span class="odd-meta-label">Bond</span>
+              <span class="odd-meta-label">{{ t('order.detail.labels.bond') }}</span>
               <span class="odd-meta-value">{{ raw.bond }}</span>
             </div>
             <div v-if="raw.source" class="odd-meta-row">
-              <span class="odd-meta-label">Source field</span>
+              <span class="odd-meta-label">{{ t('order.detail.labels.sourceField') }}</span>
               <span class="odd-meta-value odd-mono">{{ raw.source }}</span>
             </div>
             <div v-if="raw.name" class="odd-meta-row">
-              <span class="odd-meta-label">Name</span>
+              <span class="odd-meta-label">{{ t('order.detail.labels.name') }}</span>
               <span class="odd-meta-value">{{ raw.name }}</span>
             </div>
             <template v-if="order.rep.kind === 'stars'">
               <div class="odd-meta-row">
-                <span class="odd-meta-label">Reputation</span>
+                <span class="odd-meta-label">{{ t('order.detail.labels.reputation') }}</span>
                 <span class="odd-meta-value odd-rep-row">
                   <ReputationBar v-bind="order.rep" />
                   <span class="odd-rep-num">{{ order.rep.rating.toFixed(2) }} / 5</span>
                 </span>
               </div>
               <div class="odd-meta-row">
-                <span class="odd-meta-label">Trades</span>
+                <span class="odd-meta-label">{{ t('order.detail.labels.trades') }}</span>
                 <span class="odd-meta-value odd-mono">{{ order.rep.count }}</span>
               </div>
               <div v-if="order.rep.days !== undefined" class="odd-meta-row">
-                <span class="odd-meta-label">Days on platform</span>
+                <span class="odd-meta-label">{{ t('order.detail.labels.daysOnPlatform') }}</span>
                 <span class="odd-meta-value odd-mono">{{ order.rep.days }}</span>
               </div>
             </template>
             <div v-else class="odd-meta-row">
-              <span class="odd-meta-label">Reputation</span>
+              <span class="odd-meta-label">{{ t('order.detail.labels.reputation') }}</span>
               <span class="odd-meta-value">{{ order.rep.tooltip }}</span>
             </div>
           </div>
@@ -323,8 +326,8 @@ onUnmounted(() => {
         <!-- ── E. Raw event JSON ──────────────────────────────────────────── -->
         <div class="odd-section">
           <details class="odd-details">
-            <summary class="odd-details-summary">Raw event JSON</summary>
-            <pre class="odd-pre">{{ event ? JSON.stringify(event, null, 2) : 'unavailable' }}</pre>
+            <summary class="odd-details-summary">{{ t('order.detail.labels.rawEventJson') }}</summary>
+            <pre class="odd-pre">{{ event ? JSON.stringify(event, null, 2) : t('order.detail.labels.unavailable') }}</pre>
           </details>
         </div>
 

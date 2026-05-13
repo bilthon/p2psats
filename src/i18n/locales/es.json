@@ -1,0 +1,149 @@
+{
+  "app": {
+    "brandTag": "libro de órdenes nostr · NIP-69"
+  },
+  "nav": {
+    "orderBook": "Libro de órdenes",
+    "alerts": "Alertas",
+    "alertsComingSoon": "próximamente"
+  },
+  "footer": {
+    "brand": "P2P Explorer",
+    "tag": "nostr · NIP-69",
+    "home": "Inicio",
+    "about": "Acerca de",
+    "contact": "Contacto",
+    "aggregated": "Agregado desde relés nostr públicos. Solo lectura — este sitio no toma órdenes.",
+    "referenceRate": "Tasa de referencia de yadio."
+  },
+  "home": {
+    "stats": {
+      "midPrice": "Precio medio",
+      "bestBid": "Mejor oferta",
+      "bestAsk": "Mejor venta",
+      "spread": "Diferencial",
+      "spreadCrossed": "Diferencial (cruzado)",
+      "bidDepth": "Profundidad de compra",
+      "askDepth": "Profundidad de venta",
+      "vsRef": "vs ref {ref}",
+      "acrossAllBids": "en todas las ofertas",
+      "acrossAllAsks": "en todas las ventas",
+      "buyOrders": "{count} orden de compra | {count} órdenes de compra",
+      "sellOrders": "{count} orden de venta | {count} órdenes de venta"
+    },
+    "live": "en vivo · {count} órdenes",
+    "relaysConnected": "{open}/{total} relés conectados",
+    "invertedSpread": "invertido",
+    "depthCardTitle": "Profundidad del libro de órdenes"
+  },
+  "about": {
+    "title": "Acerca de",
+    "lead": "No puede haber libertad sin privacidad. Poder realizar transacciones de forma privada, lejos de las miradas indiscretas de entidades centralizadas que recopilan datos, es enormemente importante.",
+    "p1": "P2P Explorer muestra los libros de órdenes en vivo de mercados de bitcoin entre pares sin permiso. Extrae datos de órdenes en tiempo real de relés públicos de Nostr, donde plataformas como Mostro, lnp2pbot, RoboSats y Peach transmiten sus ofertas bajo NIP-69.",
+    "p2": "El objetivo es mostrar lo que ocurre en estos mercados para que las personas puedan encontrarse y comparar precios entre plataformas. Esperemos que esto ayude a hacer estos mercados más fuertes y eficientes.",
+    "p3": "Este sitio no toma cuentas ni órdenes, es solo una fuente de información. Las operaciones deben publicarse en sus respectivas plataformas."
+  },
+  "contact": {
+    "title": "Contacto",
+    "lead": "¿Tienes comentarios, encontraste un error, quieres contribuir o simplemente quieres hablar sobre bitcoin entre pares? Escríbenos.",
+    "nostr": "Nostr",
+    "email": "Correo",
+    "notConfigured": "no configurado"
+  },
+  "arbitrage": {
+    "clean": {
+      "title": "El libro es consistente",
+      "sub": "No hay órdenes cruzadas ahora mismo — cada oferta está por debajo de cada venta."
+    },
+    "detected": "ningún par cruzado detectado | {count} par cruzado detectado | {count} pares cruzados detectados",
+    "shared": "{count} con método de pago compartido",
+    "best": "Mejor oportunidad: comprar en {ask} ({askSrc}), vender en {bid} ({bidSrc}) — diferencial {spread} ({fiat} por BTC)",
+    "cta": "Ver todos"
+  },
+  "currencySwitcher": {
+    "heading": "Moneda de cotización",
+    "saved": "Guardado en este navegador"
+  },
+  "languageSwitcher": {
+    "heading": "Idioma de visualización"
+  },
+  "order": {
+    "table": {
+      "headers": {
+        "price": "Precio",
+        "premium": "Prima",
+        "amountRange": "Rango de monto",
+        "sats": "Sats",
+        "payment": "Pago",
+        "rep": "Rep",
+        "source": "Origen",
+        "age": "Antigüedad"
+      },
+      "help": {
+        "buy": "Los maker quieren comprar BTC",
+        "sell": "Los maker quieren vender BTC"
+      }
+    },
+    "book": {
+      "tabs": {
+        "bids": "Compras",
+        "asks": "Ventas"
+      },
+      "aria": {
+        "side": "Lado del libro de órdenes"
+      },
+      "crossedTooltip": "0 cruzados | {count} cruzado | {count} cruzados"
+    },
+    "detail": {
+      "aria": {
+        "dialog": "Detalle de la orden",
+        "close": "Cerrar",
+        "copy": "Copiar"
+      },
+      "sections": {
+        "pricing": "Precios",
+        "identity": "Identidad (diagnóstico de duplicados)",
+        "meta": "Metadatos NIP-69"
+      },
+      "labels": {
+        "price": "Precio",
+        "premium": "Prima",
+        "fiatRange": "Rango fiat",
+        "amount": "Monto",
+        "dTag": "d-tag (id de oferta)",
+        "makerPubkey": "Pubkey del maker (hex)",
+        "makerNpub": "Npub del maker",
+        "rawEventId": "ID de evento raw",
+        "sourcePlatform": "Plataforma origen (y tag)",
+        "sourceRelay": "Relay origen",
+        "status": "Estado",
+        "created": "Creado",
+        "expires": "Expira",
+        "paymentMethods": "Métodos de pago",
+        "network": "Network",
+        "layer": "Layer",
+        "geohash": "Geohash",
+        "bond": "Bono",
+        "sourceField": "Campo origen",
+        "name": "Nombre",
+        "reputation": "Reputación",
+        "trades": "Operaciones",
+        "daysOnPlatform": "Días en la plataforma",
+        "rawEventJson": "JSON de evento raw",
+        "noExpiry": "sin expiración",
+        "unavailable": "no disponible"
+      },
+      "crossesMark": "El precio cruza una orden del otro lado"
+    }
+  },
+  "crossedPairs": {
+    "title": "Órdenes cruzadas",
+    "subtitle": "Precios de compra que igualan o superan un precio de venta. Los pares que comparten un método de pago y son de plataformas distintas son candidatos de arbitraje viables.",
+    "buyAtAsk": "COMPRAR al PRECIO DE VENTA",
+    "sellToBid": "VENDER al PRECIO DE COMPRA",
+    "perBtc": "por BTC",
+    "via": "vía {methods}",
+    "noSharedMethod": "sin método compartido",
+    "pairCount": "{count} par | {count} pares"
+  }
+}

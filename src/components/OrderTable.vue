@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { fmtFiat, fmtSatsCompact, fmtTimeShort } from '@/lib/data'
 import type { Currency, Order } from '@/lib/types'
 import MethodChips from './MethodChips.vue'
 import SourceDot from './SourceDot.vue'
 import ReputationBar from './ReputationBar.vue'
 import SatSymbol from './SatSymbol.vue'
+
+const { t } = useI18n()
 
 const emit = defineEmits<{ select: [order: Order] }>()
 
@@ -42,7 +45,7 @@ function premColor(premium: number): string {
         <span class="pb-table-count">{{ orders.length }}</span>
       </div>
       <div class="pb-table-help">
-        {{ side === 'buy' ? 'Makers want to buy BTC' : 'Makers want to sell BTC' }}
+        {{ side === 'buy' ? t('order.table.help.buy') : t('order.table.help.sell') }}
       </div>
     </div>
 
@@ -60,14 +63,14 @@ function premColor(premium: number): string {
         </colgroup>
         <thead class="pb-thead">
           <tr>
-            <th class="col-price">Price</th>
-            <th v-if="showPremium" class="col-prem">Premium</th>
-            <th class="col-amount">Amount range</th>
-            <th class="col-sats">Sats</th>
-            <th class="col-methods">Payment</th>
-            <th class="col-rep">Rep</th>
-            <th class="col-src">Source</th>
-            <th class="col-age">Age</th>
+            <th class="col-price">{{ t('order.table.headers.price') }}</th>
+            <th v-if="showPremium" class="col-prem">{{ t('order.table.headers.premium') }}</th>
+            <th class="col-amount">{{ t('order.table.headers.amountRange') }}</th>
+            <th class="col-sats">{{ t('order.table.headers.sats') }}</th>
+            <th class="col-methods">{{ t('order.table.headers.payment') }}</th>
+            <th class="col-rep">{{ t('order.table.headers.rep') }}</th>
+            <th class="col-src">{{ t('order.table.headers.source') }}</th>
+            <th class="col-age">{{ t('order.table.headers.age') }}</th>
           </tr>
         </thead>
         <tbody class="pb-tbody">
@@ -86,7 +89,7 @@ function premColor(premium: number): string {
             @keydown.space.prevent="emit('select', o)"
           >
             <td class="col-price" :style="{ color: sideColor, fontWeight: '600' }">
-              <span v-if="crossedIds.has(o.id)" class="pb-cross-mark" title="Price crosses an order on the other side">⚡</span>
+              <span v-if="crossedIds.has(o.id)" class="pb-cross-mark" :title="t('order.detail.crossesMark')">⚡</span>
               {{ fmtFiat(o.price, o.currency, { bare: true }) }}
             </td>
             <td v-if="showPremium" class="col-prem">

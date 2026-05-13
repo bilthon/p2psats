@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { fmtFiat } from '@/lib/data'
 import type { CrossResult, Currency } from '@/lib/types'
 import MethodChips from './MethodChips.vue'
@@ -8,20 +9,21 @@ const props = defineProps<{
   crosses: CrossResult
   currency: Currency
 }>()
+
+const { t } = useI18n()
 </script>
 
 <template>
   <section v-if="crosses.pairs.length" class="pb-cross-card" id="crossed-pairs">
     <div class="pb-card-hd">
       <div>
-        <h2 class="pb-card-title">Crossed orders</h2>
+        <h2 class="pb-card-title">{{ t('crossedPairs.title') }}</h2>
         <p class="pb-section-sub" style="margin-top: 4px">
-          Bid prices that meet or exceed an ask price. Pairs sharing a payment method and from
-          different platforms are tractable arbitrage candidates.
+          {{ t('crossedPairs.subtitle') }}
         </p>
       </div>
       <div class="pb-section-meta">
-        {{ crosses.pairs.length }} pair{{ crosses.pairs.length === 1 ? '' : 's' }}
+        {{ t('crossedPairs.pairCount', crosses.pairs.length) }}
       </div>
     </div>
 
@@ -35,7 +37,7 @@ const props = defineProps<{
 
         <div class="pb-cross-leg pb-cross-leg--ask">
           <div class="pb-cross-leg-hd">
-            <span class="pb-cross-side-tag pb-cross-side-tag--ask">BUY at ASK</span>
+            <span class="pb-cross-side-tag pb-cross-side-tag--ask">{{ t('crossedPairs.buyAtAsk') }}</span>
             <SourceDot :source="p.sell.source" />
           </div>
           <div class="pb-cross-price" style="color: oklch(0.55 0.18 25)">
@@ -70,7 +72,7 @@ const props = defineProps<{
 
         <div class="pb-cross-leg pb-cross-leg--bid">
           <div class="pb-cross-leg-hd">
-            <span class="pb-cross-side-tag pb-cross-side-tag--bid">SELL to BID</span>
+            <span class="pb-cross-side-tag pb-cross-side-tag--bid">{{ t('crossedPairs.sellToBid') }}</span>
             <SourceDot :source="p.buy.source" />
           </div>
           <div class="pb-cross-price" style="color: oklch(0.55 0.14 155)">
@@ -92,12 +94,12 @@ const props = defineProps<{
 
         <div class="pb-cross-edge">
           <div class="pb-cross-edge-pct">+{{ p.spreadPct.toFixed(2) }}%</div>
-          <div class="pb-cross-edge-abs">{{ fmtFiat(p.spreadFiat, currency) }} per BTC</div>
+          <div class="pb-cross-edge-abs">{{ fmtFiat(p.spreadFiat, currency) }} {{ t('crossedPairs.perBtc') }}</div>
           <div v-if="p.sharedMethods.length > 0" class="pb-cross-shared">
             <span class="pb-cross-shared-dot" />
-            via {{ p.sharedMethods.map((m) => m.label).join(', ') }}
+            {{ t('crossedPairs.via', { methods: p.sharedMethods.map((m) => m.label).join(', ') }) }}
           </div>
-          <div v-else class="pb-cross-shared pb-cross-shared--none">no shared method</div>
+          <div v-else class="pb-cross-shared pb-cross-shared--none">{{ t('crossedPairs.noSharedMethod') }}</div>
         </div>
       </div>
     </div>

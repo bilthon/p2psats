@@ -10,9 +10,8 @@ import { useNostrOrderbookStore } from '@/services/nostrOrderbook'
 import { useBtcRatesStore } from '@/services/btcRates'
 import { toVueOrder } from '@/lib/orderAdapter'
 import type { Alert, Currency, Order } from '@/lib/types'
+import { setLocale as i18nSetLocale, detectInitialLocale, type AppLocale } from '@/i18n'
 
-// pe.page is intentionally omitted — the route URL is the source of truth for
-// the active page; persisting it redundantly would risk drift on cross-tab use.
 const PE_KEYS = {
   currency: 'pe.currency',
   sources: 'pe.sources',
@@ -38,6 +37,7 @@ function writeStorage(key: string, value: unknown): void {
 
 export const useAppStore = defineStore('app', () => {
   // ── Persisted state ──────────────────────────────────────────────────────
+  const locale = ref<AppLocale>(detectInitialLocale())
   const currency = ref<Currency>(readStorage<Currency>(PE_KEYS.currency, 'USD'))
   const activeSources = ref<string[]>(
     readStorage<string[]>(PE_KEYS.sources, ['mostro', 'lnp2pbot', 'robosats', 'peach']),
@@ -110,6 +110,11 @@ export const useAppStore = defineStore('app', () => {
 
   // ── Mutating actions ─────────────────────────────────────────────────────
 
+  function setLocale(l: AppLocale) {
+    locale.value = l
+    i18nSetLocale(l)
+  }
+
   function setCurrency(c: Currency) {
     currency.value = c
     writeStorage(PE_KEYS.currency, c)
@@ -143,6 +148,7 @@ export const useAppStore = defineStore('app', () => {
 
   return {
     // state
+    locale,
     currency,
     activeSources,
     alerts,
@@ -164,6 +170,7 @@ export const useAppStore = defineStore('app', () => {
     activeAlerts,
     totalActiveMatches,
     // actions
+    setLocale,
     setCurrency,
     toggleSource,
     addAlert,

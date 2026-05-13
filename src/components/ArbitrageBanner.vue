@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { fmtFiat } from '@/lib/data'
 import type { CrossResult, Currency } from '@/lib/types'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   crosses: CrossResult
@@ -32,8 +35,8 @@ const tractable = computed(() => props.crosses.pairs.filter((p) => p.tractable).
       </svg>
     </div>
     <div class="pb-arb-body">
-      <div class="pb-arb-title">Book is consistent</div>
-      <div class="pb-arb-sub">No crossed orders right now — every bid is below every ask.</div>
+      <div class="pb-arb-title">{{ t('arbitrage.clean.title') }}</div>
+      <div class="pb-arb-sub">{{ t('arbitrage.clean.sub') }}</div>
     </div>
   </div>
 
@@ -55,28 +58,22 @@ const tractable = computed(() => props.crosses.pairs.filter((p) => p.tractable).
     </div>
     <div class="pb-arb-body">
       <div class="pb-arb-title">
-        <span class="pb-arb-title-text"
-          >{{ crosses.pairs.length }} crossed pair{{
-            crosses.pairs.length === 1 ? '' : 's'
-          }}
-          detected</span
-        >
-        <span v-if="tractable > 0" class="pb-arb-pill"
-          >{{ tractable }} with shared payment method</span
-        >
+        <span class="pb-arb-title-text">{{ t('arbitrage.detected', crosses.pairs.length) }}</span>
+        <span v-if="tractable > 0" class="pb-arb-pill">{{ t('arbitrage.shared', { count: tractable }) }}</span>
       </div>
       <div v-if="top" class="pb-arb-sub">
-        Best opportunity: buy at <b>{{ fmtFiat(top.sell.price, currency) }}</b> ({{
-          top.sell.sourceLabel
-        }}), sell at <b>{{ fmtFiat(top.buy.price, currency) }}</b> ({{ top.buy.sourceLabel }}) —
-        spread <b class="pb-arb-spread">+{{ top.spreadPct.toFixed(2) }}%</b> ({{
-          fmtFiat(top.spreadFiat, currency)
-        }}
-        per BTC)
+        {{ t('arbitrage.best', {
+          ask: fmtFiat(top.sell.price, currency),
+          askSrc: top.sell.sourceLabel,
+          bid: fmtFiat(top.buy.price, currency),
+          bidSrc: top.buy.sourceLabel,
+          spread: `+${top.spreadPct.toFixed(2)}%`,
+          fiat: fmtFiat(top.spreadFiat, currency),
+        }) }}
       </div>
     </div>
     <button type="button" class="pb-arb-cta" @click="emit('jumpTo')">
-      See all <span aria-hidden="true">↓</span>
+      {{ t('arbitrage.cta') }} <span aria-hidden="true">↓</span>
     </button>
   </div>
 </template>

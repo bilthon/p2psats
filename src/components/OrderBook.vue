@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { Currency, Order } from '@/lib/types'
 import OrderTable from './OrderTable.vue'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   buys: Order[]
@@ -51,7 +54,7 @@ const ASK_TINT = 'oklch(0.6 0.18 25 / 0.07)'
     <!-- Header (tabs mode only — in split mode each OrderTable renders its
          own Bids/Asks title with count, so the header would just duplicate). -->
     <div v-if="view === 'tabs'" class="pb-book-hd">
-      <div class="pb-book-tabs" role="tablist" aria-label="Order book side">
+      <div class="pb-book-tabs" role="tablist" :aria-label="t('order.book.aria.side')">
         <button
           role="tab"
           :aria-selected="activeTab === 'buy'"
@@ -59,9 +62,9 @@ const ASK_TINT = 'oklch(0.6 0.18 25 / 0.07)'
           @click="activeTab = 'buy'"
         >
           <span class="pb-side-dot" :style="{ background: BID_COLOR }" />
-          Bids
+          {{ t('order.book.tabs.bids') }}
           <span class="pb-book-tab-count">{{ buys.length }}</span>
-          <span v-if="crossedBuyN > 0" class="pb-book-tab-cross" :title="`${crossedBuyN} crossed`"
+          <span v-if="crossedBuyN > 0" class="pb-book-tab-cross" :title="t('order.book.crossedTooltip', crossedBuyN)"
             >⚡{{ crossedBuyN }}</span
           >
         </button>
@@ -72,12 +75,12 @@ const ASK_TINT = 'oklch(0.6 0.18 25 / 0.07)'
           @click="activeTab = 'sell'"
         >
           <span class="pb-side-dot" :style="{ background: ASK_COLOR }" />
-          Asks
+          {{ t('order.book.tabs.asks') }}
           <span class="pb-book-tab-count">{{ sells.length }}</span>
           <span
             v-if="crossedSellN > 0"
             class="pb-book-tab-cross"
-            :title="`${crossedSellN} crossed`"
+            :title="t('order.book.crossedTooltip', crossedSellN)"
             >⚡{{ crossedSellN }}</span
           >
         </button>
@@ -87,7 +90,7 @@ const ASK_TINT = 'oklch(0.6 0.18 25 / 0.07)'
     <!-- Split layout (desktop) — two columns -->
     <div v-if="view === 'split'" class="pb-book-grid">
       <OrderTable
-        title="Bids"
+        :title="t('order.book.tabs.bids')"
         side="buy"
         :orders="sortedBuys"
         :currency="currency"
@@ -100,7 +103,7 @@ const ASK_TINT = 'oklch(0.6 0.18 25 / 0.07)'
         @select="emit('select', $event)"
       />
       <OrderTable
-        title="Asks"
+        :title="t('order.book.tabs.asks')"
         side="sell"
         :orders="sortedSells"
         :currency="currency"
@@ -117,7 +120,7 @@ const ASK_TINT = 'oklch(0.6 0.18 25 / 0.07)'
     <!-- Tabs layout (mobile) — single list driven by activeTab -->
     <OrderTable
       v-else
-      :title="activeTab === 'buy' ? 'Bids' : 'Asks'"
+      :title="activeTab === 'buy' ? t('order.book.tabs.bids') : t('order.book.tabs.asks')"
       :side="activeTab"
       :orders="activeTab === 'buy' ? sortedBuys : sortedSells"
       :currency="currency"

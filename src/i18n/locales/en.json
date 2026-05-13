@@ -1,0 +1,149 @@
+{
+  "app": {
+    "brandTag": "nostr orderbook · NIP-69"
+  },
+  "nav": {
+    "orderBook": "Order book",
+    "alerts": "Alerts",
+    "alertsComingSoon": "coming soon"
+  },
+  "footer": {
+    "brand": "P2P Explorer",
+    "tag": "nostr · NIP-69",
+    "home": "Home",
+    "about": "About",
+    "contact": "Contact",
+    "aggregated": "Aggregated from public nostr relays. Read-only — this site doesn't take orders.",
+    "referenceRate": "Reference rate from yadio."
+  },
+  "home": {
+    "stats": {
+      "midPrice": "Mid price",
+      "bestBid": "Best bid",
+      "bestAsk": "Best ask",
+      "spread": "Spread",
+      "spreadCrossed": "Spread (crossed)",
+      "bidDepth": "Bid depth",
+      "askDepth": "Ask depth",
+      "vsRef": "vs ref {ref}",
+      "acrossAllBids": "across all bids",
+      "acrossAllAsks": "across all asks",
+      "buyOrders": "{count} buy order | {count} buy orders",
+      "sellOrders": "{count} sell order | {count} sell orders"
+    },
+    "live": "live · {count} orders",
+    "relaysConnected": "{open}/{total} relays connected",
+    "invertedSpread": "inverted",
+    "depthCardTitle": "Order book depth"
+  },
+  "about": {
+    "title": "About",
+    "lead": "You cannot have freedom without privacy. Being able to transact privately, away from the prying eyes of centralized, data-collecting entities is hugely important.",
+    "p1": "P2P Explorer shows the live order books of permissionless peer-to-peer bitcoin markets. It pulls real-time order data from public Nostr relays, where platforms like Mostro, lnp2pbot, RoboSats, and Peach broadcast their offers under NIP-69.",
+    "p2": "The goal is to surface what's happening on these markets so people can find each other and compare prices across venues. Hopefully this helps in making these markets stronger and more efficient.",
+    "p3": "This site doesn't take accounts or orders, it just an information source. Trades must be posted on their respective platforms."
+  },
+  "contact": {
+    "title": "Contact",
+    "lead": "Have feedback, found a bug, want to contribute, or just want to talk about peer-to-peer bitcoin? Reach out.",
+    "nostr": "Nostr",
+    "email": "Email",
+    "notConfigured": "not configured"
+  },
+  "arbitrage": {
+    "clean": {
+      "title": "Book is consistent",
+      "sub": "No crossed orders right now — every bid is below every ask."
+    },
+    "detected": "no crossed pair detected | {count} crossed pair detected | {count} crossed pairs detected",
+    "shared": "{count} with shared payment method",
+    "best": "Best opportunity: buy at {ask} ({askSrc}), sell at {bid} ({bidSrc}) — spread {spread} ({fiat} per BTC)",
+    "cta": "See all"
+  },
+  "currencySwitcher": {
+    "heading": "Quote currency",
+    "saved": "Saved to this browser"
+  },
+  "languageSwitcher": {
+    "heading": "Display language"
+  },
+  "order": {
+    "table": {
+      "headers": {
+        "price": "Price",
+        "premium": "Premium",
+        "amountRange": "Amount range",
+        "sats": "Sats",
+        "payment": "Payment",
+        "rep": "Rep",
+        "source": "Source",
+        "age": "Age"
+      },
+      "help": {
+        "buy": "Makers want to buy BTC",
+        "sell": "Makers want to sell BTC"
+      }
+    },
+    "book": {
+      "tabs": {
+        "bids": "Bids",
+        "asks": "Asks"
+      },
+      "aria": {
+        "side": "Order book side"
+      },
+      "crossedTooltip": "0 crossed | {count} crossed | {count} crossed"
+    },
+    "detail": {
+      "aria": {
+        "dialog": "Order detail",
+        "close": "Close",
+        "copy": "Copy"
+      },
+      "sections": {
+        "pricing": "Pricing",
+        "identity": "Identity (dupe diagnostic)",
+        "meta": "NIP-69 metadata"
+      },
+      "labels": {
+        "price": "Price",
+        "premium": "Premium",
+        "fiatRange": "Fiat range",
+        "amount": "Amount",
+        "dTag": "d-tag (offer id)",
+        "makerPubkey": "Maker pubkey (hex)",
+        "makerNpub": "Maker npub",
+        "rawEventId": "Raw event id",
+        "sourcePlatform": "Source platform (y tag)",
+        "sourceRelay": "Source relay",
+        "status": "Status",
+        "created": "Created",
+        "expires": "Expires",
+        "paymentMethods": "Payment methods",
+        "network": "Network",
+        "layer": "Layer",
+        "geohash": "Geohash",
+        "bond": "Bond",
+        "sourceField": "Source field",
+        "name": "Name",
+        "reputation": "Reputation",
+        "trades": "Trades",
+        "daysOnPlatform": "Days on platform",
+        "rawEventJson": "Raw event JSON",
+        "noExpiry": "no expiry",
+        "unavailable": "unavailable"
+      },
+      "crossesMark": "Price crosses an order on the other side"
+    }
+  },
+  "crossedPairs": {
+    "title": "Crossed orders",
+    "subtitle": "Bid prices that meet or exceed an ask price. Pairs sharing a payment method and from different platforms are tractable arbitrage candidates.",
+    "buyAtAsk": "BUY at ASK",
+    "sellToBid": "SELL to BID",
+    "perBtc": "per BTC",
+    "via": "via {methods}",
+    "noSharedMethod": "no shared method",
+    "pairCount": "{count} pair | {count} pairs"
+  }
+}
