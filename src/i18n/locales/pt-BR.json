@@ -38,10 +38,10 @@
   },
   "about": {
     "title": "Sobre",
-    "lead": "Não pode haver liberdade sem privacidade. Poder realizar transações de forma privada, longe dos olhos curiosos de entidades centralizadas que coletam dados, é extremamente importante.",
-    "p1": "O P2P sats exibe os livros de ordens ao vivo de mercados de bitcoin peer-to-peer sem permissão. Ele extrai dados de ordens em tempo real de relays públicos do Nostr, onde plataformas como Mostro, lnp2pbot, RoboSats e Peach transmitem suas ofertas sob o NIP-69.",
-    "p2": "O objetivo é mostrar o que está acontecendo nesses mercados para que as pessoas possam se encontrar e comparar preços entre plataformas. Esperamos que isso ajude a tornar esses mercados mais fortes e eficientes.",
-    "p3": "Este site não aceita contas ou ordens, é apenas uma fonte de informação. As negociações devem ser publicadas em suas respectivas plataformas."
+    "lead": "A privacidade é um pré-requisito para a liberdade. Poder transacionar sem ser vigiado, perfilado ou barrado por intermediários ávidos por dados não é luxo — é o alicerce de qualquer mercado livre e, em última instância, de qualquer sociedade livre.",
+    "p1": "O P2P sats é uma ferramenta para o mercado de Bitcoin peer-to-peer. Ele obtém dados de ordens ao vivo de relays públicos do Nostr, onde plataformas como Mostro, lnp2pbot, RoboSats e Peach publicam suas ofertas sob o NIP-69, e reúne tudo em uma visão única e unificada.",
+    "p2": "Hoje esse mercado é fragmentado. Liquidez, preços e formas de pagamento estão espalhados entre apps e bots distintos, cada um com sua fatia isolada do fluxo de ordens. Essa fragmentação custa caro para todo mundo: execuções piores, casamentos mais lentos e oportunidades de arbitragem que ficam na mesa. Ao unificar a visão, o P2P sats ajuda traders a se encontrarem e a comparar preços entre plataformas, com o objetivo de mais liquidez e um mercado mais eficiente no geral.",
+    "p3": "Este site não administra contas, não recebe ordens nem custodia fundos. É apenas uma janela somente leitura para o que já é público nos relays. Para negociar de verdade, vá até a plataforma que publicou a ordem que te interessa."
   },
   "contact": {
     "title": "Contato",

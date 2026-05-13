@@ -38,10 +38,10 @@
   },
   "about": {
     "title": "Acerca de",
-    "lead": "No puede haber libertad sin privacidad. Poder realizar transacciones de forma privada, lejos de las miradas indiscretas de entidades centralizadas que recopilan datos, es enormemente importante.",
-    "p1": "P2P sats muestra los libros de órdenes en vivo de mercados de bitcoin entre pares sin permiso. Extrae datos de órdenes en tiempo real de relés públicos de Nostr, donde plataformas como Mostro, lnp2pbot, RoboSats y Peach transmiten sus ofertas bajo NIP-69.",
-    "p2": "El objetivo es mostrar lo que ocurre en estos mercados para que las personas puedan encontrarse y comparar precios entre plataformas. Esperemos que esto ayude a hacer estos mercados más fuertes y eficientes.",
-    "p3": "Este sitio no toma cuentas ni órdenes, es solo una fuente de información. Las operaciones deben publicarse en sus respectivas plataformas."
+    "lead": "La privacidad es un requisito previo de la libertad. Poder operar sin ser observado, perfilado ni controlado por intermediarios ávidos de datos no es un lujo: es la base de cualquier mercado libre y, en última instancia, de cualquier sociedad libre.",
+    "p1": "P2P sats es una herramienta para el mercado de Bitcoin peer-to-peer. Toma datos de órdenes en vivo desde relés públicos de Nostr, donde plataformas como Mostro, lnp2pbot, RoboSats y Peach publican sus ofertas bajo NIP-69, y los reúne en una vista única y unificada.",
+    "p2": "Hoy este mercado está fragmentado. La liquidez, los precios y los métodos de pago se reparten entre aplicaciones y bots distintos, cada uno con su propia porción aislada del flujo de órdenes. Esa fragmentación nos cuesta a todos: peores ejecuciones, emparejamientos más lentos y oportunidades de arbitraje desaprovechadas. Al unificar la vista, P2P sats ayuda a que los traders se encuentren y comparen precios entre plataformas, con el objetivo de lograr más liquidez y un mercado más eficiente en su conjunto.",
+    "p3": "Este sitio no maneja cuentas, no toma órdenes ni custodia fondos. Es solo una ventana de solo lectura a lo que ya es público en los relés. Para operar de verdad, ve a la plataforma que publicó la orden que te interesa."
   },
   "contact": {
     "title": "Contacto",

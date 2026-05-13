@@ -38,10 +38,10 @@
   },
   "about": {
     "title": "About",
-    "lead": "You cannot have freedom without privacy. Being able to transact privately, away from the prying eyes of centralized, data-collecting entities is hugely important.",
-    "p1": "P2P sats shows the live order books of permissionless peer-to-peer bitcoin markets. It pulls real-time order data from public Nostr relays, where platforms like Mostro, lnp2pbot, RoboSats, and Peach broadcast their offers under NIP-69.",
-    "p2": "The goal is to surface what's happening on these markets so people can find each other and compare prices across venues. Hopefully this helps in making these markets stronger and more efficient.",
-    "p3": "This site doesn't take accounts or orders, it just an information source. Trades must be posted on their respective platforms."
+    "lead": "Privacy is a prerequisite for freedom. The ability to transact without being watched, profiled, or gatekept by data-hungry intermediaries isn't a luxury — it's the foundation of any free market, and ultimately of any free society.",
+    "p1": "P2P sats is a tool for the peer-to-peer Bitcoin market. It pulls live order data from public Nostr relays, where platforms like Mostro, lnp2pbot, RoboSats, and Peach broadcast their offers under NIP-69, and brings everything into a single, unified view.",
+    "p2": "Today this market is fragmented. Liquidity, prices, and payment options are spread thinly across separate apps and bots, each with its own siloed slice of the order flow. That fragmentation costs everyone — worse fills, slower matches, and arbitrage left on the table. By unifying the view, P2P sats helps traders find each other and compare prices across venues, with the goal of deeper liquidity and a more efficient market overall.",
+    "p3": "This site doesn't hold accounts, take orders, or touch funds. It's purely a read-only window into what's already public on the relays. To actually trade, head to the platform that posted the order you're interested in."
   },
   "contact": {
     "title": "Contact",
