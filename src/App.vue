@@ -118,7 +118,9 @@ function onCurrencyChange(c: Currency) {
     </nav>
 
     <!-- ── Page content ────────────────────────────────────── -->
-    <RouterView :key="store.locale" />
+    <main class="pb-main">
+      <RouterView :key="store.locale" />
+    </main>
 
     <!-- ── Footer ──────────────────────────────────────────── -->
     <footer class="pb-foot">
