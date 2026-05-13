@@ -9,6 +9,7 @@ import CurrencySwitcher from '@/components/CurrencySwitcher.vue'
 import LanguageSwitcher from '@/components/LanguageSwitcher.vue'
 import RelayStatus from '@/components/RelayStatus.vue'
 import type { Currency } from '@/lib/types'
+import logoUrl from '@/assets/img/p2psats.png'
 
 const { t } = useI18n()
 const store = useAppStore()
@@ -42,16 +43,7 @@ function onCurrencyChange(c: Currency) {
     <header class="pb-header">
       <div class="pb-brand">
         <div class="pb-logo" aria-hidden="true">
-          <svg viewBox="0 0 24 24" width="22" height="22">
-            <path
-              d="M5 4v16M19 4v16M5 12h14"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-            />
-            <circle cx="9" cy="8" r="1.6" fill="currentColor" />
-            <circle cx="15" cy="16" r="1.6" fill="currentColor" />
-          </svg>
+          <img :src="logoUrl" alt="P2P sats logo" width="32" height="32" />
         </div>
         <div class="pb-brand-text">
           <div class="pb-brand-name">P2P sats</div>
