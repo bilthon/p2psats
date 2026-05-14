@@ -138,19 +138,19 @@
   },
   "seo": {
     "home": {
-      "title": "Live P2P Bitcoin Order Book | P2P sats",
+      "title": "Live P2P Bitcoin Order Book · P2P sats",
       "description": "Live peer-to-peer Bitcoin order book aggregated from Nostr relays via NIP-69. Compare prices across Mostro, lnp2pbot, RoboSats and Peach."
     },
     "alerts": {
-      "title": "P2P Order Alerts | P2P sats",
+      "title": "P2P Order Alerts · P2P sats",
       "description": "Set price and spread alerts for peer-to-peer Bitcoin orders on Nostr. Get notified the moment a matching NIP-69 order appears on any tracked relay."
     },
     "about": {
-      "title": "About | P2P sats",
-      "description": "P2P sats is a privacy-first, non-custodial Bitcoin order book aggregator. It reads live NIP-69 orders from public Nostr relays (no accounts, no data collection)."
+      "title": "About · P2P sats",
+      "description": "P2P sats is a privacy-first Bitcoin order book aggregator. It reads live NIP-69 orders from public Nostr relays (no accounts, no data collection)."
     },
     "contact": {
-      "title": "Contact | P2P sats",
+      "title": "Contact · P2P sats",
       "description": "Reach the P2P sats team via Nostr or email. Report bugs, share feedback, or talk peer-to-peer Bitcoin."
     }
   },

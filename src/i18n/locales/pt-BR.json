@@ -138,19 +138,19 @@
   },
   "seo": {
     "home": {
-      "title": "Livro de ordens P2P de Bitcoin ao vivo | P2P sats",
+      "title": "Livro de ordens P2P de Bitcoin ao vivo · P2P sats",
       "description": "Livro de ordens peer-to-peer de Bitcoin em tempo real, agregado de relays Nostr via NIP-69. Compare preços entre Mostro, lnp2pbot, RoboSats e Peach."
     },
     "alerts": {
-      "title": "Alertas de ordens P2P | P2P sats",
+      "title": "Alertas de ordens P2P · P2P sats",
       "description": "Configure alertas de preço e spread para ordens P2P de Bitcoin no Nostr. Seja notificado assim que uma ordem NIP-69 compatível aparecer em qualquer relay monitorado."
     },
     "about": {
-      "title": "Sobre | P2P sats",
-      "description": "O P2P sats é um agregador de ordens de Bitcoin não custodial com foco em privacidade. Lê ordens NIP-69 de relays públicos do Nostr (sem cadastro, sem coleta de dados)."
+      "title": "Sobre · P2P sats",
+      "description": "O P2P sats é um agregador de ordens de Bitcoin com foco em privacidade. Lê ordens NIP-69 de relays públicos do Nostr (sem cadastro, sem coleta de dados)."
     },
     "contact": {
-      "title": "Contato | P2P sats",
+      "title": "Contato · P2P sats",
       "description": "Fale com a equipe do P2P sats via Nostr ou e-mail. Reporte bugs, envie sugestões ou converse sobre Bitcoin peer-to-peer."
     }
   },
