@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <!-- Soft gaussian blur applied to the bid/ask silhouette paths only.
+         Generous filter region so the blur halo isn't clipped at path edges. -->
+    <filter id="depthBlur" x="-15%" y="-15%" width="130%" height="130%">
+      <feGaussianBlur stdDeviation="5"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#FAFAF7"/>
+
+  <!-- Brand accent stripe (top) -->
+  <rect x="0" y="0" width="1200" height="6" fill="#5B5BD6"/>
+
+  <!-- LEFT: brand block -->
+  <g font-family="Inter Tight, Inter, Helvetica Neue, Helvetica, Arial, sans-serif">
+    <!-- LIVE indicator -->
+    <circle cx="92" cy="124" r="6" fill="#3FA56B"/>
+    <text x="108" y="131" font-size="20" font-weight="600" fill="#7A736A" letter-spacing="2">LIVE</text>
+
+    <!-- Wordmark -->
+    <text x="84" y="288" font-size="132" font-weight="700" fill="#221E18" letter-spacing="-4">P2P sats</text>
+
+    <!-- Value prop -->
+    <text x="88" y="358" font-size="36" font-weight="500" fill="#3A332B">Live peer-to-peer Bitcoin</text>
+    <text x="88" y="402" font-size="36" font-weight="500" fill="#3A332B">order book</text>
+    <text x="88" y="450" font-size="26" font-weight="400" fill="#7A736A">aggregated from Nostr relays</text>
+
+    <!-- Footer tagline -->
+    <text x="88" y="568" font-size="20" font-weight="600" fill="#7A736A" letter-spacing="3">NOSTR  ·  NIP-69</text>
+  </g>
+
+  <!-- RIGHT: depth chart silhouette -->
+  <g>
+    <!-- Bid + ask staircases get a soft gaussian blur for an atmospheric feel.
+         Structural lines and labels stay sharp so they remain legible. -->
+    <g filter="url(#depthBlur)">
+      <!-- Bid side (green, left half rising toward outer edge) -->
+      <path d="
+        M 730 565
+        L 730 270
+        L 770 270 L 770 305
+        L 810 305 L 810 350
+        L 850 350 L 850 395
+        L 890 395 L 890 440
+        L 930 440 L 930 485
+        L 965 485 L 965 520
+        L 1000 520
+        L 1000 565 Z"
+        fill="#3FA56B" fill-opacity="0.88"/>
+
+      <!-- Ask side (red, right half rising toward outer edge) -->
+      <path d="
+        M 1000 565
+        L 1000 520
+        L 1035 520 L 1035 485
+        L 1070 485 L 1070 440
+        L 1105 440 L 1105 395
+        L 1140 395 L 1140 350
+        L 1165 350 L 1165 305
+        L 1180 305 L 1180 565 Z"
+        fill="#D85B30" fill-opacity="0.88"/>
+    </g>
+
+    <!-- Mid-price marker -->
+    <line x1="1000" y1="250" x2="1000" y2="565" stroke="#221E18" stroke-width="1.5" stroke-dasharray="5,5" opacity="0.45"/>
+
+    <!-- Baseline -->
+    <line x1="710" y1="565" x2="1180" y2="565" stroke="#221E18" stroke-width="2"/>
+
+    <!-- Tiny axis labels -->
+    <g font-family="IBM Plex Mono, Menlo, Consolas, monospace" font-size="14" fill="#9A938A" letter-spacing="0.5">
+      <text x="730" y="595">bids</text>
+      <text x="1148" y="595">asks</text>
+      <text x="977" y="235" font-size="13">mid</text>
+    </g>
+  </g>
+</svg>

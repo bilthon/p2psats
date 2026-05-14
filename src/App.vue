@@ -17,14 +17,21 @@ const { t } = useI18n()
 const store = useAppStore()
 
 // Site-wide head defaults. Individual views override title/description/canonical.
-// TODO: add og:image / twitter:image once a card image is designed
+const siteUrl = import.meta.env.VITE_SITE_URL ?? 'https://p2psats.com'
+const ogImageUrl = `${siteUrl}/og.png`
+
 useHead(computed(() => ({
   htmlAttrs: { lang: store.locale },
   meta: [
     { property: 'og:site_name', content: 'P2P sats' },
     { property: 'og:type', content: 'website' },
     { property: 'og:locale', content: OG_LOCALE[store.locale] ?? 'en_US' },
+    { property: 'og:image', content: ogImageUrl },
+    { property: 'og:image:width', content: '1200' },
+    { property: 'og:image:height', content: '630' },
+    { property: 'og:image:alt', content: 'P2P sats — live peer-to-peer Bitcoin order book aggregated from Nostr relays' },
     { name: 'twitter:card', content: 'summary_large_image' },
+    { name: 'twitter:image', content: ogImageUrl },
   ],
 })))
 const nostr = useNostrOrderbookStore()
