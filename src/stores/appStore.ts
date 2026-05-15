@@ -16,6 +16,7 @@ const PE_KEYS = {
   currency: 'pe.currency',
   sources: 'pe.sources',
   alerts: 'pe.alerts',
+  theme: 'pe.theme',
 } as const
 
 function readStorage<T>(key: string, fallback: T): T {
@@ -41,6 +42,20 @@ export const useAppStore = defineStore('app', () => {
   // ── Persisted state ──────────────────────────────────────────────────────
   const locale = ref<AppLocale>(detectInitialLocale())
   const currency = ref<Currency>(readStorage<Currency>(PE_KEYS.currency, 'USD'))
+
+  // Theme — persisted under pe.theme, respects prefers-color-scheme on first visit.
+  // During SSG prerender (Node) window is undefined — default to 'light'.
+  function detectInitialTheme(): 'light' | 'dark' {
+    if (typeof window === 'undefined') return 'light'
+    const stored = readStorage<string>(PE_KEYS.theme, '')
+    if (stored === 'light' || stored === 'dark') return stored
+    try {
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches) return 'dark'
+    } catch { /* matchMedia not available */ }
+    return 'light'
+  }
+
+  const theme = ref<'light' | 'dark'>(detectInitialTheme())
   const activeSources = ref<string[]>(
     readStorage<string[]>(PE_KEYS.sources, ['mostro', 'lnp2pbot', 'robosats', 'peach']),
   )
@@ -117,6 +132,18 @@ export const useAppStore = defineStore('app', () => {
     i18nSetLocale(l)
   }
 
+  function setTheme(t: 'light' | 'dark') {
+    theme.value = t
+    writeStorage(PE_KEYS.theme, t)
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-theme', t)
+    }
+  }
+
+  function toggleTheme() {
+    setTheme(theme.value === 'light' ? 'dark' : 'light')
+  }
+
   function setCurrency(c: Currency) {
     currency.value = c
     writeStorage(PE_KEYS.currency, c)
@@ -154,6 +181,7 @@ export const useAppStore = defineStore('app', () => {
     currency,
     activeSources,
     alerts,
+    theme,
     // derived
     allOrders,
     ccyOrders,
@@ -178,5 +206,7 @@ export const useAppStore = defineStore('app', () => {
     addAlert,
     removeAlert,
     toggleAlert,
+    setTheme,
+    toggleTheme,
   }
 })

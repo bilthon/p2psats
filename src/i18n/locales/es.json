@@ -154,6 +154,10 @@
       "description": "Contáctanos vía Nostr o correo electrónico. Reporta errores, comparte sugerencias o conversa sobre Bitcoin peer-to-peer."
     }
   },
+  "themeToggle": {
+    "switchToDark": "Cambiar a tema oscuro",
+    "switchToLight": "Cambiar a tema claro"
+  },
   "crossedPairs": {
     "title": "Órdenes cruzadas",
     "subtitle": "Precios de compra que igualan o superan un precio de venta. Los pares que comparten un método de pago y son de plataformas distintas son candidatos de arbitraje viables.",

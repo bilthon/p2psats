@@ -9,6 +9,7 @@ import { useBtcRatesStore } from '@/services/btcRates'
 import CurrencySwitcher from '@/components/CurrencySwitcher.vue'
 import LanguageSwitcher from '@/components/LanguageSwitcher.vue'
 import RelayStatus from '@/components/RelayStatus.vue'
+import ThemeToggle from '@/components/ThemeToggle.vue'
 import type { Currency } from '@/lib/types'
 import logoUrl from '@/assets/img/p2psats.png'
 import { OG_LOCALE } from '@/i18n'
@@ -40,6 +41,11 @@ const router = useRouter()
 const route = useRoute()
 
 onMounted(() => {
+  // Sync the Pinia theme state to the DOM attribute on client boot.
+  // The FOUC-prevention script in index.html already sets data-theme before
+  // paint, but calling setTheme here ensures the store and DOM stay in sync
+  // in case they somehow diverge (e.g. localStorage updated in another tab).
+  store.setTheme(store.theme)
   nostr.connect()
   btcRates.start()
 })
@@ -78,6 +84,7 @@ function onCurrencyChange(c: Currency) {
       />
 
       <div class="pb-header-right">
+        <ThemeToggle />
         <LanguageSwitcher />
         <CurrencySwitcher :model-value="store.currency" @update:model-value="onCurrencyChange" />
       </div>
