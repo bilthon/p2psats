@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, type CSSProperties } from 'vue'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
 import { LineChart } from 'echarts/charts'
@@ -15,6 +15,7 @@ import { fmtFiat, fmtSatsCompact, getUserLocale } from '@/lib/data'
 import { useIntlLocale } from '@/i18n/composables'
 import type { CrossResult, Currency, Order } from '@/lib/types'
 import { useBtcRatesStore } from '@/services/btcRates'
+import { useAppStore } from '@/stores/appStore'
 import SatSymbol from './SatSymbol.vue'
 
 use([
@@ -34,6 +35,7 @@ const props = defineProps<{
 }>()
 
 const btcRates = useBtcRatesStore()
+const appStore = useAppStore()
 const intl = useIntlLocale()
 
 // ── Custom cursor tracking (replaces ECharts tooltip for accuracy) ───────────
@@ -76,6 +78,24 @@ function onChartLeave() {
   cursorPrice.value = null
   cursorPx.value = null
 }
+
+// Reactive tooltip styles that update when the theme changes.
+const tipStyle = computed<CSSProperties>(() => {
+  const isDark = appStore.theme === 'dark'
+  return {
+    position: 'absolute',
+    pointerEvents: 'none',
+    background: isDark ? 'oklch(0.22 0.005 80 / 0.96)' : 'oklch(1 0 0 / 0.96)',
+    border: `1px solid ${isDark ? 'oklch(0.35 0.005 80)' : 'oklch(0.92 0.005 80)'}`,
+    borderRadius: '8px',
+    padding: '8px 10px',
+    boxShadow: isDark ? '0 4px 12px rgba(0,0,0,0.45)' : '0 4px 12px rgba(20,18,10,0.06)',
+    fontFamily: "'Inter Tight', sans-serif",
+    fontSize: '12px',
+    whiteSpace: 'nowrap',
+    zIndex: 5,
+  }
+})
 
 // Cumulative depth at a given price. For bids: sum of bids with price >= P.
 // For asks: sum of asks with price <= P. O(n) per call which is fine at our
@@ -151,6 +171,18 @@ function buildLevels(orders: Order[], side: 'buy' | 'sell', currency: Currency):
 // ── Computed option ───────────────────────────────────────────────────────────
 const option = computed(() => {
   void intl.value
+  // Reference theme so this computed reacts when the theme toggles.
+  const isDark = appStore.theme === 'dark'
+  const themeColors = {
+    axisLabel:   isDark ? 'oklch(0.55 0.005 80)' : 'oklch(0.5 0.005 80)',
+    splitLine:   isDark ? 'oklch(0.32 0.005 80)' : 'oklch(0.92 0.005 80)',
+    cursorLine:  isDark ? 'oklch(0.55 0.005 80)' : 'oklch(0.6 0.005 80)',
+    midLine:     isDark ? 'oklch(0.65 0.005 80)' : 'oklch(0.45 0.005 80)',
+    midLabel:    isDark ? 'oklch(0.70 0.005 80)' : 'oklch(0.4 0.005 80)',
+    tipBg:       isDark ? 'oklch(0.22 0.005 80 / 0.96)' : 'oklch(1 0 0 / 0.96)',
+    tipBorder:   isDark ? 'oklch(0.35 0.005 80)' : 'oklch(0.92 0.005 80)',
+    tipShadow:   isDark ? '0 4px 12px rgba(0,0,0,0.45)' : '0 4px 12px rgba(20,18,10,0.06)',
+  }
   const allOrders = props.orders.filter((o) => o.currency === props.currency)
 
   if (!allOrders.length) return null
@@ -332,7 +364,7 @@ const option = computed(() => {
         symbol: 'none',
         // Default style applies to entries that don't override lineStyle.
         lineStyle: {
-          color: 'oklch(0.45 0.005 80)',
+          color: themeColors.midLine,
           type: 'dashed' as const,
           dashOffset: 0,
           width: 1,
@@ -341,7 +373,7 @@ const option = computed(() => {
           show: true,
           fontFamily: 'Inter Tight, sans-serif',
           fontSize: 10,
-          color: 'oklch(0.4 0.005 80)',
+          color: themeColors.midLabel,
         },
         data: markLineData,
       }
@@ -476,7 +508,7 @@ const option = computed(() => {
         formatter: (v: number) => fmtFiat(v, props.currency, { bare: true }),
         fontFamily: 'Inter Tight, sans-serif',
         fontSize: 10,
-        color: 'oklch(0.5 0.005 80)',
+        color: themeColors.axisLabel,
         fontVariantNumeric: 'tabular-nums',
         margin: 8,
         hideOverlap: true,
@@ -489,7 +521,7 @@ const option = computed(() => {
         type: 'line' as const,
         triggerTooltip: false,
         lineStyle: {
-          color: 'oklch(0.6 0.005 80)',
+          color: themeColors.cursorLine,
           width: 1,
           type: 'solid' as const,
         },
@@ -515,14 +547,14 @@ const option = computed(() => {
         formatter: (v: number) => (v > 0 ? `${fmtSatsCompact(v, { bare: true })} {sat|!}` : ''),
         fontFamily: 'Inter Tight, sans-serif',
         fontSize: 10,
-        color: 'oklch(0.5 0.005 80)',
+        color: themeColors.axisLabel,
         fontVariantNumeric: 'tabular-nums',
         margin: 8,
         rich: {
           sat: {
             fontFamily: 'Satoshi Symbol, sans-serif',
             fontSize: 10,
-            color: 'oklch(0.5 0.005 80)',
+            color: themeColors.axisLabel,
           },
         },
       },
@@ -530,7 +562,7 @@ const option = computed(() => {
         show: true,
         interval: (index: number) => index === 1 || index === 2 || index === 3,
         lineStyle: {
-          color: 'oklch(0.92 0.005 80)',
+          color: themeColors.splitLine,
           width: 1,
         },
       },
@@ -570,19 +602,9 @@ const option = computed(() => {
       v-if="cursorInfo && cursorPx"
       class="pb-depth-tip"
       :style="{
-        position: 'absolute',
+        ...tipStyle,
         left: cursorPx.x + 14 + 'px',
         top: cursorPx.y + 14 + 'px',
-        pointerEvents: 'none',
-        background: 'oklch(1 0 0 / 0.96)',
-        border: '1px solid oklch(0.92 0.005 80)',
-        borderRadius: '8px',
-        padding: '8px 10px',
-        boxShadow: '0 4px 12px rgba(20,18,10,0.06)',
-        fontFamily: '\'Inter Tight\', sans-serif',
-        fontSize: '12px',
-        whiteSpace: 'nowrap',
-        zIndex: 5,
       }"
     >
       <div

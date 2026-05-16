@@ -154,6 +154,10 @@
       "description": "Reach the P2P sats team via Nostr or email. Report bugs, share feedback, or talk peer-to-peer Bitcoin."
     }
   },
+  "themeToggle": {
+    "switchToDark": "Switch to dark theme",
+    "switchToLight": "Switch to light theme"
+  },
   "crossedPairs": {
     "title": "Crossed orders",
     "subtitle": "Bid prices that meet or exceed an ask price. Pairs sharing a payment method and from different platforms are tractable arbitrage candidates.",
