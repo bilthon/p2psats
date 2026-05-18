@@ -12,7 +12,7 @@ import OrderBook from '@/components/OrderBook.vue'
 import CrossedPairsList from '@/components/CrossedPairsList.vue'
 import OrderDetailDialog from '@/components/OrderDetailDialog.vue'
 import SatSymbol from '@/components/SatSymbol.vue'
-import type { Order } from '@/lib/types'
+import type { Order } from '@p2psats/shared'
 
 const { t } = useI18n()
 const route = useRoute()

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { PaymentMethod } from '@/lib/types'
+import type { PaymentMethod } from '@p2psats/shared'
 
 const props = withDefaults(
   defineProps<{

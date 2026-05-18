@@ -1,7 +1,7 @@
 // arbitrage.ts — detect crossed P2P books.
 // A "cross" happens when a bid price >= an ask price.
 
-import type { CrossResult, Currency, Order } from './types'
+import type { CrossResult, Currency, Order } from '@p2psats/shared'
 
 export function detectCrosses(orders: Order[], currency: Currency): CrossResult {
   const buys = orders.filter((o) => o.side === 'buy' && o.currency === currency)
