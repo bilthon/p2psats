@@ -2,7 +2,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { CCY_LIST, CCY_LABEL } from '@/lib/data'
-import type { Currency } from '@/lib/types'
+import type { Currency } from '@p2psats/shared'
 
 const { t } = useI18n()
 

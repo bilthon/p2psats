@@ -6,7 +6,7 @@ import { useRoute } from 'vue-router'
 import { useAppStore } from '@/stores/appStore'
 import AlertBuilder from '@/components/AlertBuilder.vue'
 import SavedAlerts from '@/components/SavedAlerts.vue'
-import type { Alert } from '@/lib/types'
+import type { Alert } from '@p2psats/shared'
 
 const { t } = useI18n()
 const store = useAppStore()

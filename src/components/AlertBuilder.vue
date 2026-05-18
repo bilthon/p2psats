@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { SOURCES, PAYMENT_METHODS } from '@/lib/data'
-import { DEFAULT_RULE } from '@/lib/alerts'
-import type { Alert, Currency, PaymentMethod } from '@/lib/types'
+import { DEFAULT_RULE } from '@p2psats/shared'
+import type { Alert, Currency, PaymentMethod } from '@p2psats/shared'
 
 const props = defineProps<{
   currency: Currency
@@ -15,7 +15,6 @@ const emit = defineEmits<{ save: [alert: Alert] }>()
 const side = ref<'any' | 'buy' | 'sell'>(DEFAULT_RULE.side)
 const premOp = ref<'<=' | '>=' | '=='>(DEFAULT_RULE.premium.op)
 const premValue = ref<number>(DEFAULT_RULE.premium.value)
-const email = ref('')
 const name = ref('')
 const methods = ref<string[]>([])
 const sources = ref<string[]>([])
@@ -24,7 +23,8 @@ const amountMax = ref<number | null>(null)
 const showAdvanced = ref(false)
 
 
-const canSave = computed(() => email.value.includes('@') && email.value.includes('.'))
+// TODO: channel selector (task #14) — for now always allow save
+const canSave = computed(() => true)
 
 function toggleMethod(id: string) {
   if (methods.value.includes(id)) {
@@ -46,7 +46,6 @@ function reset() {
   side.value = DEFAULT_RULE.side
   premOp.value = DEFAULT_RULE.premium.op
   premValue.value = DEFAULT_RULE.premium.value
-  email.value = ''
   name.value = ''
   methods.value = []
   sources.value = []
@@ -57,6 +56,7 @@ function reset() {
 
 function save() {
   if (!canSave.value) return
+  // TODO: channel selector (task #14) — emailEnabled/nostrEnabled will be user-controlled
   const alert: Alert = {
     id: 'a_' + Math.random().toString(36).slice(2, 8),
     name: name.value || undefined,
@@ -67,7 +67,8 @@ function save() {
     sources: [...sources.value],
     amountMin: amountMin.value,
     amountMax: amountMax.value,
-    email: email.value,
+    emailEnabled: true,
+    nostrEnabled: false,
     enabled: true,
     createdAt: Date.now(),
   }
@@ -135,15 +136,7 @@ const advancedCount = computed(() => methods.value.length + sources.value.length
         </div>
       </label>
 
-      <label class="pb-field" style="flex: 1">
-        <span class="pb-field-label">Email for delivery</span>
-        <input
-          v-model="email"
-          type="email"
-          placeholder="you@example.com"
-          class="pb-input"
-        />
-      </label>
+      <!-- TODO: channel selector (task #14) — email/nostr channel checkboxes go here -->
     </div>
 
     <!-- Advanced disclosure -->

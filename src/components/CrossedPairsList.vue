@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { fmtFiat } from '@/lib/data'
-import type { CrossResult, Currency } from '@/lib/types'
+import type { CrossResult, Currency } from '@p2psats/shared'
 import MethodChips from './MethodChips.vue'
 import SourceDot from './SourceDot.vue'
 

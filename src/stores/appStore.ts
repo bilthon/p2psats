@@ -5,11 +5,11 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { methodsForCurrency, midPrice } from '@/lib/data'
 import { detectCrosses } from '@/lib/arbitrage'
-import { matchesRule } from '@/lib/alerts'
+import { matchesRule } from '@p2psats/shared'
 import { useNostrOrderbookStore } from '@/services/nostrOrderbook'
 import { useBtcRatesStore } from '@/services/btcRates'
 import { toVueOrder } from '@/lib/orderAdapter'
-import type { Alert, Currency, Order } from '@/lib/types'
+import type { Alert, Currency, Order } from '@p2psats/shared'
 import { setLocale as i18nSetLocale, detectInitialLocale, type AppLocale } from '@/i18n'
 
 const PE_KEYS = {
@@ -59,7 +59,17 @@ export const useAppStore = defineStore('app', () => {
   const activeSources = ref<string[]>(
     readStorage<string[]>(PE_KEYS.sources, ['mostro', 'lnp2pbot', 'robosats', 'peach']),
   )
-  const alerts = ref<Alert[]>(readStorage<Alert[]>(PE_KEYS.alerts, []))
+  // One-time localStorage migration: old Alert shape had `email: string`.
+  // Shared lib 1.0.0 replaced it with `emailEnabled: boolean` + `nostrEnabled: boolean`.
+  const alerts = ref<Alert[]>(
+    readStorage<(Alert & { email?: string })[]>(PE_KEYS.alerts, []).map((a) => {
+      if ('email' in a && typeof a.email === 'string') {
+        const { email: _dropped, ...rest } = a
+        return { ...rest, emailEnabled: true, nostrEnabled: false } as Alert
+      }
+      return a as Alert
+    }),
+  )
 
   // ── Derived / computed ───────────────────────────────────────────────────
 

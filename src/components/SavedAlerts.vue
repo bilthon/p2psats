@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Alert } from '@/lib/types'
+import type { Alert } from '@p2psats/shared'
 
 defineProps<{
   alerts: Alert[]
@@ -64,7 +64,7 @@ function opSymbol(op: string): string {
           <span v-if="a.sources.length > 0" class="pb-alert-tag"
             >{{ a.sources.length }} source{{ a.sources.length > 1 ? 's' : '' }}</span
           >
-          <span class="pb-alert-email">→ {{ a.email }}</span>
+          <!-- TODO: channel badges (task #14) -->
         </div>
       </div>
 
