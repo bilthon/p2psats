@@ -98,6 +98,33 @@ export const useAppStore = defineStore('app', () => {
   const account = ref<AccountDto | null>(null)
   const signedIn = computed(() => account.value !== null)
 
+  /**
+   * Push a freshly-authenticated account into the store. Called by the
+   * sign-in completion paths (SignInPanel after verifyNostr, AuthVerifyView
+   * after verifyEmail) so the UI reacts immediately — otherwise the new
+   * __session cookie is set on the response but `signedIn` stays false
+   * until the next reload (when the bootstrap IIFE re-runs auth.me()).
+   *
+   * On sign-in we also kick off a backend alerts.list() so the user's
+   * server-side alerts replace any local drafts. Fire-and-forget — the
+   * UI transitions on the synchronous `account.value` assignment; the
+   * alerts list lands a moment later. Errors are swallowed (matches the
+   * bootstrap IIFE's posture).
+   */
+  function setAccount(dto: AccountDto | null): void {
+    account.value = dto
+    if (dto !== null) {
+      void apiClient.alerts
+        .list()
+        .then((remote) => {
+          alerts.value = remote.map(toLocalAlert)
+        })
+        .catch((e) => {
+          console.warn('[appStore] alerts.list() after sign-in failed:', e)
+        })
+    }
+  }
+
   // ── Persisted state ──────────────────────────────────────────────────────
   const locale = ref<AppLocale>(detectInitialLocale())
   const currency = ref<Currency>(readStorage<Currency>(PE_KEYS.currency, 'USD'))
@@ -311,6 +338,7 @@ export const useAppStore = defineStore('app', () => {
     // auth state
     account,
     signedIn,
+    setAccount,
     // persisted state
     locale,
     currency,

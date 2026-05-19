@@ -4,9 +4,11 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { apiClient, ApiError } from '@/services/apiClient'
 import type { NostrEvent } from '@/services/apiClient'
+import { useAppStore } from '@/stores/appStore'
 
 const { t } = useI18n()
 const router = useRouter()
+const store = useAppStore()
 
 // ---------------------------------------------------------------------------
 // Tab state
@@ -115,9 +117,15 @@ async function handleNostrSignIn() {
     const signedEvent = await window.nostr.signEvent(unsignedEvent)
 
     // 4. Submit to backend
-    await apiClient.auth.verifyNostr(signedEvent)
+    const { account } = await apiClient.auth.verifyNostr(signedEvent)
 
-    // 5. Redirect on success
+    // 5. Push the account into the store so signedIn flips to true
+    // synchronously — otherwise the redirect to /alerts still shows the
+    // SignInPanel until the next reload (when the store's bootstrap IIFE
+    // re-runs auth.me()).
+    store.setAccount(account)
+
+    // 6. Redirect on success
     await router.push('/alerts')
   } catch (err) {
     if (err instanceof ApiError) {

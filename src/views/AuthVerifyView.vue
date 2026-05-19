@@ -3,10 +3,12 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { apiClient, ApiError } from '@/services/apiClient'
+import { useAppStore } from '@/stores/appStore'
 
 const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
+const store = useAppStore()
 
 type VerifyState = 'verifying' | 'missing-token' | 'error'
 
@@ -23,8 +25,12 @@ onMounted(async () => {
   }
 
   try {
-    await apiClient.auth.verifyEmail(token.trim())
-    // On success the backend has set the __session cookie.
+    const { account } = await apiClient.auth.verifyEmail(token.trim())
+    // On success the backend has set the __session cookie. Push the account
+    // into the store so signedIn flips synchronously before the redirect —
+    // otherwise /alerts still shows the SignInPanel until a reload triggers
+    // the store's bootstrap auth.me() call.
+    store.setAccount(account)
     // Redirect to the alerts page — that's the post-auth destination.
     await router.replace('/alerts')
   } catch (err) {
