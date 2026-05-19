@@ -192,6 +192,13 @@
       "description": "Entre no P2P sats para gerenciar seus alertas de ordens P2P de Bitcoin."
     }
   },
+  "matchToast": {
+    "newMatch": "Nova correspondência",
+    "close": "Fechar",
+    "viewOnOrderbook": "Ver no livro de ordens",
+    "viewComingSoon": "Link direto em breve",
+    "anySide": "QUALQUER"
+  },
   "themeToggle": {
     "switchToDark": "Mudar para tema escuro",
     "switchToLight": "Mudar para tema claro"

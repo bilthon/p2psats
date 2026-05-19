@@ -192,6 +192,13 @@
       "description": "Sign in to P2P sats to manage your P2P Bitcoin order alerts."
     }
   },
+  "matchToast": {
+    "newMatch": "Alert match",
+    "close": "Close",
+    "viewOnOrderbook": "View on order book",
+    "viewComingSoon": "Deep-link to order coming soon",
+    "anySide": "ANY"
+  },
   "themeToggle": {
     "switchToDark": "Switch to dark theme",
     "switchToLight": "Switch to light theme"
