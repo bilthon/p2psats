@@ -13,7 +13,7 @@ import { SimplePool } from 'nostr-tools/pool'
 import type { Event } from 'nostr-tools'
 
 import { parseOrder, type RawNip69Order } from '@p2psats/shared/nip69/parseOrder'
-import { RELAYS } from '@p2psats/shared/nip69/relays'
+import { RELAYS } from '@/lib/relays'
 import type { RelayStatus } from '@/lib/nip69/types'
 
 // Minimal subscription handle shape we rely on. We avoid importing
