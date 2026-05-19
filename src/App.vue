@@ -116,13 +116,7 @@ function onCurrencyChange(c: Currency) {
         <span>{{ t('nav.orderBook') }}</span>
         <span class="pb-nav-count">{{ store.ccyOrders.length }}</span>
       </button>
-      <button
-        type="button"
-        class="pb-nav-item pb-nav-item--disabled"
-        disabled
-        aria-disabled="true"
-        :title="t('nav.alerts') + ' ' + t('nav.alertsComingSoon')"
-      >
+      <RouterLink to="/alerts" class="pb-nav-item" active-class="pb-nav-item--on">
         <svg
           width="16"
           height="16"
@@ -137,8 +131,7 @@ function onCurrencyChange(c: Currency) {
           <path d="M13.73 21a2 2 0 0 1-3.46 0" />
         </svg>
         <span>{{ t('nav.alerts') }}</span>
-        <span class="pb-nav-soon">{{ t('nav.alertsComingSoon') }}</span>
-      </button>
+      </RouterLink>
     </nav>
 
     <!-- ── Page content ────────────────────────────────────── -->

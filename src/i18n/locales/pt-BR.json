@@ -4,8 +4,7 @@
   },
   "nav": {
     "orderBook": "Livro de ordens",
-    "alerts": "Alertas",
-    "alertsComingSoon": "em breve"
+    "alerts": "Alertas"
   },
   "footer": {
     "brand": "P2P sats",
