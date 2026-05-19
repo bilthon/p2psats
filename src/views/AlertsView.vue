@@ -80,12 +80,13 @@ async function onSave(alert: Alert): Promise<void> {
       />
     </template>
 
-    <!-- SavedAlerts always visible — shows local drafts when signed out too -->
+    <!-- SavedAlerts always visible — shows local drafts when signed out too.
+         The component owns its own store calls so async errors can be caught
+         locally (a parent fire-and-forget listener can't observe the rejected
+         promise from removeAlert/toggleAlert). -->
     <SavedAlerts
       :alerts="store.alerts"
       :current-matches="store.matchesByAlert"
-      @remove="store.removeAlert"
-      @toggle="store.toggleAlert"
     />
   </section>
 </template>

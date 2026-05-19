@@ -1,18 +1,15 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { ApiError } from '@/services/apiClient'
+import { useAppStore } from '@/stores/appStore'
 import type { Alert } from '@p2psats/shared'
 
 const { t } = useI18n()
+const store = useAppStore()
 
 defineProps<{
   alerts: Alert[]
   currentMatches: Record<string, number>
-}>()
-
-const emit = defineEmits<{
-  remove: [id: string]
-  toggle: [id: string]
 }>()
 
 function opSymbol(op: string): string {
@@ -20,13 +17,16 @@ function opSymbol(op: string): string {
   return map[op] ?? op
 }
 
+// Call the store actions directly rather than emitting up to the parent — the
+// store's removeAlert/toggleAlert are async and may reject, and a parent's
+// fire-and-forget @remove="store.removeAlert" listener would never observe
+// the rejection. Owning the call here lets us actually catch errors.
 async function onRemove(id: string) {
   try {
-    emit('remove', id)
+    await store.removeAlert(id)
   } catch (err) {
-    // Stale-cache fix (#30): if the backend returns 404 the alert is already
-    // gone — treat as success. Any non-404 error is logged but we still swallow
-    // it here since the optimistic update already happened in the store.
+    // Stale-cache fix: if the backend returns 404 the alert is already gone —
+    // treat as success. Any non-404 error is logged.
     if (err instanceof ApiError && err.status === 404) {
       return
     }
@@ -36,7 +36,7 @@ async function onRemove(id: string) {
 
 async function onToggle(id: string) {
   try {
-    emit('toggle', id)
+    await store.toggleAlert(id)
   } catch (err) {
     console.warn('[SavedAlerts] toggleAlert failed:', err)
   }
