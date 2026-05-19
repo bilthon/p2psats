@@ -154,6 +154,44 @@
       "description": "Reach the P2P sats team via Nostr or email. Report bugs, share feedback, or talk peer-to-peer Bitcoin."
     }
   },
+  "signIn": {
+    "heading": "Sign in",
+    "sub": "Create an account or sign in to manage your alerts.",
+    "tabs": {
+      "ariaLabel": "Sign-in method",
+      "email": "Sign in with email",
+      "nostr": "Sign in with Nostr"
+    },
+    "email": {
+      "lead": "Enter your email and we'll send you a magic link. No password needed.",
+      "label": "Email address",
+      "placeholder": "you{'@'}example.com",
+      "cta": "Send magic link",
+      "checkInbox": "Check your inbox at {email} for a sign-in link.",
+      "tryAgain": "Try a different email"
+    },
+    "nostr": {
+      "lead": "Sign in by signing a challenge with your Nostr key. Your extension will prompt you.",
+      "noExtension": "No NIP-07 extension detected. Install one to sign in with your Nostr key:",
+      "cta": "Sign in with Nostr"
+    },
+    "status": {
+      "sending": "Sending…",
+      "signingIn": "Signing in…",
+      "verifying": "Verifying your link…"
+    },
+    "verify": {
+      "missingToken": "Missing token. Did you click a valid magic link?",
+      "backHome": "Back to home"
+    },
+    "error": {
+      "generic": "Something went wrong. Please try again."
+    },
+    "seo": {
+      "title": "Sign In · P2P sats",
+      "description": "Sign in to P2P sats to manage your P2P Bitcoin order alerts."
+    }
+  },
   "themeToggle": {
     "switchToDark": "Switch to dark theme",
     "switchToLight": "Switch to light theme"

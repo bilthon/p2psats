@@ -154,6 +154,44 @@
       "description": "Fale com a equipe do P2P sats via Nostr ou e-mail. Reporte bugs, envie sugestões ou converse sobre Bitcoin peer-to-peer."
     }
   },
+  "signIn": {
+    "heading": "Entrar",
+    "sub": "Crie uma conta ou entre para gerenciar seus alertas.",
+    "tabs": {
+      "ariaLabel": "Método de entrada",
+      "email": "Entrar com e-mail",
+      "nostr": "Entrar com Nostr"
+    },
+    "email": {
+      "lead": "Informe seu e-mail e enviaremos um link mágico. Sem senha.",
+      "label": "Endereço de e-mail",
+      "placeholder": "você{'@'}exemplo.com",
+      "cta": "Enviar link mágico",
+      "checkInbox": "Verifique sua caixa de entrada em {email} para encontrar o link.",
+      "tryAgain": "Tentar outro e-mail"
+    },
+    "nostr": {
+      "lead": "Entre assinando um desafio com sua chave Nostr. Sua extensão irá solicitar.",
+      "noExtension": "Nenhuma extensão NIP-07 detectada. Instale uma para entrar com sua chave Nostr:",
+      "cta": "Entrar com Nostr"
+    },
+    "status": {
+      "sending": "Enviando…",
+      "signingIn": "Entrando…",
+      "verifying": "Verificando seu link…"
+    },
+    "verify": {
+      "missingToken": "Token ausente. Você clicou em um link mágico válido?",
+      "backHome": "Voltar para o início"
+    },
+    "error": {
+      "generic": "Algo deu errado. Por favor, tente novamente."
+    },
+    "seo": {
+      "title": "Entrar · P2P sats",
+      "description": "Entre no P2P sats para gerenciar seus alertas de ordens P2P de Bitcoin."
+    }
+  },
   "themeToggle": {
     "switchToDark": "Mudar para tema escuro",
     "switchToLight": "Mudar para tema claro"

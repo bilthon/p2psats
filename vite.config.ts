@@ -30,9 +30,11 @@ export default defineConfig({
     },
   },
   ssgOptions: {
-    // Prerender only the four real pages; /book is a redirect and must be excluded.
+    // Prerender only the four real content pages. /book is a redirect;
+    // /signin and /auth/verify are client-only flows that rely on URL
+    // query params or live backend calls and should not be pre-rendered.
     includedRoutes(paths) {
-      return paths.filter((p) => p !== "/book");
+      return paths.filter((p) => !["/book", "/signin", "/auth/verify"].includes(p));
     },
     script: "async",
     formatting: "minify",
