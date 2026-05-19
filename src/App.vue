@@ -116,7 +116,7 @@ function onCurrencyChange(c: Currency) {
         <span>{{ t('nav.orderBook') }}</span>
         <span class="pb-nav-count">{{ store.ccyOrders.length }}</span>
       </button>
-      <RouterLink to="/alerts" class="pb-nav-item">
+      <RouterLink to="/alerts" class="pb-nav-item" active-class="pb-nav-item--on">
         <svg
           width="16"
           height="16"
