@@ -10,6 +10,7 @@ import CurrencySwitcher from '@/components/CurrencySwitcher.vue'
 import LanguageSwitcher from '@/components/LanguageSwitcher.vue'
 import RelayStatus from '@/components/RelayStatus.vue'
 import ThemeToggle from '@/components/ThemeToggle.vue'
+import MatchToast from '@/components/MatchToast.vue'
 import type { Currency } from '@p2psats/shared'
 import logoUrl from '@/assets/img/p2psats.png'
 import { OG_LOCALE } from '@/i18n'
@@ -66,6 +67,9 @@ function onCurrencyChange(c: Currency) {
 
 <template>
   <div class="pb-app pb-app--nav">
+    <!-- ── Fixed-position toast stack (floats above all routed views) ─── -->
+    <MatchToast />
+
     <!-- ── Header ──────────────────────────────────────────── -->
     <header class="pb-header">
       <div class="pb-brand">

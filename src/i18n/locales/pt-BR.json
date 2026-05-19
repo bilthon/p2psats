@@ -192,6 +192,41 @@
       "description": "Entre no P2P sats para gerenciar seus alertas de ordens P2P de Bitcoin."
     }
   },
+  "alerts": {
+    "signInPrompt": "Entre para criar alertas. Rascunhos criados sem sessão são salvos localmente."
+  },
+  "alertBuilder": {
+    "channels": {
+      "heading": "Canais de notificação",
+      "email": "E-mail",
+      "nostrDm": "Nostr DM",
+      "deliveredTo": "Enviado para",
+      "deliveredToNpub": "Enviado para",
+      "emailUnverified": "Verifique seu e-mail para ativar este canal",
+      "nostrUnverified": "Vincule uma identidade Nostr para ativar este canal",
+      "verifyEmail": "Verificar e-mail",
+      "linkNostr": "Vincular Nostr",
+      "saveHintNone": "Ative pelo menos um canal de notificação para salvar",
+      "saveHintEmailUnverified": "Verifique seu e-mail para usar o canal de E-mail",
+      "saveHintNostrUnverified": "Vincule uma identidade Nostr para usar o canal Nostr DM"
+    },
+    "error": {
+      "saveFailed": "Não foi possível salvar o alerta. Por favor, tente novamente."
+    }
+  },
+  "savedAlerts": {
+    "badge": {
+      "email": "E-mail",
+      "nostr": "Nostr"
+    }
+  },
+  "matchToast": {
+    "newMatch": "Alerta correspondida",
+    "close": "Fechar",
+    "viewOnOrderbook": "Ver no livro de ordens",
+    "viewComingSoon": "Link direto para a ordem em breve",
+    "anySide": "QUALQUER"
+  },
   "themeToggle": {
     "switchToDark": "Mudar para tema escuro",
     "switchToLight": "Mudar para tema claro"

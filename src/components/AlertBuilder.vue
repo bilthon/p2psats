@@ -1,17 +1,56 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+import { storeToRefs } from 'pinia'
 import { SOURCES, PAYMENT_METHODS } from '@/lib/data'
 import { DEFAULT_RULE } from '@p2psats/shared'
+import { useAppStore } from '@/stores/appStore'
 import type { Alert, Currency, PaymentMethod } from '@p2psats/shared'
 
 const props = defineProps<{
   currency: Currency
   methodOptions: PaymentMethod[]
+  /** Async handler called with the constructed Alert; should throw on backend errors. */
+  onSave: (alert: Alert) => Promise<void>
 }>()
 
-const emit = defineEmits<{ save: [alert: Alert] }>()
+const { t } = useI18n()
+const router = useRouter()
+const store = useAppStore()
+const { account } = storeToRefs(store)
 
+// ---------------------------------------------------------------------------
+// Channel selector state
+// ---------------------------------------------------------------------------
+const emailEnabled = ref(false)
+const nostrEnabled = ref(false)
+
+// Derived identity presence — computed so they stay reactive to account changes
+const emailIdentity = computed(() => account.value?.emailIdentity ?? null)
+const nostrIdentity = computed(() => account.value?.nostrIdentity ?? null)
+
+const emailVerified = computed(
+  () => emailIdentity.value !== null && emailIdentity.value.verifiedAt !== null,
+)
+const nostrVerified = computed(
+  () => nostrIdentity.value !== null && nostrIdentity.value.verifiedAt !== null,
+)
+
+/**
+ * Short-form pubkey display: first 8 chars + ellipsis + last 4 chars.
+ * The backend stores pubkey as 64-char hex. Shown abbreviated in v1 since
+ * we don't have nip19-encode on the frontend here.
+ */
+const nostrNpubShort = computed(() => {
+  if (!nostrIdentity.value) return ''
+  const pubkey = nostrIdentity.value.pubkey
+  return `${pubkey.slice(0, 8)}…${pubkey.slice(-4)}`
+})
+
+// ---------------------------------------------------------------------------
 // Rule form state
+// ---------------------------------------------------------------------------
 const side = ref<'any' | 'buy' | 'sell'>(DEFAULT_RULE.side)
 const premOp = ref<'<=' | '>=' | '=='>(DEFAULT_RULE.premium.op)
 const premValue = ref<number>(DEFAULT_RULE.premium.value)
@@ -22,9 +61,45 @@ const amountMin = ref<number | null>(null)
 const amountMax = ref<number | null>(null)
 const showAdvanced = ref(false)
 
+// ---------------------------------------------------------------------------
+// Save state
+// ---------------------------------------------------------------------------
+const saveError = ref<string | null>(null)
+const saving = ref(false)
 
-// TODO: channel selector (task #14) — for now always allow save
-const canSave = computed(() => true)
+// ---------------------------------------------------------------------------
+// canSave logic
+// ---------------------------------------------------------------------------
+
+/**
+ * True when at least one enabled channel has a verified identity.
+ * Mirrors the backend's validation so the button disables before the request.
+ */
+const channelValid = computed(
+  () =>
+    (emailEnabled.value && emailVerified.value) ||
+    (nostrEnabled.value && nostrVerified.value),
+)
+
+/** Human-readable explanation of why Save is disabled (shown as tooltip). */
+const saveBlockReason = computed<string>(() => {
+  if (!emailEnabled.value && !nostrEnabled.value) {
+    return t('alertBuilder.channels.saveHintNone')
+  }
+  if (emailEnabled.value && !emailVerified.value) {
+    return t('alertBuilder.channels.saveHintEmailUnverified')
+  }
+  if (nostrEnabled.value && !nostrVerified.value) {
+    return t('alertBuilder.channels.saveHintNostrUnverified')
+  }
+  return ''
+})
+
+const canSave = computed(() => channelValid.value && !saving.value)
+
+// ---------------------------------------------------------------------------
+// Handlers
+// ---------------------------------------------------------------------------
 
 function toggleMethod(id: string) {
   if (methods.value.includes(id)) {
@@ -42,7 +117,7 @@ function toggleSource(id: string) {
   }
 }
 
-function reset() {
+function resetForm() {
   side.value = DEFAULT_RULE.side
   premOp.value = DEFAULT_RULE.premium.op
   premValue.value = DEFAULT_RULE.premium.value
@@ -52,11 +127,16 @@ function reset() {
   amountMin.value = null
   amountMax.value = null
   showAdvanced.value = false
+  emailEnabled.value = false
+  nostrEnabled.value = false
+  saveError.value = null
 }
 
-function save() {
+async function handleSave() {
   if (!canSave.value) return
-  // TODO: channel selector (task #14) — emailEnabled/nostrEnabled will be user-controlled
+  saveError.value = null
+  saving.value = true
+
   const alert: Alert = {
     id: 'a_' + Math.random().toString(36).slice(2, 8),
     name: name.value || undefined,
@@ -67,14 +147,39 @@ function save() {
     sources: [...sources.value],
     amountMin: amountMin.value,
     amountMax: amountMax.value,
-    emailEnabled: true,
-    nostrEnabled: false,
+    emailEnabled: emailEnabled.value,
+    nostrEnabled: nostrEnabled.value,
     enabled: true,
     createdAt: Date.now(),
   }
-  emit('save', alert)
-  reset()
+
+  try {
+    await props.onSave(alert)
+    // Success: reset the form so the builder is ready for a new alert
+    resetForm()
+  } catch (err) {
+    saveError.value =
+      err instanceof Error ? err.message : t('alertBuilder.error.saveFailed')
+  } finally {
+    saving.value = false
+  }
 }
+
+// ---------------------------------------------------------------------------
+// Navigation helpers (channel identity prompts)
+// ---------------------------------------------------------------------------
+
+function goToEmailSignIn() {
+  void router.push('/signin')
+}
+
+function goToNostrSignIn() {
+  void router.push('/signin')
+}
+
+// ---------------------------------------------------------------------------
+// Display helpers
+// ---------------------------------------------------------------------------
 
 const opLabel = computed(() => {
   const labels: Record<string, string> = { '<=': 'at most', '>=': 'at least', '==': 'around' }
@@ -94,7 +199,7 @@ const advancedCount = computed(() => methods.value.length + sources.value.length
 
 <template>
   <div class="pb-builder">
-    <!-- Row 1: side + premium + email -->
+    <!-- Row 1: side + premium -->
     <div class="pb-builder-row">
       <label class="pb-field">
         <span class="pb-field-label">Side</span>
@@ -135,8 +240,76 @@ const advancedCount = computed(() => methods.value.length + sources.value.length
           <span class="pb-input-suffix">%</span>
         </div>
       </label>
+    </div>
 
-      <!-- TODO: channel selector (task #14) — email/nostr channel checkboxes go here -->
+    <!-- Channel selector -->
+    <div class="pb-field pb-channels">
+      <span class="pb-field-label">{{ t('alertBuilder.channels.heading') }}</span>
+      <div class="pb-channel-row">
+        <!-- Email channel -->
+        <div class="pb-channel-item">
+          <label class="pb-channel-label">
+            <input
+              v-model="emailEnabled"
+              type="checkbox"
+              class="pb-channel-checkbox"
+            />
+            <span class="pb-channel-name">{{ t('alertBuilder.channels.email') }}</span>
+          </label>
+          <div v-if="emailEnabled" class="pb-channel-detail">
+            <template v-if="emailVerified">
+              <span class="pb-channel-identity">
+                {{ t('alertBuilder.channels.deliveredTo') }}
+                <strong>{{ emailIdentity!.email }}</strong>
+              </span>
+            </template>
+            <template v-else>
+              <span class="pb-channel-unverified">
+                {{ t('alertBuilder.channels.emailUnverified') }}
+              </span>
+              <button
+                type="button"
+                class="pb-btn pb-btn--ghost pb-channel-link-btn"
+                @click="goToEmailSignIn"
+              >
+                {{ t('alertBuilder.channels.verifyEmail') }}
+              </button>
+            </template>
+          </div>
+        </div>
+
+        <!-- Nostr DM channel -->
+        <div class="pb-channel-item">
+          <label class="pb-channel-label">
+            <input
+              v-model="nostrEnabled"
+              type="checkbox"
+              class="pb-channel-checkbox"
+            />
+            <span class="pb-channel-name">{{ t('alertBuilder.channels.nostrDm') }}</span>
+          </label>
+          <div v-if="nostrEnabled" class="pb-channel-detail">
+            <template v-if="nostrVerified">
+              <span class="pb-channel-identity">
+                {{ t('alertBuilder.channels.deliveredToNpub') }}
+                <strong class="pb-channel-npub">{{ nostrNpubShort }}</strong>
+              </span>
+            </template>
+            <template v-else>
+              <span class="pb-channel-unverified">
+                {{ t('alertBuilder.channels.nostrUnverified') }}
+              </span>
+              <button
+                type="button"
+                class="pb-btn pb-btn--ghost pb-channel-link-btn"
+                @click="goToNostrSignIn"
+              >
+                {{ t('alertBuilder.channels.linkNostr') }}
+              </button>
+            </template>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Advanced disclosure -->
@@ -240,17 +413,127 @@ const advancedCount = computed(() => methods.value.length + sources.value.length
       .
     </div>
 
+    <!-- Save error -->
+    <p v-if="saveError" class="pb-save-error" role="alert">{{ saveError }}</p>
+
     <!-- Actions -->
     <div class="pb-builder-actions">
-      <button type="button" class="pb-btn pb-btn--ghost" @click="reset">Reset</button>
+      <button type="button" class="pb-btn pb-btn--ghost" @click="resetForm">Reset</button>
       <button
         type="button"
         class="pb-btn pb-btn--primary"
         :disabled="!canSave"
-        @click="save"
+        :title="!canSave && !saving ? saveBlockReason : undefined"
+        @click="handleSave"
       >
+        <span v-if="saving" class="pb-save-spinner" aria-hidden="true" />
         Create alert
       </button>
     </div>
   </div>
 </template>
+
+<style scoped>
+/* ── Channel selector ── */
+.pb-channels {
+  margin-top: 4px;
+}
+
+.pb-channel-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.pb-channel-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pb-channel-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.pb-channel-checkbox {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--accent);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.pb-channel-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.pb-channel-detail {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 23px;
+  flex-wrap: wrap;
+}
+
+.pb-channel-identity {
+  font-size: 12px;
+  color: var(--ink-mute);
+}
+
+.pb-channel-identity strong {
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+
+.pb-channel-npub {
+  font-family: monospace;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+
+.pb-channel-unverified {
+  font-size: 12px;
+  color: var(--ink-mute);
+  font-style: italic;
+}
+
+.pb-channel-link-btn {
+  font-size: 11.5px;
+  height: 26px;
+  padding: 0 10px;
+}
+
+/* ── Save error ── */
+.pb-save-error {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ask);
+  padding: 10px 12px;
+  background: oklch(0.55 0.18 25 / 0.07);
+  border: 1px solid oklch(0.55 0.18 25 / 0.22);
+  border-radius: 6px;
+}
+
+/* ── Save spinner ── */
+.pb-save-spinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: pb-spin 0.6s linear infinite;
+  flex-shrink: 0;
+  margin-right: 4px;
+}
+
+@keyframes pb-spin {
+  to { transform: rotate(360deg); }
+}
+</style>

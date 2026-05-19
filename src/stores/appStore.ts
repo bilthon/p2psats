@@ -20,6 +20,7 @@ const PE_KEYS = {
   sources: 'pe.sources',
   alerts: 'pe.alerts',
   theme: 'pe.theme',
+  alertSound: 'pe.alertSound', // added by #15
 } as const
 
 function readStorage<T>(key: string, fallback: T): T {
@@ -140,6 +141,16 @@ export const useAppStore = defineStore('app', () => {
   // Keyed on `${alertId}:${orderId}`. Non-persisted: resets on page reload.
   // #15 (MatchToast) owns the logic that populates this set.
   const seenMatchPairs = ref<Set<string>>(new Set())
+
+  // ── Alert sound setting (added by #15) ───────────────────────────────────
+  // Persisted under pe.alertSound. Default true. A future settings UI can
+  // expose setAlertSoundEnabled() to let users disable the chime.
+  const alertSoundEnabled = ref<boolean>(readStorage<boolean>(PE_KEYS.alertSound, true))
+
+  function setAlertSoundEnabled(v: boolean): void {
+    alertSoundEnabled.value = v
+    writeStorage(PE_KEYS.alertSound, v)
+  }
 
   // ── Bootstrap: resolve auth + sync backend alerts ────────────────────────
   // This IIFE runs once at first useAppStore() call (Pinia factory lifecycle).
@@ -308,6 +319,8 @@ export const useAppStore = defineStore('app', () => {
     theme,
     // non-persisted in-session state
     seenMatchPairs,
+    // sound setting (added by #15)
+    alertSoundEnabled,
     // derived
     allOrders,
     ccyOrders,
@@ -334,5 +347,6 @@ export const useAppStore = defineStore('app', () => {
     toggleAlert,
     setTheme,
     toggleTheme,
+    setAlertSoundEnabled, // added by #15
   }
 })
