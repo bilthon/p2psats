@@ -8,6 +8,7 @@ import { useAppStore } from '@/stores/appStore'
 import AlertBuilder from '@/components/AlertBuilder.vue'
 import SavedAlerts from '@/components/SavedAlerts.vue'
 import SignInPanel from '@/components/SignInPanel.vue'
+import TestNostrDmAction from '@/components/TestNostrDmAction.vue'
 import type { Alert } from '@p2psats/shared'
 
 const { t } = useI18n()
@@ -78,6 +79,7 @@ async function onSave(alert: Alert): Promise<void> {
         :method-options="store.methodsForCcy"
         :on-save="onSave"
       />
+      <TestNostrDmAction />
     </template>
 
     <!-- SavedAlerts always visible — shows local drafts when signed out too.

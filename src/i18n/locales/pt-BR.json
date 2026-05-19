@@ -192,7 +192,19 @@
     }
   },
   "alerts": {
-    "signInPrompt": "Entre para criar alertas. Rascunhos criados sem sessão são salvos localmente."
+    "signInPrompt": "Entre para criar alertas. Rascunhos criados sem sessão são salvos localmente.",
+    "testDm": {
+      "button": "Testar entrega Nostr",
+      "confirmTitle": "Enviar DM de teste?",
+      "confirmBody": "Publicaremos agora mesmo uma mensagem NIP-17 gift-wrap nos seus relays de DM do Nostr. Verifique seu cliente Nostr para confirmar o recebimento.",
+      "confirmCta": "Enviar teste",
+      "cancel": "Cancelar",
+      "sending": "Enviando…",
+      "success": "Teste enviado. Verifique seu cliente Nostr.",
+      "error": {
+        "generic": "Não foi possível enviar o teste. Por favor, tente novamente mais tarde."
+      }
+    }
   },
   "alertBuilder": {
     "channels": {

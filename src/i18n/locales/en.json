@@ -192,7 +192,19 @@
     }
   },
   "alerts": {
-    "signInPrompt": "Sign in to create alerts. Any drafts you create while signed out are saved locally."
+    "signInPrompt": "Sign in to create alerts. Any drafts you create while signed out are saved locally.",
+    "testDm": {
+      "button": "Test Nostr delivery",
+      "confirmTitle": "Send test DM?",
+      "confirmBody": "We'll publish a NIP-17 gift-wrapped message to your Nostr DM relays right now. Check your Nostr client to confirm it arrived.",
+      "confirmCta": "Send test",
+      "cancel": "Cancel",
+      "sending": "Sending…",
+      "success": "Test sent. Check your Nostr client.",
+      "error": {
+        "generic": "Couldn't send the test. Please try again later."
+      }
+    }
   },
   "alertBuilder": {
     "channels": {
