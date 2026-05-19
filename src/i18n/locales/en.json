@@ -192,6 +192,41 @@
       "description": "Sign in to P2P sats to manage your P2P Bitcoin order alerts."
     }
   },
+  "alerts": {
+    "signInPrompt": "Sign in to create alerts. Any drafts you create while signed out are saved locally."
+  },
+  "alertBuilder": {
+    "channels": {
+      "heading": "Notification channels",
+      "email": "Email",
+      "nostrDm": "Nostr DM",
+      "deliveredTo": "Delivered to",
+      "deliveredToNpub": "Delivered to",
+      "emailUnverified": "Verify your email to enable this channel",
+      "nostrUnverified": "Link a Nostr identity to enable this channel",
+      "verifyEmail": "Verify email",
+      "linkNostr": "Link Nostr",
+      "saveHintNone": "Enable at least one notification channel to save",
+      "saveHintEmailUnverified": "Verify your email to use the Email channel",
+      "saveHintNostrUnverified": "Link a Nostr identity to use the Nostr DM channel"
+    },
+    "error": {
+      "saveFailed": "Couldn't save alert. Please try again."
+    }
+  },
+  "savedAlerts": {
+    "badge": {
+      "email": "Email",
+      "nostr": "Nostr"
+    }
+  },
+  "matchToast": {
+    "newMatch": "Alert match",
+    "close": "Close",
+    "viewOnOrderbook": "View on order book",
+    "viewComingSoon": "Deep-link to order coming soon",
+    "anySide": "ANY"
+  },
   "themeToggle": {
     "switchToDark": "Switch to dark theme",
     "switchToLight": "Switch to light theme"
