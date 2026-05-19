@@ -125,6 +125,19 @@ export const useAppStore = defineStore('app', () => {
     }
   }
 
+  async function signOut(): Promise<void> {
+    try {
+      await apiClient.auth.logout()
+    } catch (e) {
+      // Cookie may already be expired; still clear local state.
+      console.warn('[appStore] auth.logout() failed:', e)
+    }
+    account.value = null
+    // Restore localStorage drafts so the signed-out user sees their drafts
+    // rather than stale backend alerts.
+    alerts.value = readStorage<Alert[]>(PE_KEYS.alerts, [])
+  }
+
   // ── Persisted state ──────────────────────────────────────────────────────
   const locale = ref<AppLocale>(detectInitialLocale())
   const currency = ref<Currency>(readStorage<Currency>(PE_KEYS.currency, 'USD'))
@@ -339,6 +352,7 @@ export const useAppStore = defineStore('app', () => {
     account,
     signedIn,
     setAccount,
+    signOut,
     // persisted state
     locale,
     currency,

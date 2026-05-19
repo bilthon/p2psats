@@ -11,6 +11,7 @@ import LanguageSwitcher from '@/components/LanguageSwitcher.vue'
 import RelayStatus from '@/components/RelayStatus.vue'
 import ThemeToggle from '@/components/ThemeToggle.vue'
 import MatchToast from '@/components/MatchToast.vue'
+import UserMenu from '@/components/UserMenu.vue'
 import type { Currency } from '@p2psats/shared'
 import logoUrl from '@/assets/img/p2psats.png'
 import { OG_LOCALE } from '@/i18n'
@@ -91,6 +92,7 @@ function onCurrencyChange(c: Currency) {
         <ThemeToggle />
         <LanguageSwitcher />
         <CurrencySwitcher :model-value="store.currency" @update:model-value="onCurrencyChange" />
+        <UserMenu />
       </div>
     </header>
 
