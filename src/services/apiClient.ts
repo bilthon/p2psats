@@ -28,6 +28,55 @@
 // Types
 // ---------------------------------------------------------------------------
 
+/**
+ * Payload for creating a new alert. The id, enabled flag, and createdAt are
+ * server-generated and must not be included in the creation request.
+ */
+export interface CreateAlertPayload {
+  name?: string
+  currency: string
+  side: 'any' | 'buy' | 'sell'
+  premium: { op: '<=' | '>=' | '=='; value: number }
+  methods: string[]
+  sources: string[]
+  amountMin?: number | null
+  amountMax?: number | null
+  emailEnabled: boolean
+  nostrEnabled: boolean
+}
+
+/**
+ * Payload for partially updating an existing alert. All fields from
+ * CreateAlertPayload are optional; additionally allows toggling `enabled`.
+ */
+export type UpdateAlertPayload = Partial<CreateAlertPayload> & { enabled?: boolean }
+
+/**
+ * Wire-format response for a single alert from the backend. This is a
+ * superset of the shared Alert type — it adds currentMatches and
+ * dispatchesToday which are computed server-side and not stored locally.
+ */
+export interface AlertResponseDto {
+  id: string
+  name: string | null
+  currency: string
+  side: 'any' | 'buy' | 'sell'
+  premium: { op: '<=' | '>=' | '=='; value: number }
+  methods: string[]
+  sources: string[]
+  amountMin: number | null
+  amountMax: number | null
+  emailEnabled: boolean
+  nostrEnabled: boolean
+  enabled: boolean
+  /** ISO-8601 string — the API surface uses string, not epoch ms */
+  createdAt: string
+  /** Count of currently-active known orders that match this alert */
+  currentMatches: number
+  /** Count of successful dispatches since start of UTC day */
+  dispatchesToday: number
+}
+
 export interface AccountDto {
   id: string
   /** ISO 8601 timestamp string from the backend */
@@ -158,6 +207,25 @@ export const apiClient = {
     },
   },
 
-  // alerts.* methods are UNIMPLEMENTED — reserved for task #13
-  alerts: {},
+  alerts: {
+    /** GET /alerts — fetch all alerts for the authenticated account */
+    list(): Promise<AlertResponseDto[]> {
+      return request<AlertResponseDto[]>('GET', '/alerts')
+    },
+
+    /** POST /alerts — create a new alert; returns the persisted alert */
+    create(payload: CreateAlertPayload): Promise<AlertResponseDto> {
+      return request<AlertResponseDto>('POST', '/alerts', payload)
+    },
+
+    /** PATCH /alerts/:id — partially update an existing alert */
+    update(id: string, payload: UpdateAlertPayload): Promise<AlertResponseDto> {
+      return request<AlertResponseDto>('PATCH', `/alerts/${id}`, payload)
+    },
+
+    /** DELETE /alerts/:id — delete an alert; returns void (204 No Content) */
+    delete(id: string): Promise<void> {
+      return request<void>('DELETE', `/alerts/${id}`)
+    },
+  },
 } as const
