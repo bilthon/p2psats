@@ -192,7 +192,19 @@
     }
   },
   "alerts": {
-    "signInPrompt": "Inicia sesión para crear alertas. Los borradores creados sin sesión se guardan localmente."
+    "signInPrompt": "Inicia sesión para crear alertas. Los borradores creados sin sesión se guardan localmente.",
+    "testDm": {
+      "button": "Probar entrega por Nostr",
+      "confirmTitle": "¿Enviar DM de prueba?",
+      "confirmBody": "Publicaremos ahora mismo un mensaje NIP-17 cifrado (gift-wrap) en tus relés de DM de Nostr. Comprueba tu cliente Nostr para confirmar que llegó.",
+      "confirmCta": "Enviar prueba",
+      "cancel": "Cancelar",
+      "sending": "Enviando…",
+      "success": "Prueba enviada. Revisa tu cliente Nostr.",
+      "error": {
+        "generic": "No se pudo enviar la prueba. Por favor, inténtalo más tarde."
+      }
+    }
   },
   "alertBuilder": {
     "channels": {

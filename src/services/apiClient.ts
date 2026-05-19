@@ -233,4 +233,12 @@ export const apiClient = {
       return request<void>('DELETE', `/alerts/${id}`)
     },
   },
+
+  test: {
+    /** POST /notifications/test/nostr — publish a NIP-17 test DM to the
+     *  authenticated account's linked Nostr pubkey (204 No Content) */
+    sendNostrDm(): Promise<void> {
+      return request<void>('POST', '/notifications/test/nostr')
+    },
+  },
 } as const
