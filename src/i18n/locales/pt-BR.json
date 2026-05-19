@@ -221,10 +221,10 @@
     }
   },
   "matchToast": {
-    "newMatch": "Alerta correspondida",
+    "newMatch": "Nova correspondência",
     "close": "Fechar",
     "viewOnOrderbook": "Ver no livro de ordens",
-    "viewComingSoon": "Link direto para a ordem em breve",
+    "viewComingSoon": "Link direto em breve",
     "anySide": "QUALQUER"
   },
   "themeToggle": {
