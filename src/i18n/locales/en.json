@@ -230,6 +230,15 @@
     "switchToDark": "Switch to dark theme",
     "switchToLight": "Switch to light theme"
   },
+  "userMenu": {
+    "signOut": "Sign out",
+    "signingOut": "Signing out…",
+    "signedInVia": {
+      "nostr": "Signed in with Nostr",
+      "email": "Signed in via email"
+    },
+    "avatarAlt": "Profile picture"
+  },
   "crossedPairs": {
     "title": "Crossed orders",
     "subtitle": "Bid prices that meet or exceed an ask price. Pairs sharing a payment method and from different platforms are tractable arbitrage candidates.",

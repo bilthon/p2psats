@@ -205,6 +205,11 @@ export const apiClient = {
     me(): Promise<AccountDto> {
       return request<AccountDto>('GET', '/me')
     },
+
+    /** POST /auth/logout — clear the __session cookie server-side (204 No Content) */
+    logout(): Promise<void> {
+      return request<void>('POST', '/auth/logout')
+    },
   },
 
   alerts: {

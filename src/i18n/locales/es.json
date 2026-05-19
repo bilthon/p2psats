@@ -230,6 +230,15 @@
     "switchToDark": "Cambiar a tema oscuro",
     "switchToLight": "Cambiar a tema claro"
   },
+  "userMenu": {
+    "signOut": "Cerrar sesión",
+    "signingOut": "Cerrando sesión…",
+    "signedInVia": {
+      "nostr": "Sesión iniciada con Nostr",
+      "email": "Sesión iniciada por correo"
+    },
+    "avatarAlt": "Foto de perfil"
+  },
   "crossedPairs": {
     "title": "Órdenes cruzadas",
     "subtitle": "Precios de compra que igualan o superan un precio de venta. Los pares que comparten un método de pago y son de plataformas distintas son candidatos de arbitraje viables.",
