@@ -4,8 +4,7 @@
   },
   "nav": {
     "orderBook": "Order book",
-    "alerts": "Alerts",
-    "alertsComingSoon": "coming soon"
+    "alerts": "Alerts"
   },
   "footer": {
     "brand": "P2P sats",
