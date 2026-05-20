@@ -52,7 +52,7 @@ const nostrNpubShort = computed(() => {
 // Rule form state
 // ---------------------------------------------------------------------------
 const side = ref<'buy' | 'sell'>('buy')
-const premOp = ref<'<=' | '>='>(DEFAULT_RULE.premium.op)
+const premOp = ref<'<=' | '>='>('<=')
 const premValue = ref<number>(DEFAULT_RULE.premium.value)
 const name = ref('')
 const methods = ref<string[]>([])
@@ -119,7 +119,7 @@ function toggleSource(id: string) {
 
 function resetForm() {
   side.value = 'buy'
-  premOp.value = DEFAULT_RULE.premium.op
+  premOp.value = '<='
   premValue.value = DEFAULT_RULE.premium.value
   name.value = ''
   methods.value = []
