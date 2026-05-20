@@ -49,16 +49,15 @@ async function onSave(alert: Alert): Promise<void> {
   <section class="pb-alerts-section" id="alerts">
     <div class="pb-section-hd">
       <div>
-        <h2 class="pb-card-title">Alerts</h2>
+        <h2 class="pb-card-title">{{ t('alerts.heading') }}</h2>
         <p class="pb-section-sub">
-          Subscribe to NIP-69 events that match your rule. Get notified when a matching order
-          appears on any tracked relay.
+          {{ t('alerts.subtitle') }}
         </p>
       </div>
       <div class="pb-section-meta">
-        {{ store.alerts.length }} alert{{ store.alerts.length === 1 ? '' : 's' }} ·
-        {{ store.activeAlerts }} active · {{ store.totalActiveMatches }}
-        match{{ store.totalActiveMatches === 1 ? '' : 'es' }} now
+        {{ t('alerts.meta.count', { count: store.alerts.length }, store.alerts.length) }} ·
+        {{ t('alerts.meta.active', { count: store.activeAlerts }, store.activeAlerts) }} ·
+        {{ t('alerts.meta.matches', { count: store.totalActiveMatches }, store.totalActiveMatches) }}
       </div>
     </div>
 

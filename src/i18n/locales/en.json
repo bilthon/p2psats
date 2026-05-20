@@ -192,6 +192,13 @@
     }
   },
   "alerts": {
+    "heading": "Alerts",
+    "subtitle": "Get notified when an attractive buy or sell offer is published.",
+    "meta": {
+      "count": "{count} alert | {count} alerts",
+      "active": "{count} active",
+      "matches": "{count} match now | {count} matches now"
+    },
     "signInPrompt": "Sign in to create alerts. Any drafts you create while signed out are saved locally.",
     "testDm": {
       "button": "Test Nostr delivery",
@@ -207,6 +214,37 @@
     }
   },
   "alertBuilder": {
+    "fields": {
+      "side": "Side",
+      "buy": "Buy",
+      "sell": "Sell",
+      "premium": "Premium",
+      "opAtMost": "at most",
+      "opAtLeast": "at least",
+      "advanced": "Advanced filters",
+      "paymentMethods": "Payment methods (any)",
+      "sources": "Sources (any)",
+      "amountMin": "Min amount ({currency})",
+      "amountMax": "Max amount ({currency})",
+      "alertName": "Alert name (optional)",
+      "alertNamePlaceholder": "e.g. Cheap PIX buys"
+    },
+    "actions": {
+      "reset": "Reset",
+      "create": "Create alert"
+    },
+    "summary": {
+      "notify": "Notify me when {side} in {currency} appears with premium {op} {value}",
+      "sideBuy": "a buy order",
+      "sideSell": "a sell order",
+      "opAtMost": "at most",
+      "opAtLeast": "at least",
+      "viaMethods": "via {methods}",
+      "fromSources": "from {sources}",
+      "amountBoth": "for amounts ≥ {min} ≤ {max}",
+      "amountMinOnly": "for amounts ≥ {min}",
+      "amountMaxOnly": "for amounts ≤ {max}"
+    },
     "channels": {
       "heading": "Notification channels",
       "email": "Email",
