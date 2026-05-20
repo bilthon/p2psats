@@ -215,11 +215,23 @@
       "deliveredToNpub": "Delivered to",
       "emailUnverified": "Verify your email to enable this channel",
       "nostrUnverified": "Link a Nostr identity to enable this channel",
-      "verifyEmail": "Verify email",
-      "linkNostr": "Link Nostr",
       "saveHintNone": "Enable at least one notification channel to save",
       "saveHintEmailUnverified": "Verify your email to use the Email channel",
-      "saveHintNostrUnverified": "Link a Nostr identity to use the Nostr DM channel"
+      "saveHintNostrUnverified": "Link a Nostr identity to use the Nostr DM channel",
+      "linkEmail": {
+        "placeholder": "your-email{'@'}example.com",
+        "submit": "Send link",
+        "sending": "Sending…",
+        "success": "Check your inbox to confirm.",
+        "errorGeneric": "Couldn’t send link. Please try again."
+      },
+      "linkNostr": {
+        "label": "Link Nostr",
+        "signing": "Signing…",
+        "errorNoExt": "Install a NIP-07 extension (Alby, nos2x) to link your Nostr identity.",
+        "errorRejected": "Signature rejected.",
+        "errorGeneric": "Couldn’t link Nostr identity. Please try again."
+      }
     },
     "error": {
       "saveFailed": "Couldn't save alert. Please try again."

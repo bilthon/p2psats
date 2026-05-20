@@ -12,7 +12,7 @@ import { toVueOrder } from '@/lib/orderAdapter'
 import type { Alert, Currency, Order } from '@p2psats/shared'
 import { setLocale as i18nSetLocale, detectInitialLocale, type AppLocale } from '@/i18n'
 import { apiClient, ApiError } from '@/services/apiClient'
-import type { AlertResponseDto, CreateAlertPayload } from '@/services/apiClient'
+import type { AlertResponseDto, CreateAlertPayload, NostrEvent } from '@/services/apiClient'
 import type { AccountDto } from '@/services/apiClient'
 
 const PE_KEYS = {
@@ -310,6 +310,22 @@ export const useAppStore = defineStore('app', () => {
     writeStorage(PE_KEYS.sources, activeSources.value)
   }
 
+  async function linkEmail(email: string): Promise<void> {
+    // Backend sends a magic link with linkToAccountId set so the verify path
+    // attaches EmailIdentity to the current account. The store is NOT updated
+    // here — identity only appears after the user clicks the link and the
+    // /auth/verify?token=... endpoint runs (which calls setAccount via the
+    // AuthVerifyView). Errors propagate to the caller for inline display.
+    await apiClient.auth.linkEmail(email)
+  }
+
+  async function linkNostr(signedEvent: NostrEvent): Promise<void> {
+    // Backend verifies the signed kind:27235 event and returns the updated
+    // account with the freshly linked NostrIdentity included.
+    const { account: updated } = await apiClient.auth.linkNostr(signedEvent)
+    setAccount(updated)
+  }
+
   async function addAlert(alert: Alert): Promise<void> {
     if (signedIn.value) {
       // Backend path: persist via API, then mirror the response locally.
@@ -384,6 +400,8 @@ export const useAppStore = defineStore('app', () => {
     setLocale,
     setCurrency,
     toggleSource,
+    linkEmail,
+    linkNostr,
     addAlert,
     removeAlert,
     toggleAlert,

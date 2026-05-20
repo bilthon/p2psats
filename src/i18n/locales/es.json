@@ -215,11 +215,23 @@
       "deliveredToNpub": "Enviado a",
       "emailUnverified": "Verifica tu correo para habilitar este canal",
       "nostrUnverified": "Vincula una identidad Nostr para habilitar este canal",
-      "verifyEmail": "Verificar correo",
-      "linkNostr": "Vincular Nostr",
       "saveHintNone": "Habilita al menos un canal de notificación para guardar",
       "saveHintEmailUnverified": "Verifica tu correo para usar el canal de Email",
-      "saveHintNostrUnverified": "Vincula una identidad Nostr para usar el canal de Nostr DM"
+      "saveHintNostrUnverified": "Vincula una identidad Nostr para usar el canal de Nostr DM",
+      "linkEmail": {
+        "placeholder": "tu-correo{'@'}ejemplo.com",
+        "submit": "Enviar enlace",
+        "sending": "Enviando…",
+        "success": "Revisa tu bandeja de entrada para confirmar.",
+        "errorGeneric": "No se pudo enviar el enlace. Por favor, inténtalo de nuevo."
+      },
+      "linkNostr": {
+        "label": "Vincular Nostr",
+        "signing": "Firmando…",
+        "errorNoExt": "Instala una extensión NIP-07 (Alby, nos2x) para vincular tu identidad Nostr.",
+        "errorRejected": "Firma rechazada.",
+        "errorGeneric": "No se pudo vincular la identidad Nostr. Por favor, inténtalo de nuevo."
+      }
     },
     "error": {
       "saveFailed": "No se pudo guardar la alerta. Por favor, inténtalo de nuevo."

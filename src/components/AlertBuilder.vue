@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
 import { SOURCES, PAYMENT_METHODS } from '@/lib/data'
 import { DEFAULT_RULE } from '@p2psats/shared'
 import { useAppStore } from '@/stores/appStore'
+import { apiClient, ApiError } from '@/services/apiClient'
+import type { NostrEvent } from '@/services/apiClient'
 import type { Alert, Currency, PaymentMethod } from '@p2psats/shared'
 
 const props = defineProps<{
@@ -16,7 +17,6 @@ const props = defineProps<{
 }>()
 
 const { t } = useI18n()
-const router = useRouter()
 const store = useAppStore()
 const { account } = storeToRefs(store)
 
@@ -166,15 +166,101 @@ async function handleSave() {
 }
 
 // ---------------------------------------------------------------------------
-// Navigation helpers (channel identity prompts)
+// NIP-07 extension detection (mirrors SignInPanel pattern)
 // ---------------------------------------------------------------------------
 
-function goToEmailSignIn() {
-  void router.push('/signin')
+declare global {
+  interface Window {
+    nostr?: {
+      getPublicKey(): Promise<string>
+      signEvent(event: Omit<NostrEvent, 'id' | 'pubkey' | 'sig'>): Promise<NostrEvent>
+    }
+  }
 }
 
-function goToNostrSignIn() {
-  void router.push('/signin')
+// ---------------------------------------------------------------------------
+// Link email: inline mini-form
+// ---------------------------------------------------------------------------
+
+const linkEmailAddress = ref('')
+const linkEmailLoading = ref(false)
+const linkEmailSuccess = ref(false)
+const linkEmailError = ref<string | null>(null)
+async function submitLinkEmail() {
+  if (linkEmailLoading.value || !linkEmailAddress.value.trim()) return
+  linkEmailError.value = null
+  linkEmailLoading.value = true
+  try {
+    await store.linkEmail(linkEmailAddress.value.trim())
+    linkEmailSuccess.value = true
+    setTimeout(() => {
+      linkEmailSuccess.value = false
+      linkEmailAddress.value = ''
+    }, 6000)
+  } catch (err) {
+    if (err instanceof ApiError) {
+      const body = err.body
+      linkEmailError.value =
+        typeof body === 'object' &&
+        body !== null &&
+        'message' in body &&
+        typeof (body as Record<string, unknown>).message === 'string'
+          ? (body as { message: string }).message
+          : t('alertBuilder.channels.linkEmail.errorGeneric')
+    } else {
+      linkEmailError.value = t('alertBuilder.channels.linkEmail.errorGeneric')
+    }
+  } finally {
+    linkEmailLoading.value = false
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Link Nostr: one-click NIP-07 flow
+// ---------------------------------------------------------------------------
+
+const linkNostrLoading = ref(false)
+const linkNostrError = ref<string | null>(null)
+
+async function linkNostrIdentity() {
+  if (linkNostrLoading.value) return
+  linkNostrError.value = null
+
+  if (!window.nostr) {
+    linkNostrError.value = t('alertBuilder.channels.linkNostr.errorNoExt')
+    return
+  }
+
+  linkNostrLoading.value = true
+  try {
+    const { nonce } = await apiClient.auth.challengeNostr()
+
+    const nowSec = Math.floor(Date.now() / 1000)
+    const unsignedEvent = {
+      kind: 27235,
+      created_at: nowSec,
+      tags: [['challenge', nonce]],
+      content: '',
+    }
+
+    const signedEvent = await window.nostr.signEvent(unsignedEvent)
+    await store.linkNostr(signedEvent)
+  } catch (err) {
+    if (err instanceof ApiError) {
+      const body = err.body
+      linkNostrError.value =
+        typeof body === 'object' &&
+        body !== null &&
+        'message' in body &&
+        typeof (body as Record<string, unknown>).message === 'string'
+          ? (body as { message: string }).message
+          : t('alertBuilder.channels.linkNostr.errorGeneric')
+    } else {
+      linkNostrError.value = t('alertBuilder.channels.linkNostr.errorRejected')
+    }
+  } finally {
+    linkNostrLoading.value = false
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -267,13 +353,33 @@ const advancedCount = computed(() => methods.value.length + sources.value.length
               <span class="pb-channel-unverified">
                 {{ t('alertBuilder.channels.emailUnverified') }}
               </span>
-              <button
-                type="button"
-                class="pb-btn pb-btn--ghost pb-channel-link-btn"
-                @click="goToEmailSignIn"
-              >
-                {{ t('alertBuilder.channels.verifyEmail') }}
-              </button>
+              <div v-if="linkEmailSuccess" class="pb-link-success" role="status">
+                {{ t('alertBuilder.channels.linkEmail.success') }}
+              </div>
+              <div v-else class="pb-link-email-form">
+                <input
+                  v-model="linkEmailAddress"
+                  type="email"
+                  class="pb-input pb-link-email-input"
+                  :placeholder="t('alertBuilder.channels.linkEmail.placeholder')"
+                  autocomplete="email"
+                  :disabled="linkEmailLoading"
+                  @keyup.enter="submitLinkEmail"
+                />
+                <button
+                  type="button"
+                  class="pb-btn pb-btn--ghost pb-channel-link-btn"
+                  :disabled="linkEmailLoading || !linkEmailAddress.trim()"
+                  @click="submitLinkEmail"
+                >
+                  {{ linkEmailLoading
+                    ? t('alertBuilder.channels.linkEmail.sending')
+                    : t('alertBuilder.channels.linkEmail.submit') }}
+                </button>
+              </div>
+              <p v-if="linkEmailError" class="pb-channel-error" role="alert">
+                {{ linkEmailError }}
+              </p>
             </template>
           </div>
         </div>
@@ -302,10 +408,16 @@ const advancedCount = computed(() => methods.value.length + sources.value.length
               <button
                 type="button"
                 class="pb-btn pb-btn--ghost pb-channel-link-btn"
-                @click="goToNostrSignIn"
+                :disabled="linkNostrLoading"
+                @click="linkNostrIdentity"
               >
-                {{ t('alertBuilder.channels.linkNostr') }}
+                {{ linkNostrLoading
+                  ? t('alertBuilder.channels.linkNostr.signing')
+                  : t('alertBuilder.channels.linkNostr.label') }}
               </button>
+              <p v-if="linkNostrError" class="pb-channel-error" role="alert">
+                {{ linkNostrError }}
+              </p>
             </template>
           </div>
         </div>
@@ -507,6 +619,37 @@ const advancedCount = computed(() => methods.value.length + sources.value.length
   font-size: 11.5px;
   height: 26px;
   padding: 0 10px;
+}
+
+/* ── Link email inline form ── */
+.pb-link-email-form {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  max-width: 280px;
+}
+
+.pb-link-email-input {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  height: 26px;
+  padding: 0 8px;
+}
+
+/* ── Link success / error inline ── */
+.pb-link-success {
+  font-size: 12px;
+  color: oklch(0.55 0.14 155);
+  font-style: italic;
+}
+
+.pb-channel-error {
+  margin: 2px 0 0;
+  font-size: 11.5px;
+  color: var(--ask);
+  line-height: 1.4;
 }
 
 /* ── Save error ── */
