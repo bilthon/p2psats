@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
+import { nip19 } from 'nostr-tools'
 import { SOURCES, PAYMENT_METHODS } from '@/lib/data'
 import { DEFAULT_RULE } from '@p2psats/shared'
 import { useAppStore } from '@/stores/appStore'
@@ -38,14 +39,23 @@ const nostrVerified = computed(
 )
 
 /**
- * Short-form pubkey display: first 8 chars + ellipsis + last 4 chars.
- * The backend stores pubkey as 64-char hex. Shown abbreviated in v1 since
- * we don't have nip19-encode on the frontend here.
+ * Short-form npub display: encode the backend's 64-char hex pubkey to bech32
+ * then show the first 10 chars (preserves the "npub1" prefix + 5 disambiguating
+ * chars) and the last 4 chars as a visual fingerprint.
+ * Falls back to hex truncation if npubEncode throws (e.g. malformed pubkey).
  */
 const nostrNpubShort = computed(() => {
   if (!nostrIdentity.value) return ''
   const pubkey = nostrIdentity.value.pubkey
-  return `${pubkey.slice(0, 8)}…${pubkey.slice(-4)}`
+  try {
+    const npub = nip19.npubEncode(pubkey)
+    // "npub1" + 5 chars gives enough context to recognise bech32 encoding;
+    // last 4 chars provide a fingerprint. Total visual width is similar to
+    // the previous 8…4 hex form.
+    return `${npub.slice(0, 10)}…${npub.slice(-4)}`
+  } catch {
+    return `${pubkey.slice(0, 8)}…${pubkey.slice(-4)}`
+  }
 })
 
 // ---------------------------------------------------------------------------

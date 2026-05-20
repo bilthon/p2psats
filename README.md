@@ -62,11 +62,16 @@ npm run preview      # serve dist/
 
 ### Environment
 
-Optional:
+Copy `.env.example` to `.env` (or `.env.local`) and fill in the values. Only `VITE_*`-prefixed vars are exposed to the browser bundle.
 
-```env
-VITE_SITE_URL=https://p2psats.com   # used for canonical URLs and og:image
-```
+| Variable | Required? | Purpose |
+|---|---|---|
+| `VITE_API_URL` | required for alerts | Backend REST API base URL consumed by `apiClient.ts`. Defaults to `http://localhost:3000` when unset. |
+| `VITE_SITE_URL` | optional | Canonical URL used in OG meta tags. Defaults to `https://p2psats.com`. Override in preview / staging so OG cards point at the right host. |
+| `VITE_CONTACT_NPUB` | optional | Nostr pubkey shown on `/contact`. Leave blank to render "not configured". |
+| `VITE_CONTACT_EMAIL` | optional | Email shown on `/contact`. Leave blank to render "not configured". |
+
+See `.env.example` for the canonical list with inline comments.
 
 ## Project structure
 
