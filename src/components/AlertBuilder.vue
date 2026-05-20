@@ -51,8 +51,8 @@ const nostrNpubShort = computed(() => {
 // ---------------------------------------------------------------------------
 // Rule form state
 // ---------------------------------------------------------------------------
-const side = ref<'any' | 'buy' | 'sell'>(DEFAULT_RULE.side)
-const premOp = ref<'<=' | '>=' | '=='>(DEFAULT_RULE.premium.op)
+const side = ref<'buy' | 'sell'>('buy')
+const premOp = ref<'<=' | '>='>(DEFAULT_RULE.premium.op)
 const premValue = ref<number>(DEFAULT_RULE.premium.value)
 const name = ref('')
 const methods = ref<string[]>([])
@@ -118,7 +118,7 @@ function toggleSource(id: string) {
 }
 
 function resetForm() {
-  side.value = DEFAULT_RULE.side
+  side.value = 'buy'
   premOp.value = DEFAULT_RULE.premium.op
   premValue.value = DEFAULT_RULE.premium.value
   name.value = ''
@@ -268,12 +268,11 @@ async function linkNostrIdentity() {
 // ---------------------------------------------------------------------------
 
 const opLabel = computed(() => {
-  const labels: Record<string, string> = { '<=': 'at most', '>=': 'at least', '==': 'around' }
+  const labels: Record<string, string> = { '<=': 'at most', '>=': 'at least' }
   return labels[premOp.value] ?? premOp.value
 })
 
 const sideLabel = computed(() => {
-  if (side.value === 'any') return 'any order'
   if (side.value === 'buy') return 'a buy order'
   return 'a sell order'
 })
@@ -292,14 +291,13 @@ const advancedCount = computed(() => methods.value.length + sources.value.length
         <div class="pb-seg">
           <button
             v-for="o in [
-              { v: 'any', l: 'Any' },
               { v: 'buy', l: 'Buy' },
               { v: 'sell', l: 'Sell' },
             ]"
             :key="o.v"
             type="button"
             :class="['pb-seg-btn', side === o.v ? 'pb-seg-btn--on' : '']"
-            @click="side = o.v as 'any' | 'buy' | 'sell'"
+            @click="side = o.v as 'buy' | 'sell'"
           >
             {{ o.l }}
           </button>
@@ -311,11 +309,10 @@ const advancedCount = computed(() => methods.value.length + sources.value.length
         <div class="pb-prem-input">
           <select
             v-model="premOp"
-            class="pb-select pb-select--narrow"
+            class="pb-select"
           >
-            <option value="&lt;=">≤</option>
-            <option value="&gt;=">≥</option>
-            <option value="==">≈</option>
+            <option value="&lt;=">at most</option>
+            <option value="&gt;=">at least</option>
           </select>
           <input
             v-model.number="premValue"

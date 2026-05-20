@@ -13,7 +13,7 @@ defineProps<{
 }>()
 
 function opSymbol(op: string): string {
-  const map: Record<string, string> = { '<=': '≤', '>=': '≥', '==': '≈' }
+  const map: Record<string, string> = { '<=': 'at most', '>=': 'at least' }
   return map[op] ?? op
 }
 
@@ -74,7 +74,7 @@ async function onToggle(id: string) {
         <div class="pb-alert-title">
           {{
             a.name ||
-            `${a.side === 'any' ? 'Any' : a.side === 'buy' ? 'Buy' : 'Sell'} ${a.currency} ${opSymbol(a.premium.op)} ${a.premium.value > 0 ? '+' : ''}${a.premium.value}%`
+            `${a.side === 'buy' ? 'Buy' : 'Sell'} ${a.currency} ${opSymbol(a.premium.op)} ${a.premium.value > 0 ? '+' : ''}${a.premium.value}%`
           }}
         </div>
         <div class="pb-alert-meta">
