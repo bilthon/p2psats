@@ -277,19 +277,65 @@ async function linkNostrIdentity() {
 // Display helpers
 // ---------------------------------------------------------------------------
 
-const opLabel = computed(() => {
-  const labels: Record<string, string> = { '<=': 'at most', '>=': 'at least' }
-  return labels[premOp.value] ?? premOp.value
-})
-
-const sideLabel = computed(() => {
-  if (side.value === 'buy') return 'a buy order'
-  return 'a sell order'
-})
-
 const premSign = computed(() => (premValue.value > 0 ? '+' : ''))
 
 const advancedCount = computed(() => methods.value.length + sources.value.length)
+
+const summaryText = computed(() => {
+  const sideLabel = t(
+    side.value === 'buy'
+      ? 'alertBuilder.summary.sideBuy'
+      : 'alertBuilder.summary.sideSell',
+  )
+  const opLabel = t(
+    premOp.value === '<='
+      ? 'alertBuilder.summary.opAtMost'
+      : 'alertBuilder.summary.opAtLeast',
+  )
+  const value = `${premSign.value}${premValue.value}%`
+
+  const base = t('alertBuilder.summary.notify', {
+    side: sideLabel,
+    currency: props.currency,
+    op: opLabel,
+    value,
+  })
+
+  const extras: string[] = []
+  if (methods.value.length > 0) {
+    const labels = methods.value
+      .map((id) => PAYMENT_METHODS.find((p) => p.id === id)?.label ?? id)
+      .join(', ')
+    extras.push(t('alertBuilder.summary.viaMethods', { methods: labels }))
+  }
+  if (sources.value.length > 0) {
+    extras.push(
+      t('alertBuilder.summary.fromSources', { sources: sources.value.join(', ') }),
+    )
+  }
+  if (amountMin.value != null && amountMax.value != null) {
+    extras.push(
+      t('alertBuilder.summary.amountBoth', {
+        min: amountMin.value.toLocaleString(),
+        max: amountMax.value.toLocaleString(),
+      }),
+    )
+  } else if (amountMin.value != null) {
+    extras.push(
+      t('alertBuilder.summary.amountMinOnly', {
+        min: amountMin.value.toLocaleString(),
+      }),
+    )
+  } else if (amountMax.value != null) {
+    extras.push(
+      t('alertBuilder.summary.amountMaxOnly', {
+        max: amountMax.value.toLocaleString(),
+      }),
+    )
+  }
+
+  return extras.length > 0 ? `${base} ${extras.join(' ')}.` : `${base}.`
+})
 </script>
 
 <template>
@@ -297,12 +343,12 @@ const advancedCount = computed(() => methods.value.length + sources.value.length
     <!-- Row 1: side + premium -->
     <div class="pb-builder-row">
       <label class="pb-field">
-        <span class="pb-field-label">Side</span>
+        <span class="pb-field-label">{{ t('alertBuilder.fields.side') }}</span>
         <div class="pb-seg">
           <button
             v-for="o in [
-              { v: 'buy', l: 'Buy' },
-              { v: 'sell', l: 'Sell' },
+              { v: 'buy', l: t('alertBuilder.fields.buy') },
+              { v: 'sell', l: t('alertBuilder.fields.sell') },
             ]"
             :key="o.v"
             type="button"
@@ -315,14 +361,14 @@ const advancedCount = computed(() => methods.value.length + sources.value.length
       </label>
 
       <label class="pb-field">
-        <span class="pb-field-label">Premium</span>
+        <span class="pb-field-label">{{ t('alertBuilder.fields.premium') }}</span>
         <div class="pb-prem-input">
           <select
             v-model="premOp"
             class="pb-select"
           >
-            <option value="&lt;=">at most</option>
-            <option value="&gt;=">at least</option>
+            <option value="&lt;=">{{ t('alertBuilder.fields.opAtMost') }}</option>
+            <option value="&gt;=">{{ t('alertBuilder.fields.opAtLeast') }}</option>
           </select>
           <input
             v-model.number="premValue"
@@ -434,14 +480,14 @@ const advancedCount = computed(() => methods.value.length + sources.value.length
     <!-- Advanced disclosure -->
     <button type="button" class="pb-disclosure" @click="showAdvanced = !showAdvanced">
       <span :class="['pb-chev', showAdvanced ? 'pb-chev--open' : '']">›</span>
-      Advanced filters
+      {{ t('alertBuilder.fields.advanced') }}
       <span v-if="advancedCount > 0" class="pb-disclosure-count">{{ advancedCount }}</span>
     </button>
 
     <!-- Advanced filters -->
     <div v-if="showAdvanced" class="pb-advanced">
       <div class="pb-field">
-        <span class="pb-field-label">Payment methods (any)</span>
+        <span class="pb-field-label">{{ t('alertBuilder.fields.paymentMethods') }}</span>
         <div class="pb-chip-row">
           <button
             v-for="m in methodOptions"
@@ -455,7 +501,7 @@ const advancedCount = computed(() => methods.value.length + sources.value.length
         </div>
       </div>
       <div class="pb-field">
-        <span class="pb-field-label">Sources (any)</span>
+        <span class="pb-field-label">{{ t('alertBuilder.fields.sources') }}</span>
         <div class="pb-chip-row">
           <button
             v-for="s in SOURCES"
@@ -471,7 +517,7 @@ const advancedCount = computed(() => methods.value.length + sources.value.length
       </div>
       <div class="pb-builder-row">
         <label class="pb-field">
-          <span class="pb-field-label">Min amount ({{ currency }})</span>
+          <span class="pb-field-label">{{ t('alertBuilder.fields.amountMin', { currency }) }}</span>
           <input
             type="number"
             placeholder="0"
@@ -481,7 +527,7 @@ const advancedCount = computed(() => methods.value.length + sources.value.length
           />
         </label>
         <label class="pb-field">
-          <span class="pb-field-label">Max amount ({{ currency }})</span>
+          <span class="pb-field-label">{{ t('alertBuilder.fields.amountMax', { currency }) }}</span>
           <input
             type="number"
             placeholder="∞"
@@ -491,11 +537,11 @@ const advancedCount = computed(() => methods.value.length + sources.value.length
           />
         </label>
         <label class="pb-field" style="flex: 1">
-          <span class="pb-field-label">Alert name (optional)</span>
+          <span class="pb-field-label">{{ t('alertBuilder.fields.alertName') }}</span>
           <input
             v-model="name"
             type="text"
-            placeholder="e.g. Cheap PIX buys"
+            :placeholder="t('alertBuilder.fields.alertNamePlaceholder')"
             class="pb-input"
           />
         </label>
@@ -504,32 +550,7 @@ const advancedCount = computed(() => methods.value.length + sources.value.length
 
     <!-- Rule summary -->
     <div class="pb-rule-summary">
-      <span class="pb-summary-bold">Notify me</span> when
-      <span class="pb-summary-bold">{{ sideLabel }}</span> in
-      <span class="pb-summary-bold">{{ currency }}</span>
-      appears with premium
-      <span class="pb-summary-bold">{{ opLabel }} {{ premSign }}{{ premValue }}%</span>
-      <template v-if="methods.length > 0">
-        via
-        <span class="pb-summary-bold">{{
-          methods
-            .map((id) => PAYMENT_METHODS.find((p) => p.id === id)?.label ?? id)
-            .join(', ')
-        }}</span>
-      </template>
-      <template v-if="sources.length > 0">
-        from <span class="pb-summary-bold">{{ sources.join(', ') }}</span>
-      </template>
-      <template v-if="amountMin || amountMax">
-        for amounts
-        <template v-if="amountMin">
-          ≥ <span class="pb-summary-bold">{{ amountMin.toLocaleString() }}</span>
-        </template>
-        <template v-if="amountMax">
-          ≤ <span class="pb-summary-bold">{{ amountMax.toLocaleString() }}</span>
-        </template>
-      </template>
-      .
+      {{ summaryText }}
     </div>
 
     <!-- Save error -->
@@ -537,7 +558,7 @@ const advancedCount = computed(() => methods.value.length + sources.value.length
 
     <!-- Actions -->
     <div class="pb-builder-actions">
-      <button type="button" class="pb-btn pb-btn--ghost" @click="resetForm">Reset</button>
+      <button type="button" class="pb-btn pb-btn--ghost" @click="resetForm">{{ t('alertBuilder.actions.reset') }}</button>
       <button
         type="button"
         class="pb-btn pb-btn--primary"
@@ -546,7 +567,7 @@ const advancedCount = computed(() => methods.value.length + sources.value.length
         @click="handleSave"
       >
         <span v-if="saving" class="pb-save-spinner" aria-hidden="true" />
-        Create alert
+        {{ t('alertBuilder.actions.create') }}
       </button>
     </div>
   </div>

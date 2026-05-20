@@ -192,6 +192,13 @@
     }
   },
   "alerts": {
+    "heading": "Alertas",
+    "subtitle": "Recibe una notificación cuando se publique una oferta de compra o venta atractiva.",
+    "meta": {
+      "count": "{count} alerta | {count} alertas",
+      "active": "{count} activa | {count} activas",
+      "matches": "{count} coincidencia ahora | {count} coincidencias ahora"
+    },
     "signInPrompt": "Inicia sesión para crear alertas. Los borradores creados sin sesión se guardan localmente.",
     "testDm": {
       "button": "Probar entrega por Nostr",
@@ -207,6 +214,37 @@
     }
   },
   "alertBuilder": {
+    "fields": {
+      "side": "Lado",
+      "buy": "Compra",
+      "sell": "Venta",
+      "premium": "Premium",
+      "opAtMost": "como máximo",
+      "opAtLeast": "al menos",
+      "advanced": "Filtros avanzados",
+      "paymentMethods": "Métodos de pago (cualquiera)",
+      "sources": "Fuentes (cualquiera)",
+      "amountMin": "Monto mínimo ({currency})",
+      "amountMax": "Monto máximo ({currency})",
+      "alertName": "Nombre de la alerta (opcional)",
+      "alertNamePlaceholder": "ej. Compras PIX baratas"
+    },
+    "actions": {
+      "reset": "Restablecer",
+      "create": "Crear alerta"
+    },
+    "summary": {
+      "notify": "Notifícame cuando aparezca {side} en {currency} con premium {op} {value}",
+      "sideBuy": "una orden de compra",
+      "sideSell": "una orden de venta",
+      "opAtMost": "como máximo",
+      "opAtLeast": "al menos",
+      "viaMethods": "vía {methods}",
+      "fromSources": "desde {sources}",
+      "amountBoth": "para montos ≥ {min} ≤ {max}",
+      "amountMinOnly": "para montos ≥ {min}",
+      "amountMaxOnly": "para montos ≤ {max}"
+    },
     "channels": {
       "heading": "Canales de notificación",
       "email": "Correo",
