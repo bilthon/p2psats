@@ -48,9 +48,9 @@ function writeStorage(key: string, value: unknown): void {
 
 /**
  * Convert an AlertResponseDto (backend wire format) into the local Alert shape.
- * The DTO carries extra computed fields (currentMatches, dispatchesToday) that
- * are not part of the shared Alert type — drop them. Convert createdAt ISO
- * string → epoch ms integer to match the shared type.
+ * The DTO carries an extra computed field (currentMatches) that is not part of
+ * the shared Alert type — drop it. Convert createdAt ISO string → epoch ms
+ * integer to match the shared type.
  */
 function toLocalAlert(dto: AlertResponseDto): Alert {
   return {

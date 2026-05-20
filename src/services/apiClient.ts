@@ -53,8 +53,8 @@ export type UpdateAlertPayload = Partial<CreateAlertPayload> & { enabled?: boole
 
 /**
  * Wire-format response for a single alert from the backend. This is a
- * superset of the shared Alert type — it adds currentMatches and
- * dispatchesToday which are computed server-side and not stored locally.
+ * superset of the shared Alert type — it adds currentMatches which is
+ * computed server-side and not stored locally.
  */
 export interface AlertResponseDto {
   id: string
@@ -73,8 +73,6 @@ export interface AlertResponseDto {
   createdAt: string
   /** Count of currently-active known orders that match this alert */
   currentMatches: number
-  /** Count of successful dispatches since start of UTC day */
-  dispatchesToday: number
 }
 
 export interface AccountDto {
