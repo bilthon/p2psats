@@ -10,7 +10,9 @@ import CurrencySwitcher from '@/components/CurrencySwitcher.vue'
 import LanguageSwitcher from '@/components/LanguageSwitcher.vue'
 import RelayStatus from '@/components/RelayStatus.vue'
 import ThemeToggle from '@/components/ThemeToggle.vue'
-import type { Currency } from '@/lib/types'
+import MatchToast from '@/components/MatchToast.vue'
+import UserMenu from '@/components/UserMenu.vue'
+import type { Currency } from '@p2psats/shared'
 import logoUrl from '@/assets/img/p2psats.png'
 import { OG_LOCALE } from '@/i18n'
 
@@ -66,6 +68,9 @@ function onCurrencyChange(c: Currency) {
 
 <template>
   <div class="pb-app pb-app--nav">
+    <!-- ── Fixed-position toast stack (floats above all routed views) ─── -->
+    <MatchToast />
+
     <!-- ── Header ──────────────────────────────────────────── -->
     <header class="pb-header">
       <div class="pb-brand">
@@ -87,6 +92,7 @@ function onCurrencyChange(c: Currency) {
         <ThemeToggle />
         <LanguageSwitcher />
         <CurrencySwitcher :model-value="store.currency" @update:model-value="onCurrencyChange" />
+        <UserMenu />
       </div>
     </header>
 
@@ -112,13 +118,7 @@ function onCurrencyChange(c: Currency) {
         <span>{{ t('nav.orderBook') }}</span>
         <span class="pb-nav-count">{{ store.ccyOrders.length }}</span>
       </button>
-      <button
-        type="button"
-        class="pb-nav-item pb-nav-item--disabled"
-        disabled
-        aria-disabled="true"
-        :title="t('nav.alerts') + ' ' + t('nav.alertsComingSoon')"
-      >
+      <RouterLink to="/alerts" class="pb-nav-item" active-class="pb-nav-item--on">
         <svg
           width="16"
           height="16"
@@ -133,8 +133,7 @@ function onCurrencyChange(c: Currency) {
           <path d="M13.73 21a2 2 0 0 1-3.46 0" />
         </svg>
         <span>{{ t('nav.alerts') }}</span>
-        <span class="pb-nav-soon">{{ t('nav.alertsComingSoon') }}</span>
-      </button>
+      </RouterLink>
     </nav>
 
     <!-- ── Page content ────────────────────────────────────── -->

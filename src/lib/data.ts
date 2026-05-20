@@ -4,7 +4,7 @@
 // retained for unit tests and a future ?demo=1 flag.
 // Everything else (formatters, constants) stays stable.
 
-import type { Currency, Order, PaymentMethod, Source, SourceId } from './types'
+import type { Currency, Order, PaymentMethod, Source, SourceId } from '@p2psats/shared'
 import { getIntlLocale } from '@/i18n'
 
 export function getUserLocale(): string { return getIntlLocale() }

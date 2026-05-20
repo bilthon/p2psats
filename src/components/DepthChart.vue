@@ -13,7 +13,7 @@ import {
 import VChart from 'vue-echarts'
 import { fmtFiat, fmtSatsCompact, getUserLocale } from '@/lib/data'
 import { useIntlLocale } from '@/i18n/composables'
-import type { CrossResult, Currency, Order } from '@/lib/types'
+import type { CrossResult, Currency, Order } from '@p2psats/shared'
 import { useBtcRatesStore } from '@/services/btcRates'
 import { useAppStore } from '@/stores/appStore'
 import SatSymbol from './SatSymbol.vue'

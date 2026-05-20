@@ -12,9 +12,9 @@ import { ref, shallowRef, triggerRef } from 'vue'
 import { SimplePool } from 'nostr-tools/pool'
 import type { Event } from 'nostr-tools'
 
-import { parseOrder } from '@/lib/nip69/parseOrder'
-import { RELAYS } from '@/lib/nip69/relays'
-import type { RawNip69Order, RelayStatus } from '@/lib/nip69/types'
+import { parseOrder, type RawNip69Order } from '@p2psats/shared/nip69/parseOrder'
+import { RELAYS } from '@/lib/relays'
+import type { RelayStatus } from '@/lib/nip69/types'
 
 // Minimal subscription handle shape we rely on. We avoid importing
 // `SubCloser` directly so the store stays compatible across nostr-tools 2.x

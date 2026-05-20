@@ -5,18 +5,22 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { methodsForCurrency, midPrice } from '@/lib/data'
 import { detectCrosses } from '@/lib/arbitrage'
-import { matchesRule } from '@/lib/alerts'
+import { matchesRule } from '@p2psats/shared'
 import { useNostrOrderbookStore } from '@/services/nostrOrderbook'
 import { useBtcRatesStore } from '@/services/btcRates'
 import { toVueOrder } from '@/lib/orderAdapter'
-import type { Alert, Currency, Order } from '@/lib/types'
+import type { Alert, Currency, Order } from '@p2psats/shared'
 import { setLocale as i18nSetLocale, detectInitialLocale, type AppLocale } from '@/i18n'
+import { apiClient, ApiError } from '@/services/apiClient'
+import type { AlertResponseDto, CreateAlertPayload, NostrEvent } from '@/services/apiClient'
+import type { AccountDto } from '@/services/apiClient'
 
 const PE_KEYS = {
   currency: 'pe.currency',
   sources: 'pe.sources',
   alerts: 'pe.alerts',
   theme: 'pe.theme',
+  alertSound: 'pe.alertSound', // added by #15
 } as const
 
 function readStorage<T>(key: string, fallback: T): T {
@@ -38,7 +42,102 @@ function writeStorage(key: string, value: unknown): void {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Alert shape adapters (module-level pure functions)
+// ---------------------------------------------------------------------------
+
+/**
+ * Convert an AlertResponseDto (backend wire format) into the local Alert shape.
+ * The DTO carries extra computed fields (currentMatches, dispatchesToday) that
+ * are not part of the shared Alert type — drop them. Convert createdAt ISO
+ * string → epoch ms integer to match the shared type.
+ */
+function toLocalAlert(dto: AlertResponseDto): Alert {
+  return {
+    id: dto.id,
+    // name is optional in Alert — undefined when null from backend
+    ...(dto.name != null ? { name: dto.name } : {}),
+    side: dto.side,
+    // dto.currency is a plain string; the backend validates it against the
+    // same Currency union the shared lib declares — cast is safe here.
+    currency: dto.currency as Alert['currency'],
+    premium: dto.premium,
+    methods: dto.methods,
+    sources: dto.sources,
+    // Alert uses null (not undefined) for optional amount bounds
+    amountMin: dto.amountMin,
+    amountMax: dto.amountMax,
+    emailEnabled: dto.emailEnabled,
+    nostrEnabled: dto.nostrEnabled,
+    enabled: dto.enabled,
+    createdAt: new Date(dto.createdAt).getTime(),
+  }
+}
+
+/**
+ * Build a CreateAlertPayload from a local Alert. Strips server-generated
+ * fields: id, enabled, createdAt.
+ */
+function toCreatePayload(alert: Alert): CreateAlertPayload {
+  return {
+    name: alert.name,
+    currency: alert.currency,
+    side: alert.side,
+    premium: alert.premium,
+    methods: alert.methods,
+    sources: alert.sources,
+    amountMin: alert.amountMin ?? null,
+    amountMax: alert.amountMax ?? null,
+    emailEnabled: alert.emailEnabled,
+    nostrEnabled: alert.nostrEnabled,
+  }
+}
+
 export const useAppStore = defineStore('app', () => {
+  // ── Auth state ───────────────────────────────────────────────────────────
+  const account = ref<AccountDto | null>(null)
+  const signedIn = computed(() => account.value !== null)
+
+  /**
+   * Push a freshly-authenticated account into the store. Called by the
+   * sign-in completion paths (SignInPanel after verifyNostr, AuthVerifyView
+   * after verifyEmail) so the UI reacts immediately — otherwise the new
+   * __session cookie is set on the response but `signedIn` stays false
+   * until the next reload (when the bootstrap IIFE re-runs auth.me()).
+   *
+   * On sign-in we also kick off a backend alerts.list() so the user's
+   * server-side alerts replace any local drafts. Fire-and-forget — the
+   * UI transitions on the synchronous `account.value` assignment; the
+   * alerts list lands a moment later. Errors are swallowed (matches the
+   * bootstrap IIFE's posture).
+   */
+  function setAccount(dto: AccountDto | null): void {
+    account.value = dto
+    if (dto !== null) {
+      void apiClient.alerts
+        .list()
+        .then((remote) => {
+          alerts.value = remote.map(toLocalAlert)
+        })
+        .catch((e) => {
+          console.warn('[appStore] alerts.list() after sign-in failed:', e)
+        })
+    }
+  }
+
+  async function signOut(): Promise<void> {
+    try {
+      await apiClient.auth.logout()
+    } catch (e) {
+      // Cookie may already be expired; still clear local state.
+      console.warn('[appStore] auth.logout() failed:', e)
+    }
+    account.value = null
+    // Restore localStorage drafts so the signed-out user sees their drafts
+    // rather than stale backend alerts.
+    alerts.value = readStorage<Alert[]>(PE_KEYS.alerts, [])
+  }
+
   // ── Persisted state ──────────────────────────────────────────────────────
   const locale = ref<AppLocale>(detectInitialLocale())
   const currency = ref<Currency>(readStorage<Currency>(PE_KEYS.currency, 'USD'))
@@ -59,7 +158,60 @@ export const useAppStore = defineStore('app', () => {
   const activeSources = ref<string[]>(
     readStorage<string[]>(PE_KEYS.sources, ['mostro', 'lnp2pbot', 'robosats', 'peach']),
   )
-  const alerts = ref<Alert[]>(readStorage<Alert[]>(PE_KEYS.alerts, []))
+  // One-time localStorage migration: old Alert shape had `email: string`.
+  // Shared lib 1.0.0 replaced it with `emailEnabled: boolean` + `nostrEnabled: boolean`.
+  // Track whether any alert was actually migrated so we write back once.
+  let migrationDirty = false
+  const alerts = ref<Alert[]>(
+    readStorage<(Alert & { email?: string })[]>(PE_KEYS.alerts, []).map((a) => {
+      if ('email' in a && typeof a.email === 'string') {
+        migrationDirty = true
+        const { email: _dropped, ...rest } = a
+        return { ...rest, emailEnabled: true, nostrEnabled: false } as Alert
+      }
+      return a as Alert
+    }),
+  )
+  // Persist the migrated shape on the first boot after the upgrade.
+  if (migrationDirty) {
+    writeStorage(PE_KEYS.alerts, alerts.value)
+  }
+
+  // ── In-session match-dedup set ────────────────────────────────────────────
+  // Keyed on `${alertId}:${orderId}`. Non-persisted: resets on page reload.
+  // #15 (MatchToast) owns the logic that populates this set.
+  const seenMatchPairs = ref<Set<string>>(new Set())
+
+  // ── Alert sound setting (added by #15) ───────────────────────────────────
+  // Persisted under pe.alertSound. Default true. A future settings UI can
+  // expose setAlertSoundEnabled() to let users disable the chime.
+  const alertSoundEnabled = ref<boolean>(readStorage<boolean>(PE_KEYS.alertSound, true))
+
+  function setAlertSoundEnabled(v: boolean): void {
+    alertSoundEnabled.value = v
+    writeStorage(PE_KEYS.alertSound, v)
+  }
+
+  // ── Bootstrap: resolve auth + sync backend alerts ────────────────────────
+  // This IIFE runs once at first useAppStore() call (Pinia factory lifecycle).
+  // Skipped during SSG prerender — import.meta.env.SSR is true during vite-ssg
+  // server-side rendering, and there is no auth cookie available at build time.
+  // 401 is the normal signed-out case — silenced. Any other error is warned
+  // but swallowed so a backend outage never breaks the read-only orderbook.
+  if (!import.meta.env.SSR) {
+    void (async () => {
+      try {
+        account.value = await apiClient.auth.me()
+        // Signed in: replace local alerts with the backend's authoritative list.
+        const remote = await apiClient.alerts.list()
+        alerts.value = remote.map(toLocalAlert)
+      } catch (e) {
+        if (!(e instanceof ApiError) || e.status !== 401) {
+          console.warn('[appStore] auth.me() failed:', e)
+        }
+      }
+    })()
+  }
 
   // ── Derived / computed ───────────────────────────────────────────────────
 
@@ -158,30 +310,75 @@ export const useAppStore = defineStore('app', () => {
     writeStorage(PE_KEYS.sources, activeSources.value)
   }
 
-  function addAlert(alert: Alert) {
-    alerts.value = [alert, ...alerts.value]
-    writeStorage(PE_KEYS.alerts, alerts.value)
+  async function linkEmail(email: string): Promise<void> {
+    // Backend sends a magic link with linkToAccountId set so the verify path
+    // attaches EmailIdentity to the current account. The store is NOT updated
+    // here — identity only appears after the user clicks the link and the
+    // /auth/verify?token=... endpoint runs (which calls setAccount via the
+    // AuthVerifyView). Errors propagate to the caller for inline display.
+    await apiClient.auth.linkEmail(email)
   }
 
-  function removeAlert(id: string) {
-    alerts.value = alerts.value.filter((a) => a.id !== id)
-    writeStorage(PE_KEYS.alerts, alerts.value)
+  async function linkNostr(signedEvent: NostrEvent): Promise<void> {
+    // Backend verifies the signed kind:27235 event and returns the updated
+    // account with the freshly linked NostrIdentity included.
+    const { account: updated } = await apiClient.auth.linkNostr(signedEvent)
+    setAccount(updated)
   }
 
-  function toggleAlert(id: string) {
-    alerts.value = alerts.value.map((a) =>
-      a.id === id ? { ...a, enabled: a.enabled === false } : a,
-    )
-    writeStorage(PE_KEYS.alerts, alerts.value)
+  async function addAlert(alert: Alert): Promise<void> {
+    if (signedIn.value) {
+      // Backend path: persist via API, then mirror the response locally.
+      // Throws on error so the calling component (AlertBuilder) can surface it.
+      const dto = await apiClient.alerts.create(toCreatePayload(alert))
+      alerts.value = [toLocalAlert(dto), ...alerts.value]
+    } else {
+      // Signed-out path: draft mode in localStorage.
+      alerts.value = [alert, ...alerts.value]
+      writeStorage(PE_KEYS.alerts, alerts.value)
+    }
+  }
+
+  async function removeAlert(id: string): Promise<void> {
+    if (signedIn.value) {
+      await apiClient.alerts.delete(id)
+      alerts.value = alerts.value.filter((a) => a.id !== id)
+    } else {
+      alerts.value = alerts.value.filter((a) => a.id !== id)
+      writeStorage(PE_KEYS.alerts, alerts.value)
+    }
+  }
+
+  async function toggleAlert(id: string): Promise<void> {
+    if (signedIn.value) {
+      const current = alerts.value.find((a) => a.id === id)
+      if (!current) return
+      const dto = await apiClient.alerts.update(id, { enabled: !current.enabled })
+      alerts.value = alerts.value.map((a) => (a.id === id ? toLocalAlert(dto) : a))
+    } else {
+      alerts.value = alerts.value.map((a) =>
+        a.id === id ? { ...a, enabled: a.enabled === false } : a,
+      )
+      writeStorage(PE_KEYS.alerts, alerts.value)
+    }
   }
 
   return {
-    // state
+    // auth state
+    account,
+    signedIn,
+    setAccount,
+    signOut,
+    // persisted state
     locale,
     currency,
     activeSources,
     alerts,
     theme,
+    // non-persisted in-session state
+    seenMatchPairs,
+    // sound setting (added by #15)
+    alertSoundEnabled,
     // derived
     allOrders,
     ccyOrders,
@@ -203,10 +400,13 @@ export const useAppStore = defineStore('app', () => {
     setLocale,
     setCurrency,
     toggleSource,
+    linkEmail,
+    linkNostr,
     addAlert,
     removeAlert,
     toggleAlert,
     setTheme,
     toggleTheme,
+    setAlertSoundEnabled, // added by #15
   }
 })

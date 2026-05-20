@@ -4,8 +4,7 @@
   },
   "nav": {
     "orderBook": "Order book",
-    "alerts": "Alerts",
-    "alertsComingSoon": "coming soon"
+    "alerts": "Alerts"
   },
   "footer": {
     "brand": "P2P sats",
@@ -154,9 +153,115 @@
       "description": "Reach the P2P sats team via Nostr or email. Report bugs, share feedback, or talk peer-to-peer Bitcoin."
     }
   },
+  "signIn": {
+    "heading": "Sign in",
+    "sub": "Create an account or sign in to manage your alerts.",
+    "tabs": {
+      "ariaLabel": "Sign-in method",
+      "email": "Sign in with email",
+      "nostr": "Sign in with Nostr"
+    },
+    "email": {
+      "lead": "Enter your email and we'll send you a magic link. No password needed.",
+      "label": "Email address",
+      "placeholder": "you{'@'}example.com",
+      "cta": "Send magic link",
+      "checkInbox": "Check your inbox at {email} for a sign-in link.",
+      "tryAgain": "Try a different email"
+    },
+    "nostr": {
+      "lead": "Sign in by signing a challenge with your Nostr key. Your extension will prompt you.",
+      "noExtension": "No NIP-07 extension detected. Install one to sign in with your Nostr key:",
+      "cta": "Sign in with Nostr"
+    },
+    "status": {
+      "sending": "Sending…",
+      "signingIn": "Signing in…",
+      "verifying": "Verifying your link…"
+    },
+    "verify": {
+      "missingToken": "Missing token. Did you click a valid magic link?",
+      "backHome": "Back to home"
+    },
+    "error": {
+      "generic": "Something went wrong. Please try again."
+    },
+    "seo": {
+      "title": "Sign In · P2P sats",
+      "description": "Sign in to P2P sats to manage your P2P Bitcoin order alerts."
+    }
+  },
+  "alerts": {
+    "signInPrompt": "Sign in to create alerts. Any drafts you create while signed out are saved locally.",
+    "testDm": {
+      "button": "Test Nostr delivery",
+      "confirmTitle": "Send test DM?",
+      "confirmBody": "We'll publish a NIP-17 gift-wrapped message to your Nostr DM relays right now. Check your Nostr client to confirm it arrived.",
+      "confirmCta": "Send test",
+      "cancel": "Cancel",
+      "sending": "Sending…",
+      "success": "Test sent. Check your Nostr client.",
+      "error": {
+        "generic": "Couldn't send the test. Please try again later."
+      }
+    }
+  },
+  "alertBuilder": {
+    "channels": {
+      "heading": "Notification channels",
+      "email": "Email",
+      "nostrDm": "Nostr DM",
+      "deliveredTo": "Delivered to",
+      "deliveredToNpub": "Delivered to",
+      "emailUnverified": "Verify your email to enable this channel",
+      "nostrUnverified": "Link a Nostr identity to enable this channel",
+      "saveHintNone": "Enable at least one notification channel to save",
+      "saveHintEmailUnverified": "Verify your email to use the Email channel",
+      "saveHintNostrUnverified": "Link a Nostr identity to use the Nostr DM channel",
+      "linkEmail": {
+        "placeholder": "your-email{'@'}example.com",
+        "submit": "Send link",
+        "sending": "Sending…",
+        "success": "Check your inbox to confirm.",
+        "errorGeneric": "Couldn’t send link. Please try again."
+      },
+      "linkNostr": {
+        "label": "Link Nostr",
+        "signing": "Signing…",
+        "errorNoExt": "Install a NIP-07 extension (Alby, nos2x) to link your Nostr identity.",
+        "errorRejected": "Signature rejected.",
+        "errorGeneric": "Couldn’t link Nostr identity. Please try again."
+      }
+    },
+    "error": {
+      "saveFailed": "Couldn't save alert. Please try again."
+    }
+  },
+  "savedAlerts": {
+    "badge": {
+      "email": "Email",
+      "nostr": "Nostr"
+    }
+  },
+  "matchToast": {
+    "newMatch": "Alert match",
+    "close": "Close",
+    "viewOnOrderbook": "View on order book",
+    "viewComingSoon": "Deep-link to order coming soon",
+    "anySide": "ANY"
+  },
   "themeToggle": {
     "switchToDark": "Switch to dark theme",
     "switchToLight": "Switch to light theme"
+  },
+  "userMenu": {
+    "signOut": "Sign out",
+    "signingOut": "Signing out…",
+    "signedInVia": {
+      "nostr": "Signed in with Nostr",
+      "email": "Signed in via email"
+    },
+    "avatarAlt": "Profile picture"
   },
   "crossedPairs": {
     "title": "Crossed orders",

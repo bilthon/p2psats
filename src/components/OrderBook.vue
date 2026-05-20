@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { Currency, Order } from '@/lib/types'
+import type { Currency, Order } from '@p2psats/shared'
 import OrderTable from './OrderTable.vue'
 
 const { t } = useI18n()
