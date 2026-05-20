@@ -1066,23 +1066,6 @@ button { font-family: inherit; cursor: pointer; }
   border: 1px solid var(--line);
 }
 .pb-nav-item--on .pb-nav-count { background: var(--bg-soft); color: var(--ink-soft); }
-.pb-nav-item--disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-.pb-nav-item--disabled:hover { color: var(--ink-soft); }
-.pb-nav-soon {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  padding: 1px 6px;
-  border-radius: 999px;
-  background: var(--bg);
-  color: var(--ink-mute);
-  border: 1px solid var(--line);
-}
 
 @media (max-width: 900px) {
   .pb-app { padding: 16px; }
