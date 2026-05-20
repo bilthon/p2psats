@@ -227,7 +227,9 @@
       "amountMin": "Valor mínimo ({currency})",
       "amountMax": "Valor máximo ({currency})",
       "alertName": "Nome do alerta (opcional)",
-      "alertNamePlaceholder": "ex. Compras PIX baratas"
+      "alertNamePlaceholder": "ex. Compras PIX baratas",
+      "premiumIncrease": "Aumentar premium",
+      "premiumDecrease": "Diminuir premium"
     },
     "actions": {
       "reset": "Redefinir",

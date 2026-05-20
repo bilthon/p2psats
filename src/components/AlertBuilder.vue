@@ -277,6 +277,13 @@ async function linkNostrIdentity() {
 // Display helpers
 // ---------------------------------------------------------------------------
 
+const PREM_STEP = 0.5
+
+function stepPremValue(delta: number) {
+  const current = Number(premValue.value) || 0
+  premValue.value = Math.round((current + delta * PREM_STEP) * 2) / 2
+}
+
 const premSign = computed(() => (premValue.value > 0 ? '+' : ''))
 
 const advancedCount = computed(() => methods.value.length + sources.value.length)
@@ -370,12 +377,34 @@ const summaryText = computed(() => {
             <option value="&lt;=">{{ t('alertBuilder.fields.opAtMost') }}</option>
             <option value="&gt;=">{{ t('alertBuilder.fields.opAtLeast') }}</option>
           </select>
-          <input
-            v-model.number="premValue"
-            type="number"
-            step="0.5"
-            class="pb-input pb-input--narrow"
-          />
+          <div class="pb-prem-value">
+            <input
+              v-model.number="premValue"
+              type="number"
+              step="0.5"
+              class="pb-input pb-input--narrow"
+            />
+            <div class="pb-prem-steppers" role="group" :aria-label="t('alertBuilder.fields.premium')">
+              <button
+                type="button"
+                class="pb-prem-step"
+                tabindex="-1"
+                :aria-label="t('alertBuilder.fields.premiumIncrease')"
+                @click="stepPremValue(1)"
+              >
+                <svg width="10" height="6" viewBox="0 0 10 6" aria-hidden="true"><path d="M1 5 L5 1 L9 5" fill="currentColor" /></svg>
+              </button>
+              <button
+                type="button"
+                class="pb-prem-step"
+                tabindex="-1"
+                :aria-label="t('alertBuilder.fields.premiumDecrease')"
+                @click="stepPremValue(-1)"
+              >
+                <svg width="10" height="6" viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1 L5 5 L9 1" fill="currentColor" /></svg>
+              </button>
+            </div>
+          </div>
           <span class="pb-input-suffix">%</span>
         </div>
       </label>

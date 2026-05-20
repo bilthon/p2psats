@@ -227,7 +227,9 @@
       "amountMin": "Min amount ({currency})",
       "amountMax": "Max amount ({currency})",
       "alertName": "Alert name (optional)",
-      "alertNamePlaceholder": "e.g. Cheap PIX buys"
+      "alertNamePlaceholder": "e.g. Cheap PIX buys",
+      "premiumIncrease": "Increase premium",
+      "premiumDecrease": "Decrease premium"
     },
     "actions": {
       "reset": "Reset",
