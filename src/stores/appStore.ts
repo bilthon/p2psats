@@ -3,7 +3,7 @@
 
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { methodsForCurrency, midPrice } from '@/lib/data'
+import { midPrice } from '@/lib/data'
 import { detectCrosses } from '@/lib/arbitrage'
 import { matchesRule } from '@p2psats/shared'
 import { useNostrOrderbookStore } from '@/services/nostrOrderbook'
@@ -229,8 +229,6 @@ export const useAppStore = defineStore('app', () => {
     return out
   })
 
-  const methodsForCcy = computed(() => methodsForCurrency(currency.value))
-
   const mid = computed(() => midPrice(ccyOrders.value, currency.value))
 
   const buys = computed(() => ccyOrders.value.filter((o) => o.side === 'buy'))
@@ -355,7 +353,6 @@ export const useAppStore = defineStore('app', () => {
     ccyOrders,
     crosses,
     matchesByAlert,
-    methodsForCcy,
     mid,
     buys,
     sells,

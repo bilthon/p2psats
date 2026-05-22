@@ -84,9 +84,6 @@ async function onToggle(id: string) {
             >prem {{ opSymbol(a.premium.op) }}
             {{ a.premium.value > 0 ? '+' : '' }}{{ a.premium.value }}%</span
           >
-          <span v-if="a.methods.length > 0" class="pb-alert-tag"
-            >{{ a.methods.length }} method{{ a.methods.length > 1 ? 's' : '' }}</span
-          >
           <span v-if="a.sources.length > 0" class="pb-alert-tag"
             >{{ a.sources.length }} source{{ a.sources.length > 1 ? 's' : '' }}</span
           >
