@@ -89,6 +89,35 @@ const channelValid = computed(
     (nostrEnabled.value && nostrVerified.value),
 )
 
+// ---------------------------------------------------------------------------
+// Amount validation
+// ---------------------------------------------------------------------------
+
+type AmountError = 'negative' | 'minGtMax'
+
+const amountMinError = computed<AmountError | null>(() => {
+  if (amountMin.value != null && amountMin.value < 0) return 'negative'
+  return null
+})
+
+const amountMaxError = computed<AmountError | null>(() => {
+  if (amountMax.value != null && amountMax.value < 0) return 'negative'
+  return null
+})
+
+const amountBoundsError = computed<AmountError | null>(() => {
+  if (
+    amountMin.value != null &&
+    amountMax.value != null &&
+    amountMin.value > amountMax.value
+  ) return 'minGtMax'
+  return null
+})
+
+const hasAmountError = computed(
+  () => amountMinError.value !== null || amountMaxError.value !== null || amountBoundsError.value !== null,
+)
+
 /** Human-readable explanation of why Save is disabled (shown as tooltip). */
 const saveBlockReason = computed<string>(() => {
   if (quotaReached.value) {
@@ -103,10 +132,16 @@ const saveBlockReason = computed<string>(() => {
   if (nostrEnabled.value && !nostrVerified.value) {
     return t('alertBuilder.channels.saveHintNostrUnverified')
   }
+  if (amountMinError.value === 'negative' || amountMaxError.value === 'negative') {
+    return t('alertBuilder.amountError.negative')
+  }
+  if (amountBoundsError.value === 'minGtMax') {
+    return t('alertBuilder.amountError.minGtMax')
+  }
   return ''
 })
 
-const canSave = computed(() => channelValid.value && !saving.value && !quotaReached.value)
+const canSave = computed(() => channelValid.value && !saving.value && !quotaReached.value && !hasAmountError.value)
 
 // ---------------------------------------------------------------------------
 // Handlers
@@ -529,8 +564,10 @@ const summaryText = computed(() => {
           <input
             type="number"
             placeholder="0"
+            min="0"
+            step="any"
             :value="amountMin ?? ''"
-            class="pb-input"
+            :class="['pb-input', amountMinError || amountBoundsError ? 'pb-input--error' : '']"
             @input="(e) => { const v = (e.target as HTMLInputElement).value; amountMin = v ? Number(v) : null }"
           />
         </label>
@@ -539,8 +576,10 @@ const summaryText = computed(() => {
           <input
             type="number"
             placeholder="∞"
+            min="0"
+            step="any"
             :value="amountMax ?? ''"
-            class="pb-input"
+            :class="['pb-input', amountMaxError || amountBoundsError ? 'pb-input--error' : '']"
             @input="(e) => { const v = (e.target as HTMLInputElement).value; amountMax = v ? Number(v) : null }"
           />
         </label>
@@ -553,6 +592,14 @@ const summaryText = computed(() => {
             class="pb-input"
           />
         </label>
+      </div>
+      <div v-if="hasAmountError" class="pb-amount-error" role="alert">
+        <span v-if="amountMinError === 'negative' || amountMaxError === 'negative'">
+          {{ t('alertBuilder.amountError.negative') }}
+        </span>
+        <span v-else-if="amountBoundsError === 'minGtMax'">
+          {{ t('alertBuilder.amountError.minGtMax') }}
+        </span>
       </div>
     </div>
 

@@ -274,6 +274,10 @@
     },
     "error": {
       "saveFailed": "Não foi possível salvar o alerta. Por favor, tente novamente."
+    },
+    "amountError": {
+      "negative": "O valor não pode ser negativo.",
+      "minGtMax": "O valor mínimo deve ser menor ou igual ao valor máximo."
     }
   },
   "savedAlerts": {

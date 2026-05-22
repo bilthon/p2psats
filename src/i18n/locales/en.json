@@ -274,6 +274,10 @@
     },
     "error": {
       "saveFailed": "Couldn't save alert. Please try again."
+    },
+    "amountError": {
+      "negative": "Amount cannot be negative.",
+      "minGtMax": "Minimum amount must be less than or equal to maximum amount."
     }
   },
   "savedAlerts": {

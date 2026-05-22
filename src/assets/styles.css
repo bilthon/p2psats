@@ -729,6 +729,20 @@ button { font-family: inherit; cursor: pointer; }
   padding-top: 4px;
 }
 .pb-chip-row { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* ── Amount validation errors ── */
+.pb-input--error {
+  border-color: var(--ask, oklch(0.55 0.18 25));
+  background: oklch(0.55 0.18 25 / 0.04);
+}
+.pb-input--error:focus {
+  outline-color: var(--ask, oklch(0.55 0.18 25));
+}
+.pb-amount-error {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--ask, oklch(0.55 0.18 25));
+}
 .pb-chip {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 6px 10px;
