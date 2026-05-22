@@ -1142,6 +1142,7 @@ button { font-family: inherit; cursor: pointer; }
   font-family: var(--font-display);
   font-size: 13px; font-weight: 500;
   color: var(--ink-soft);
+  text-decoration: none;
   transition: background 120ms, color 120ms;
 }
 .pb-nav-item:hover { color: var(--ink); }
