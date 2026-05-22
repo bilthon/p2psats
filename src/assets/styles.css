@@ -1153,6 +1153,8 @@ button { font-family: inherit; cursor: pointer; }
   .pb-table .col-amount, .pb-table .col-methods, .pb-table .col-maker,
   .pb-table .col-sats, .pb-table .col-rep { display: none; }
   .pb-stats { grid-template-columns: repeat(2, 1fr); }
+  .pb-section-hd { flex-direction: column; gap: 8px; }
+  .pb-section-meta { white-space: normal; order: -1; }
 }
 
 /* ── Tweaks panel ────────────────────────────────────── */

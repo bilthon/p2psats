@@ -19,7 +19,7 @@ const props = defineProps<{
 
 const { t } = useI18n()
 const store = useAppStore()
-const { account } = storeToRefs(store)
+const { account, quotaReached, maxAlerts } = storeToRefs(store)
 
 // ---------------------------------------------------------------------------
 // Channel selector state
@@ -93,6 +93,9 @@ const channelValid = computed(
 
 /** Human-readable explanation of why Save is disabled (shown as tooltip). */
 const saveBlockReason = computed<string>(() => {
+  if (quotaReached.value) {
+    return t('alertBuilder.channels.saveHintQuotaReached', { max: maxAlerts.value })
+  }
   if (!emailEnabled.value && !nostrEnabled.value) {
     return t('alertBuilder.channels.saveHintNone')
   }
@@ -105,7 +108,7 @@ const saveBlockReason = computed<string>(() => {
   return ''
 })
 
-const canSave = computed(() => channelValid.value && !saving.value)
+const canSave = computed(() => channelValid.value && !saving.value && !quotaReached.value)
 
 // ---------------------------------------------------------------------------
 // Handlers
@@ -346,7 +349,14 @@ const summaryText = computed(() => {
 </script>
 
 <template>
-  <div class="pb-builder">
+  <div class="pb-builder" :class="{ 'pb-builder--quota-locked': quotaReached }">
+    <!-- Quota banner: shown when the user has hit the free-tier cap. The
+         rest of the form below is visually muted and made non-interactive
+         via the .pb-builder--quota-locked modifier. -->
+    <div v-if="quotaReached" class="pb-quota-banner" role="status">
+      {{ t('alertBuilder.channels.saveHintQuotaReached', { max: maxAlerts }) }}
+    </div>
+
     <!-- Row 1: side + premium -->
     <div class="pb-builder-row">
       <label class="pb-field">
@@ -603,6 +613,27 @@ const summaryText = computed(() => {
 </template>
 
 <style scoped>
+/* ── Quota lockout ── */
+.pb-quota-banner {
+  padding: 12px 14px;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  background: oklch(0.85 0.07 80 / 0.35);
+  border: 1px solid oklch(0.75 0.12 80 / 0.5);
+  border-radius: 8px;
+  margin-bottom: 4px;
+}
+
+/* When the quota is reached, everything below the banner is visibly muted
+   and non-interactive. The banner sits outside the locked region so it
+   keeps its full contrast. */
+.pb-builder--quota-locked > *:not(.pb-quota-banner) {
+  opacity: 0.45;
+  pointer-events: none;
+  user-select: none;
+}
+
 /* ── Channel selector ── */
 .pb-channels {
   margin-top: 4px;
