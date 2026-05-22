@@ -3,16 +3,15 @@ import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
 import { nip19 } from 'nostr-tools'
-import { SOURCES, PAYMENT_METHODS } from '@/lib/data'
+import { SOURCES } from '@/lib/data'
 import { DEFAULT_RULE } from '@p2psats/shared'
 import { useAppStore } from '@/stores/appStore'
 import { apiClient, ApiError } from '@/services/apiClient'
 import type { NostrEvent } from '@/services/apiClient'
-import type { Alert, Currency, PaymentMethod } from '@p2psats/shared'
+import type { Alert, Currency } from '@p2psats/shared'
 
 const props = defineProps<{
   currency: Currency
-  methodOptions: PaymentMethod[]
   /** Async handler called with the constructed Alert; should throw on backend errors. */
   onSave: (alert: Alert) => Promise<void>
 }>()
@@ -65,7 +64,6 @@ const side = ref<'buy' | 'sell'>('buy')
 const premOp = ref<'<=' | '>='>('<=')
 const premValue = ref<number>(DEFAULT_RULE.premium.value)
 const name = ref('')
-const methods = ref<string[]>([])
 const sources = ref<string[]>([])
 const amountMin = ref<number | null>(null)
 const amountMax = ref<number | null>(null)
@@ -114,14 +112,6 @@ const canSave = computed(() => channelValid.value && !saving.value && !quotaReac
 // Handlers
 // ---------------------------------------------------------------------------
 
-function toggleMethod(id: string) {
-  if (methods.value.includes(id)) {
-    methods.value = methods.value.filter((m) => m !== id)
-  } else {
-    methods.value = [...methods.value, id]
-  }
-}
-
 function toggleSource(id: string) {
   if (sources.value.includes(id)) {
     sources.value = sources.value.filter((s) => s !== id)
@@ -135,7 +125,6 @@ function resetForm() {
   premOp.value = '<='
   premValue.value = DEFAULT_RULE.premium.value
   name.value = ''
-  methods.value = []
   sources.value = []
   amountMin.value = null
   amountMax.value = null
@@ -156,7 +145,7 @@ async function handleSave() {
     side: side.value,
     currency: props.currency,
     premium: { op: premOp.value, value: premValue.value },
-    methods: [...methods.value],
+    methods: [],
     sources: [...sources.value],
     amountMin: amountMin.value,
     amountMax: amountMax.value,
@@ -289,7 +278,7 @@ function stepPremValue(delta: number) {
 
 const premSign = computed(() => (premValue.value > 0 ? '+' : ''))
 
-const advancedCount = computed(() => methods.value.length + sources.value.length)
+const advancedCount = computed(() => sources.value.length)
 
 const summaryText = computed(() => {
   const sideLabel = t(
@@ -312,12 +301,6 @@ const summaryText = computed(() => {
   })
 
   const extras: string[] = []
-  if (methods.value.length > 0) {
-    const labels = methods.value
-      .map((id) => PAYMENT_METHODS.find((p) => p.id === id)?.label ?? id)
-      .join(', ')
-    extras.push(t('alertBuilder.summary.viaMethods', { methods: labels }))
-  }
   if (sources.value.length > 0) {
     extras.push(
       t('alertBuilder.summary.fromSources', { sources: sources.value.join(', ') }),
@@ -525,20 +508,6 @@ const summaryText = computed(() => {
 
     <!-- Advanced filters -->
     <div v-if="showAdvanced" class="pb-advanced">
-      <div class="pb-field">
-        <span class="pb-field-label">{{ t('alertBuilder.fields.paymentMethods') }}</span>
-        <div class="pb-chip-row">
-          <button
-            v-for="m in methodOptions"
-            :key="m.id"
-            type="button"
-            :class="['pb-chip', methods.includes(m.id) ? 'pb-chip--on' : '']"
-            @click="toggleMethod(m.id)"
-          >
-            {{ m.label }}
-          </button>
-        </div>
-      </div>
       <div class="pb-field">
         <span class="pb-field-label">{{ t('alertBuilder.fields.sources') }}</span>
         <div class="pb-chip-row">

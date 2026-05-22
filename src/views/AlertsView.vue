@@ -75,7 +75,6 @@ async function onSave(alert: Alert): Promise<void> {
     <template v-else>
       <AlertBuilder
         :currency="store.currency"
-        :method-options="store.methodsForCcy"
         :on-save="onSave"
       />
       <TestNostrDmAction />
