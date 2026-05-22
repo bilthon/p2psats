@@ -81,6 +81,8 @@ export interface AccountDto {
   createdAt: string
   emailIdentity: { email: string; verifiedAt: string | null } | null
   nostrIdentity: { pubkey: string; verifiedAt: string | null } | null
+  /** Per-account alert quota (free tier = 4; premium tiers will raise this) */
+  maxAlerts: number
 }
 
 /**

@@ -195,7 +195,7 @@
     "heading": "Alerts",
     "subtitle": "Get notified when an attractive buy or sell offer is published.",
     "meta": {
-      "count": "{count} alert | {count} alerts",
+      "count": "{count} of {max} alert | {count} of {max} alerts",
       "active": "{count} active",
       "matches": "{count} match now | {count} matches now"
     },
@@ -258,6 +258,7 @@
       "saveHintNone": "Enable at least one notification channel to save",
       "saveHintEmailUnverified": "Verify your email to use the Email channel",
       "saveHintNostrUnverified": "Link a Nostr identity to use the Nostr DM channel",
+      "saveHintQuotaReached": "You've reached the limit of {max} alerts. Delete one to create another.",
       "linkEmail": {
         "placeholder": "your-email{'@'}example.com",
         "submit": "Send link",

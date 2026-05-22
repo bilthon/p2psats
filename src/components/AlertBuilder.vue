@@ -19,7 +19,7 @@ const props = defineProps<{
 
 const { t } = useI18n()
 const store = useAppStore()
-const { account } = storeToRefs(store)
+const { account, quotaReached, maxAlerts } = storeToRefs(store)
 
 // ---------------------------------------------------------------------------
 // Channel selector state
@@ -93,6 +93,9 @@ const channelValid = computed(
 
 /** Human-readable explanation of why Save is disabled (shown as tooltip). */
 const saveBlockReason = computed<string>(() => {
+  if (quotaReached.value) {
+    return t('alertBuilder.channels.saveHintQuotaReached', { max: maxAlerts.value })
+  }
   if (!emailEnabled.value && !nostrEnabled.value) {
     return t('alertBuilder.channels.saveHintNone')
   }
@@ -105,7 +108,7 @@ const saveBlockReason = computed<string>(() => {
   return ''
 })
 
-const canSave = computed(() => channelValid.value && !saving.value)
+const canSave = computed(() => channelValid.value && !saving.value && !quotaReached.value)
 
 // ---------------------------------------------------------------------------
 // Handlers

@@ -195,7 +195,7 @@
     "heading": "Alertas",
     "subtitle": "Seja notificado quando uma oferta de compra ou venda atrativa for publicada.",
     "meta": {
-      "count": "{count} alerta | {count} alertas",
+      "count": "{count} de {max} alerta | {count} de {max} alertas",
       "active": "{count} ativo | {count} ativos",
       "matches": "{count} correspondência agora | {count} correspondências agora"
     },
@@ -258,6 +258,7 @@
       "saveHintNone": "Ative pelo menos um canal de notificação para salvar",
       "saveHintEmailUnverified": "Verifique seu e-mail para usar o canal de E-mail",
       "saveHintNostrUnverified": "Vincule uma identidade Nostr para usar o canal Nostr DM",
+      "saveHintQuotaReached": "Você atingiu o limite de {max} alertas. Exclua um para criar outro.",
       "linkEmail": {
         "placeholder": "seu-email{'@'}exemplo.com",
         "submit": "Enviar link",

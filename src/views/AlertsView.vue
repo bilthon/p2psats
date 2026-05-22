@@ -54,8 +54,8 @@ async function onSave(alert: Alert): Promise<void> {
           {{ t('alerts.subtitle') }}
         </p>
       </div>
-      <div class="pb-section-meta">
-        {{ t('alerts.meta.count', { count: store.alerts.length }, store.alerts.length) }} ·
+      <div v-if="signedIn" class="pb-section-meta">
+        {{ t('alerts.meta.count', { count: store.alerts.length, max: store.maxAlerts }, store.alerts.length) }} ·
         {{ t('alerts.meta.active', { count: store.activeAlerts }, store.activeAlerts) }} ·
         {{ t('alerts.meta.matches', { count: store.totalActiveMatches }, store.totalActiveMatches) }}
       </div>
@@ -81,11 +81,12 @@ async function onSave(alert: Alert): Promise<void> {
       <TestNostrDmAction />
     </template>
 
-    <!-- SavedAlerts always visible — shows local drafts when signed out too.
-         The component owns its own store calls so async errors can be caught
-         locally (a parent fire-and-forget listener can't observe the rejected
-         promise from removeAlert/toggleAlert). -->
+    <!-- SavedAlerts only renders when signed in. It owns its own store calls
+         so async errors can be caught locally (a parent fire-and-forget
+         listener can't observe the rejected promise from removeAlert /
+         toggleAlert). -->
     <SavedAlerts
+      v-if="signedIn"
       :alerts="store.alerts"
       :current-matches="store.matchesByAlert"
     />

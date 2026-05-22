@@ -18,7 +18,6 @@ import type { AccountDto } from '@/services/apiClient'
 const PE_KEYS = {
   currency: 'pe.currency',
   sources: 'pe.sources',
-  alerts: 'pe.alerts',
   theme: 'pe.theme',
   alertSound: 'pe.alertSound', // added by #15
 } as const
@@ -105,11 +104,10 @@ export const useAppStore = defineStore('app', () => {
    * __session cookie is set on the response but `signedIn` stays false
    * until the next reload (when the bootstrap IIFE re-runs auth.me()).
    *
-   * On sign-in we also kick off a backend alerts.list() so the user's
-   * server-side alerts replace any local drafts. Fire-and-forget — the
-   * UI transitions on the synchronous `account.value` assignment; the
-   * alerts list lands a moment later. Errors are swallowed (matches the
-   * bootstrap IIFE's posture).
+   * On sign-in we also kick off a backend alerts.list() to load the user's
+   * alerts. Fire-and-forget — the UI transitions on the synchronous
+   * `account.value` assignment; the alerts list lands a moment later.
+   * Errors are swallowed (matches the bootstrap IIFE's posture).
    */
   function setAccount(dto: AccountDto | null): void {
     account.value = dto
@@ -133,9 +131,7 @@ export const useAppStore = defineStore('app', () => {
       console.warn('[appStore] auth.logout() failed:', e)
     }
     account.value = null
-    // Restore localStorage drafts so the signed-out user sees their drafts
-    // rather than stale backend alerts.
-    alerts.value = readStorage<Alert[]>(PE_KEYS.alerts, [])
+    alerts.value = []
   }
 
   // ── Persisted state ──────────────────────────────────────────────────────
@@ -158,24 +154,8 @@ export const useAppStore = defineStore('app', () => {
   const activeSources = ref<string[]>(
     readStorage<string[]>(PE_KEYS.sources, ['mostro', 'lnp2pbot', 'robosats', 'peach']),
   )
-  // One-time localStorage migration: old Alert shape had `email: string`.
-  // Shared lib 1.0.0 replaced it with `emailEnabled: boolean` + `nostrEnabled: boolean`.
-  // Track whether any alert was actually migrated so we write back once.
-  let migrationDirty = false
-  const alerts = ref<Alert[]>(
-    readStorage<(Alert & { email?: string })[]>(PE_KEYS.alerts, []).map((a) => {
-      if ('email' in a && typeof a.email === 'string') {
-        migrationDirty = true
-        const { email: _dropped, ...rest } = a
-        return { ...rest, emailEnabled: true, nostrEnabled: false } as Alert
-      }
-      return a as Alert
-    }),
-  )
-  // Persist the migrated shape on the first boot after the upgrade.
-  if (migrationDirty) {
-    writeStorage(PE_KEYS.alerts, alerts.value)
-  }
+  // Alerts are backend-owned: populated after sign-in via apiClient.alerts.list().
+  const alerts = ref<Alert[]>([])
 
   // ── In-session match-dedup set ────────────────────────────────────────────
   // Keyed on `${alertId}:${orderId}`. Non-persisted: resets on page reload.
@@ -277,6 +257,15 @@ export const useAppStore = defineStore('app', () => {
     Object.values(matchesByAlert.value).reduce((s, n) => s + n, 0),
   )
 
+  // Free-tier quota: sourced from the backend's GET /me response so the UI
+  // never has to hardcode the limit. Falls back to 4 (matches the current
+  // backend free-tier default) for the brief window where /me hasn't
+  // resolved yet, or against an older backend that doesn't return the field.
+  const maxAlerts = computed(() => account.value?.maxAlerts ?? 4)
+  const quotaReached = computed(
+    () => signedIn.value && alerts.value.length >= maxAlerts.value,
+  )
+
   // ── Mutating actions ─────────────────────────────────────────────────────
 
   function setLocale(l: AppLocale) {
@@ -327,40 +316,22 @@ export const useAppStore = defineStore('app', () => {
   }
 
   async function addAlert(alert: Alert): Promise<void> {
-    if (signedIn.value) {
-      // Backend path: persist via API, then mirror the response locally.
-      // Throws on error so the calling component (AlertBuilder) can surface it.
-      const dto = await apiClient.alerts.create(toCreatePayload(alert))
-      alerts.value = [toLocalAlert(dto), ...alerts.value]
-    } else {
-      // Signed-out path: draft mode in localStorage.
-      alerts.value = [alert, ...alerts.value]
-      writeStorage(PE_KEYS.alerts, alerts.value)
-    }
+    // Persist via API, then mirror the response locally. Throws on error so
+    // the calling component (AlertBuilder) can surface it.
+    const dto = await apiClient.alerts.create(toCreatePayload(alert))
+    alerts.value = [toLocalAlert(dto), ...alerts.value]
   }
 
   async function removeAlert(id: string): Promise<void> {
-    if (signedIn.value) {
-      await apiClient.alerts.delete(id)
-      alerts.value = alerts.value.filter((a) => a.id !== id)
-    } else {
-      alerts.value = alerts.value.filter((a) => a.id !== id)
-      writeStorage(PE_KEYS.alerts, alerts.value)
-    }
+    await apiClient.alerts.delete(id)
+    alerts.value = alerts.value.filter((a) => a.id !== id)
   }
 
   async function toggleAlert(id: string): Promise<void> {
-    if (signedIn.value) {
-      const current = alerts.value.find((a) => a.id === id)
-      if (!current) return
-      const dto = await apiClient.alerts.update(id, { enabled: !current.enabled })
-      alerts.value = alerts.value.map((a) => (a.id === id ? toLocalAlert(dto) : a))
-    } else {
-      alerts.value = alerts.value.map((a) =>
-        a.id === id ? { ...a, enabled: a.enabled === false } : a,
-      )
-      writeStorage(PE_KEYS.alerts, alerts.value)
-    }
+    const current = alerts.value.find((a) => a.id === id)
+    if (!current) return
+    const dto = await apiClient.alerts.update(id, { enabled: !current.enabled })
+    alerts.value = alerts.value.map((a) => (a.id === id ? toLocalAlert(dto) : a))
   }
 
   return {
@@ -396,6 +367,8 @@ export const useAppStore = defineStore('app', () => {
     spreadPct,
     activeAlerts,
     totalActiveMatches,
+    maxAlerts,
+    quotaReached,
     // actions
     setLocale,
     setCurrency,
