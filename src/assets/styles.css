@@ -742,6 +742,9 @@ button { font-family: inherit; cursor: pointer; }
   margin-top: 6px;
   font-size: 12px;
   color: var(--ask, oklch(0.55 0.18 25));
+  /* Reserve one line of vertical space so pb-builder's height stays
+     stable when the error appears/clears. line-height matches body (1.45). */
+  min-height: 1.45em;
 }
 .pb-chip {
   display: inline-flex; align-items: center; gap: 6px;

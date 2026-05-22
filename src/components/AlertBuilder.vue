@@ -618,9 +618,11 @@ const summaryText = computed(() => {
       </button>
     </div>
 
-    <!-- Amount validation error (placed at the bottom of pb-builder so the
-         rule-summary above it doesn't jump when the error appears/disappears). -->
-    <div v-if="hasAmountError" class="pb-amount-error" role="alert">
+    <!-- Amount validation error. Always rendered so pb-builder's overall
+         height stays stable when the error appears/disappears (.pb-amount-error
+         has min-height ≈ 1 line of text). aria-live="polite" announces the
+         message change to screen readers without interrupting. -->
+    <div class="pb-amount-error" role="alert" aria-live="polite">
       <span v-if="amountMinError === 'negative' || amountMaxError === 'negative'">
         {{ t('alertBuilder.amountError.negative') }}
       </span>
