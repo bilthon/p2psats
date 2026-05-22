@@ -97,7 +97,7 @@ function onCurrencyChange(c: Currency) {
     </header>
 
     <!-- ── Page nav ────────────────────────────────────────── -->
-    <nav class="pb-nav" aria-label="Primary">
+    <nav :class="['pb-nav', route.path === '/alerts' ? 'pb-nav--alerts' : 'pb-nav--book']" aria-label="Primary">
       <button
         type="button"
         :class="['pb-nav-item', route.path === '/' ? 'pb-nav-item--on' : '']"
