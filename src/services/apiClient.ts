@@ -20,8 +20,19 @@
  *
  * Environment variable
  * ────────────────────
- * Set `VITE_API_URL` in `.env` (or `.env.local`) to point at the backend.
- * Defaults to `http://localhost:3000` when the variable is absent (dev only).
+ * Set `VITE_API_URL` in `.env` (or `.env.local`) to the backend's base URL
+ * INCLUDING the `/api` prefix — every backend route is mounted under
+ * `/api` via NestJS's setGlobalPrefix. The value goes straight in front
+ * of the per-route paths (`/auth/...`, `/alerts`, `/me`, etc.).
+ *
+ * Examples:
+ *   - Local dev:   http://localhost:3000/api
+ *   - Production:  https://api.p2psats.com/api  (or https://p2psats.com/api
+ *                  if you serve the frontend and the API from the same host
+ *                  via an nginx location)
+ *
+ * Defaults to `http://localhost:3000/api` when the variable is absent
+ * (dev only).
  */
 
 // ---------------------------------------------------------------------------
@@ -127,7 +138,7 @@ export class ApiError extends Error {
 // Internal helpers
 // ---------------------------------------------------------------------------
 
-const BASE_URL = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:3000'
+const BASE_URL = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:3000/api'
 
 const JSON_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE'])
 
