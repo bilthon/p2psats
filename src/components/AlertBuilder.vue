@@ -593,14 +593,6 @@ const summaryText = computed(() => {
           />
         </label>
       </div>
-      <div v-if="hasAmountError" class="pb-amount-error" role="alert">
-        <span v-if="amountMinError === 'negative' || amountMaxError === 'negative'">
-          {{ t('alertBuilder.amountError.negative') }}
-        </span>
-        <span v-else-if="amountBoundsError === 'minGtMax'">
-          {{ t('alertBuilder.amountError.minGtMax') }}
-        </span>
-      </div>
     </div>
 
     <!-- Rule summary -->
@@ -624,6 +616,17 @@ const summaryText = computed(() => {
         <span v-if="saving" class="pb-save-spinner" aria-hidden="true" />
         {{ t('alertBuilder.actions.create') }}
       </button>
+    </div>
+
+    <!-- Amount validation error (placed at the bottom of pb-builder so the
+         rule-summary above it doesn't jump when the error appears/disappears). -->
+    <div v-if="hasAmountError" class="pb-amount-error" role="alert">
+      <span v-if="amountMinError === 'negative' || amountMaxError === 'negative'">
+        {{ t('alertBuilder.amountError.negative') }}
+      </span>
+      <span v-else-if="amountBoundsError === 'minGtMax'">
+        {{ t('alertBuilder.amountError.minGtMax') }}
+      </span>
     </div>
   </div>
 </template>
