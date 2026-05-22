@@ -137,7 +137,7 @@
 [data-theme="dark"] .pb-cross-shared-dot { background: oklch(0.65 0.14 155); }
 
 /* Nav item shadow */
-[data-theme="dark"] .pb-nav-item--on { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35); }
+[data-theme="dark"] .pb-nav::before { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35); }
 
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
@@ -1124,6 +1124,7 @@ button { font-family: inherit; cursor: pointer; }
 .pb-nav {
   /* Grid (not flex) with equal-width auto-columns so the two tabs render
      symmetrically — both stretched to the width of the widest tab's content. */
+  position: relative;
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: 1fr;
@@ -1134,7 +1135,21 @@ button { font-family: inherit; cursor: pointer; }
   border-radius: var(--r-md);
   align-self: flex-start;
 }
+.pb-nav::before {
+  content: "";
+  position: absolute;
+  top: 4px; bottom: 4px; left: 4px;
+  width: calc((100% - 12px) / 2);
+  background: var(--bg-card);
+  border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(20, 18, 14, 0.06);
+  transition: transform 220ms ease-in-out;
+  pointer-events: none;
+}
+.pb-nav--alerts::before { transform: translateX(calc(100% + 4px)); }
 .pb-nav-item {
+  position: relative;
+  z-index: 1;
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   padding: 8px 14px;
   background: transparent; border: 0;
@@ -1142,13 +1157,12 @@ button { font-family: inherit; cursor: pointer; }
   font-family: var(--font-display);
   font-size: 13px; font-weight: 500;
   color: var(--ink-soft);
+  text-decoration: none;
   transition: background 120ms, color 120ms;
 }
 .pb-nav-item:hover { color: var(--ink); }
 .pb-nav-item--on {
-  background: var(--bg-card);
   color: var(--ink);
-  box-shadow: 0 1px 2px rgba(20, 18, 14, 0.06);
 }
 .pb-nav-count {
   font-family: var(--font-mono); font-size: 10.5px; font-weight: 600;
@@ -1157,6 +1171,48 @@ button { font-family: inherit; cursor: pointer; }
   border: 1px solid var(--line);
 }
 .pb-nav-item--on .pb-nav-count { background: var(--bg-soft); color: var(--ink-soft); }
+
+/* ── Nav icon animations (active tab only) ───────────────────────── */
+.pb-nav-icon { transform-box: fill-box; }
+.pb-nav-item--on .pb-nav-icon--alerts {
+  transform-origin: 50% 0;
+  animation: pb-nav-bell-swing 1.6s ease-out 1 both;
+}
+@keyframes pb-nav-bell-swing {
+  0%   { transform: rotate(0deg); }
+  12%  { transform: rotate(-20deg); }
+  28%  { transform: rotate(15deg); }
+  44%  { transform: rotate(-10deg); }
+  60%  { transform: rotate(6deg); }
+  76%  { transform: rotate(-3deg); }
+  90%  { transform: rotate(1.2deg); }
+  100% { transform: rotate(0deg); }
+}
+.pb-nav-book-line { transform-box: fill-box; transform-origin: 0 50%; }
+.pb-nav-item--on .pb-nav-book-line {
+  animation: pb-nav-book-wave 1.4s ease-in-out 1 both;
+}
+.pb-nav-item--on .pb-nav-book-line--3 { animation-delay: 0s; }
+.pb-nav-item--on .pb-nav-book-line--2 { animation-delay: 0.12s; }
+.pb-nav-item--on .pb-nav-book-line--1 { animation-delay: 0.24s; }
+@keyframes pb-nav-book-wave {
+  0%   { transform: scaleX(1); }
+  20%  { transform: scaleX(0.6); }
+  40%  { transform: scaleX(1.2); }
+  60%  { transform: scaleX(0.8); }
+  80%  { transform: scaleX(1.1); }
+  100% { transform: scaleX(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pb-nav::before {
+    transition: none;
+  }
+  .pb-nav-item--on .pb-nav-icon--alerts,
+  .pb-nav-item--on .pb-nav-book-line {
+    animation: none;
+  }
+}
 
 @media (max-width: 900px) {
   .pb-app { padding: 16px; }

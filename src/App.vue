@@ -97,13 +97,14 @@ function onCurrencyChange(c: Currency) {
     </header>
 
     <!-- ── Page nav ────────────────────────────────────────── -->
-    <nav class="pb-nav" aria-label="Primary">
+    <nav :class="['pb-nav', route.path === '/alerts' ? 'pb-nav--alerts' : 'pb-nav--book']" aria-label="Primary">
       <button
         type="button"
         :class="['pb-nav-item', route.path === '/' ? 'pb-nav-item--on' : '']"
         @click="goHome"
       >
         <svg
+          class="pb-nav-icon pb-nav-icon--book"
           width="16"
           height="16"
           viewBox="0 0 24 24"
@@ -113,13 +114,16 @@ function onCurrencyChange(c: Currency) {
           stroke-linecap="round"
           stroke-linejoin="round"
         >
-          <path d="M3 6h18M3 12h18M3 18h12" />
+          <path class="pb-nav-book-line pb-nav-book-line--1" d="M3 6h18" />
+          <path class="pb-nav-book-line pb-nav-book-line--2" d="M3 12h18" />
+          <path class="pb-nav-book-line pb-nav-book-line--3" d="M3 18h12" />
         </svg>
         <span>{{ t('nav.orderBook') }}</span>
         <span class="pb-nav-count">{{ store.ccyOrders.length }}</span>
       </button>
       <RouterLink to="/alerts" class="pb-nav-item" active-class="pb-nav-item--on">
         <svg
+          class="pb-nav-icon pb-nav-icon--alerts"
           width="16"
           height="16"
           viewBox="0 0 24 24"
