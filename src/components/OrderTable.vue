@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { fmtFiat, fmtSatsCompact, fmtTimeShort } from '@/lib/data'
-import type { Currency, Order } from '@/lib/types'
+import type { Currency, Order } from '@p2psats/shared'
 import MethodChips from './MethodChips.vue'
 import SourceDot from './SourceDot.vue'
 import ReputationBar from './ReputationBar.vue'

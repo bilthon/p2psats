@@ -4,8 +4,7 @@
   },
   "nav": {
     "orderBook": "Livro de ordens",
-    "alerts": "Alertas",
-    "alertsComingSoon": "em breve"
+    "alerts": "Alertas"
   },
   "footer": {
     "brand": "P2P sats",
@@ -153,6 +152,159 @@
       "title": "Contato · P2P sats",
       "description": "Fale com a equipe do P2P sats via Nostr ou e-mail. Reporte bugs, envie sugestões ou converse sobre Bitcoin peer-to-peer."
     }
+  },
+  "signIn": {
+    "heading": "Entrar",
+    "sub": "Crie uma conta ou entre para gerenciar seus alertas.",
+    "tabs": {
+      "ariaLabel": "Método de entrada",
+      "email": "Entrar com e-mail",
+      "nostr": "Entrar com Nostr"
+    },
+    "email": {
+      "lead": "Informe seu e-mail e enviaremos um link mágico. Sem senha.",
+      "label": "Endereço de e-mail",
+      "placeholder": "você{'@'}exemplo.com",
+      "cta": "Enviar link mágico",
+      "checkInbox": "Verifique sua caixa de entrada em {email} para encontrar o link.",
+      "tryAgain": "Tentar outro e-mail"
+    },
+    "nostr": {
+      "lead": "Entre assinando um desafio com sua chave Nostr. Sua extensão irá solicitar.",
+      "noExtension": "Nenhuma extensão NIP-07 detectada. Instale uma para entrar com sua chave Nostr:",
+      "cta": "Entrar com Nostr"
+    },
+    "status": {
+      "sending": "Enviando…",
+      "signingIn": "Entrando…",
+      "verifying": "Verificando seu link…"
+    },
+    "verify": {
+      "missingToken": "Token ausente. Você clicou em um link mágico válido?",
+      "backHome": "Voltar para o início"
+    },
+    "error": {
+      "generic": "Algo deu errado. Por favor, tente novamente."
+    },
+    "seo": {
+      "title": "Entrar · P2P sats",
+      "description": "Entre no P2P sats para gerenciar seus alertas de ordens P2P de Bitcoin."
+    }
+  },
+  "alerts": {
+    "heading": "Alertas",
+    "subtitle": "Seja notificado quando uma oferta de compra ou venda atrativa for publicada.",
+    "meta": {
+      "count": "{count} de {max} alerta | {count} de {max} alertas",
+      "active": "{count} ativo | {count} ativos",
+      "matches": "{count} correspondência agora | {count} correspondências agora"
+    },
+    "signInPrompt": "Entre para criar alertas. Rascunhos criados sem sessão são salvos localmente.",
+    "testDm": {
+      "button": "Testar entrega Nostr",
+      "confirmTitle": "Enviar DM de teste?",
+      "confirmBody": "Publicaremos agora mesmo uma mensagem NIP-17 gift-wrap nos seus relays de DM do Nostr. Verifique seu cliente Nostr para confirmar o recebimento.",
+      "confirmCta": "Enviar teste",
+      "cancel": "Cancelar",
+      "sending": "Enviando…",
+      "success": "Teste enviado. Verifique seu cliente Nostr.",
+      "error": {
+        "generic": "Não foi possível enviar o teste. Por favor, tente novamente mais tarde."
+      }
+    }
+  },
+  "alertBuilder": {
+    "fields": {
+      "side": "Lado",
+      "buy": "Compra",
+      "sell": "Venda",
+      "premium": "Premium",
+      "opAtMost": "no máximo",
+      "opAtLeast": "no mínimo",
+      "advanced": "Filtros avançados",
+      "sources": "Fontes (qualquer)",
+      "amountMin": "Valor mínimo ({currency})",
+      "amountMax": "Valor máximo ({currency})",
+      "alertName": "Nome do alerta (opcional)",
+      "alertNamePlaceholder": "ex. Compras PIX baratas",
+      "premiumIncrease": "Aumentar premium",
+      "premiumDecrease": "Diminuir premium"
+    },
+    "actions": {
+      "reset": "Redefinir",
+      "create": "Criar alerta"
+    },
+    "summary": {
+      "notify": "Notifique-me quando aparecer {side} em {currency} com premium {op} {value}",
+      "sideBuy": "uma ordem de compra",
+      "sideSell": "uma ordem de venda",
+      "opAtMost": "no máximo",
+      "opAtLeast": "no mínimo",
+      "fromSources": "de {sources}",
+      "amountBoth": "para valores ≥ {min} ≤ {max}",
+      "amountMinOnly": "para valores ≥ {min}",
+      "amountMaxOnly": "para valores ≤ {max}"
+    },
+    "channels": {
+      "heading": "Canais de notificação",
+      "email": "E-mail",
+      "nostrDm": "Nostr DM",
+      "deliveredTo": "Enviado para",
+      "deliveredToNpub": "Enviado para",
+      "emailUnverified": "Verifique seu e-mail para ativar este canal",
+      "nostrUnverified": "Vincule uma identidade Nostr para ativar este canal",
+      "saveHintNone": "Ative pelo menos um canal de notificação para salvar",
+      "saveHintEmailUnverified": "Verifique seu e-mail para usar o canal de E-mail",
+      "saveHintNostrUnverified": "Vincule uma identidade Nostr para usar o canal Nostr DM",
+      "saveHintQuotaReached": "Você atingiu o limite de {max} alertas. Exclua um para criar outro.",
+      "linkEmail": {
+        "placeholder": "seu-email{'@'}exemplo.com",
+        "submit": "Enviar link",
+        "sending": "Enviando…",
+        "success": "Verifique sua caixa de entrada para confirmar.",
+        "errorGeneric": "Não foi possível enviar o link. Por favor, tente novamente."
+      },
+      "linkNostr": {
+        "label": "Vincular Nostr",
+        "signing": "Assinando…",
+        "errorNoExt": "Instale uma extensão NIP-07 (Alby, nos2x) para vincular sua identidade Nostr.",
+        "errorRejected": "Assinatura rejeitada.",
+        "errorGeneric": "Não foi possível vincular a identidade Nostr. Por favor, tente novamente."
+      }
+    },
+    "error": {
+      "saveFailed": "Não foi possível salvar o alerta. Por favor, tente novamente."
+    },
+    "amountError": {
+      "negative": "O valor não pode ser negativo.",
+      "minGtMax": "O valor mínimo deve ser menor ou igual ao valor máximo."
+    }
+  },
+  "savedAlerts": {
+    "badge": {
+      "email": "E-mail",
+      "nostr": "Nostr"
+    }
+  },
+  "matchToast": {
+    "newMatch": "Nova correspondência",
+    "close": "Fechar",
+    "viewOnOrderbook": "Ver no livro de ordens",
+    "viewComingSoon": "Link direto em breve",
+    "anySide": "QUALQUER"
+  },
+  "themeToggle": {
+    "switchToDark": "Mudar para tema escuro",
+    "switchToLight": "Mudar para tema claro"
+  },
+  "userMenu": {
+    "signOut": "Sair",
+    "signingOut": "Saindo…",
+    "signedInVia": {
+      "nostr": "Entrou com Nostr",
+      "email": "Entrou via e-mail"
+    },
+    "avatarAlt": "Foto de perfil"
   },
   "crossedPairs": {
     "title": "Ordens cruzadas",

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { RepProps } from '@/lib/types'
+import type { RepProps } from '@p2psats/shared'
 
 const props = defineProps<RepProps>()
 

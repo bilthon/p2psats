@@ -9,7 +9,10 @@ import { useBtcRatesStore } from '@/services/btcRates'
 import CurrencySwitcher from '@/components/CurrencySwitcher.vue'
 import LanguageSwitcher from '@/components/LanguageSwitcher.vue'
 import RelayStatus from '@/components/RelayStatus.vue'
-import type { Currency } from '@/lib/types'
+import ThemeToggle from '@/components/ThemeToggle.vue'
+import MatchToast from '@/components/MatchToast.vue'
+import UserMenu from '@/components/UserMenu.vue'
+import type { Currency } from '@p2psats/shared'
 import logoUrl from '@/assets/img/p2psats.png'
 import { OG_LOCALE } from '@/i18n'
 
@@ -40,6 +43,11 @@ const router = useRouter()
 const route = useRoute()
 
 onMounted(() => {
+  // Sync the Pinia theme state to the DOM attribute on client boot.
+  // The FOUC-prevention script in index.html already sets data-theme before
+  // paint, but calling setTheme here ensures the store and DOM stay in sync
+  // in case they somehow diverge (e.g. localStorage updated in another tab).
+  store.setTheme(store.theme)
   nostr.connect()
   btcRates.start()
 })
@@ -56,10 +64,18 @@ function goHome() {
 function onCurrencyChange(c: Currency) {
   store.setCurrency(c)
 }
+
+// Build stamp surfaced in the footer. Values come from vite.config.ts `define`
+// (see __APP_VERSION__/__APP_COMMIT__ in src/vite-env.d.ts).
+const buildVersion = __APP_VERSION__
+const buildCommit = __APP_COMMIT__
 </script>
 
 <template>
   <div class="pb-app pb-app--nav">
+    <!-- ── Fixed-position toast stack (floats above all routed views) ─── -->
+    <MatchToast />
+
     <!-- ── Header ──────────────────────────────────────────── -->
     <header class="pb-header">
       <div class="pb-brand">
@@ -78,19 +94,22 @@ function onCurrencyChange(c: Currency) {
       />
 
       <div class="pb-header-right">
+        <ThemeToggle />
         <LanguageSwitcher />
         <CurrencySwitcher :model-value="store.currency" @update:model-value="onCurrencyChange" />
+        <UserMenu />
       </div>
     </header>
 
     <!-- ── Page nav ────────────────────────────────────────── -->
-    <nav class="pb-nav" aria-label="Primary">
+    <nav :class="['pb-nav', route.path === '/alerts' ? 'pb-nav--alerts' : 'pb-nav--book']" aria-label="Primary">
       <button
         type="button"
         :class="['pb-nav-item', route.path === '/' ? 'pb-nav-item--on' : '']"
         @click="goHome"
       >
         <svg
+          class="pb-nav-icon pb-nav-icon--book"
           width="16"
           height="16"
           viewBox="0 0 24 24"
@@ -100,19 +119,16 @@ function onCurrencyChange(c: Currency) {
           stroke-linecap="round"
           stroke-linejoin="round"
         >
-          <path d="M3 6h18M3 12h18M3 18h12" />
+          <path class="pb-nav-book-line pb-nav-book-line--1" d="M3 6h18" />
+          <path class="pb-nav-book-line pb-nav-book-line--2" d="M3 12h18" />
+          <path class="pb-nav-book-line pb-nav-book-line--3" d="M3 18h12" />
         </svg>
         <span>{{ t('nav.orderBook') }}</span>
         <span class="pb-nav-count">{{ store.ccyOrders.length }}</span>
       </button>
-      <button
-        type="button"
-        class="pb-nav-item pb-nav-item--disabled"
-        disabled
-        aria-disabled="true"
-        :title="t('nav.alerts') + ' ' + t('nav.alertsComingSoon')"
-      >
+      <RouterLink to="/alerts" class="pb-nav-item" active-class="pb-nav-item--on">
         <svg
+          class="pb-nav-icon pb-nav-icon--alerts"
           width="16"
           height="16"
           viewBox="0 0 24 24"
@@ -126,8 +142,7 @@ function onCurrencyChange(c: Currency) {
           <path d="M13.73 21a2 2 0 0 1-3.46 0" />
         </svg>
         <span>{{ t('nav.alerts') }}</span>
-        <span class="pb-nav-soon">{{ t('nav.alertsComingSoon') }}</span>
-      </button>
+      </RouterLink>
     </nav>
 
     <!-- ── Page content ────────────────────────────────────── -->
@@ -151,6 +166,10 @@ function onCurrencyChange(c: Currency) {
         <span>{{ t('footer.aggregated') }}</span>
         <span class="pb-foot-sep">·</span>
         <span>{{ t('footer.referenceRate') }}</span>
+        <span class="pb-foot-sep">·</span>
+        <span class="pb-foot-build" :title="`v${buildVersion} · ${buildCommit}`">
+          v{{ buildVersion }} · {{ buildCommit }}
+        </span>
       </div>
     </footer>
   </div>

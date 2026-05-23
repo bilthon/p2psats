@@ -4,8 +4,7 @@
   },
   "nav": {
     "orderBook": "Libro de órdenes",
-    "alerts": "Alertas",
-    "alertsComingSoon": "próximamente"
+    "alerts": "Alertas"
   },
   "footer": {
     "brand": "P2P sats",
@@ -153,6 +152,159 @@
       "title": "Contacto · P2P sats",
       "description": "Contáctanos vía Nostr o correo electrónico. Reporta errores, comparte sugerencias o conversa sobre Bitcoin peer-to-peer."
     }
+  },
+  "signIn": {
+    "heading": "Iniciar sesión",
+    "sub": "Crea una cuenta o inicia sesión para gestionar tus alertas.",
+    "tabs": {
+      "ariaLabel": "Método de inicio de sesión",
+      "email": "Entrar con correo",
+      "nostr": "Entrar con Nostr"
+    },
+    "email": {
+      "lead": "Ingresa tu correo y te enviaremos un enlace mágico. Sin contraseña.",
+      "label": "Dirección de correo",
+      "placeholder": "tú{'@'}ejemplo.com",
+      "cta": "Enviar enlace mágico",
+      "checkInbox": "Revisa tu bandeja de entrada en {email} para encontrar el enlace.",
+      "tryAgain": "Probar con otro correo"
+    },
+    "nostr": {
+      "lead": "Inicia sesión firmando un desafío con tu clave Nostr. Tu extensión te lo pedirá.",
+      "noExtension": "No se detectó ninguna extensión NIP-07. Instala una para iniciar sesión con tu clave Nostr:",
+      "cta": "Entrar con Nostr"
+    },
+    "status": {
+      "sending": "Enviando…",
+      "signingIn": "Iniciando sesión…",
+      "verifying": "Verificando tu enlace…"
+    },
+    "verify": {
+      "missingToken": "Token ausente. ¿Hiciste clic en un enlace mágico válido?",
+      "backHome": "Volver al inicio"
+    },
+    "error": {
+      "generic": "Algo salió mal. Por favor, inténtalo de nuevo."
+    },
+    "seo": {
+      "title": "Iniciar sesión · P2P sats",
+      "description": "Inicia sesión en P2P sats para gestionar tus alertas de órdenes P2P de Bitcoin."
+    }
+  },
+  "alerts": {
+    "heading": "Alertas",
+    "subtitle": "Recibe una notificación cuando se publique una oferta de compra o venta atractiva.",
+    "meta": {
+      "count": "{count} de {max} alerta | {count} de {max} alertas",
+      "active": "{count} activa | {count} activas",
+      "matches": "{count} coincidencia ahora | {count} coincidencias ahora"
+    },
+    "signInPrompt": "Inicia sesión para crear alertas. Los borradores creados sin sesión se guardan localmente.",
+    "testDm": {
+      "button": "Probar entrega por Nostr",
+      "confirmTitle": "¿Enviar DM de prueba?",
+      "confirmBody": "Publicaremos ahora mismo un mensaje NIP-17 cifrado (gift-wrap) en tus relés de DM de Nostr. Comprueba tu cliente Nostr para confirmar que llegó.",
+      "confirmCta": "Enviar prueba",
+      "cancel": "Cancelar",
+      "sending": "Enviando…",
+      "success": "Prueba enviada. Revisa tu cliente Nostr.",
+      "error": {
+        "generic": "No se pudo enviar la prueba. Por favor, inténtalo más tarde."
+      }
+    }
+  },
+  "alertBuilder": {
+    "fields": {
+      "side": "Lado",
+      "buy": "Compra",
+      "sell": "Venta",
+      "premium": "Premium",
+      "opAtMost": "como máximo",
+      "opAtLeast": "al menos",
+      "advanced": "Filtros avanzados",
+      "sources": "Fuentes (cualquiera)",
+      "amountMin": "Monto mínimo ({currency})",
+      "amountMax": "Monto máximo ({currency})",
+      "alertName": "Nombre de la alerta (opcional)",
+      "alertNamePlaceholder": "ej. Compras PIX baratas",
+      "premiumIncrease": "Aumentar premium",
+      "premiumDecrease": "Disminuir premium"
+    },
+    "actions": {
+      "reset": "Restablecer",
+      "create": "Crear alerta"
+    },
+    "summary": {
+      "notify": "Notifícame cuando aparezca {side} en {currency} con premium {op} {value}",
+      "sideBuy": "una orden de compra",
+      "sideSell": "una orden de venta",
+      "opAtMost": "como máximo",
+      "opAtLeast": "al menos",
+      "fromSources": "desde {sources}",
+      "amountBoth": "para montos ≥ {min} ≤ {max}",
+      "amountMinOnly": "para montos ≥ {min}",
+      "amountMaxOnly": "para montos ≤ {max}"
+    },
+    "channels": {
+      "heading": "Canales de notificación",
+      "email": "Correo",
+      "nostrDm": "Nostr DM",
+      "deliveredTo": "Enviado a",
+      "deliveredToNpub": "Enviado a",
+      "emailUnverified": "Verifica tu correo para habilitar este canal",
+      "nostrUnverified": "Vincula una identidad Nostr para habilitar este canal",
+      "saveHintNone": "Habilita al menos un canal de notificación para guardar",
+      "saveHintEmailUnverified": "Verifica tu correo para usar el canal de Email",
+      "saveHintNostrUnverified": "Vincula una identidad Nostr para usar el canal de Nostr DM",
+      "saveHintQuotaReached": "Has alcanzado el límite de {max} alertas. Borra una para crear otra.",
+      "linkEmail": {
+        "placeholder": "tu-correo{'@'}ejemplo.com",
+        "submit": "Enviar enlace",
+        "sending": "Enviando…",
+        "success": "Revisa tu bandeja de entrada para confirmar.",
+        "errorGeneric": "No se pudo enviar el enlace. Por favor, inténtalo de nuevo."
+      },
+      "linkNostr": {
+        "label": "Vincular Nostr",
+        "signing": "Firmando…",
+        "errorNoExt": "Instala una extensión NIP-07 (Alby, nos2x) para vincular tu identidad Nostr.",
+        "errorRejected": "Firma rechazada.",
+        "errorGeneric": "No se pudo vincular la identidad Nostr. Por favor, inténtalo de nuevo."
+      }
+    },
+    "error": {
+      "saveFailed": "No se pudo guardar la alerta. Por favor, inténtalo de nuevo."
+    },
+    "amountError": {
+      "negative": "El monto no puede ser negativo.",
+      "minGtMax": "El monto mínimo debe ser menor o igual que el máximo."
+    }
+  },
+  "savedAlerts": {
+    "badge": {
+      "email": "Email",
+      "nostr": "Nostr"
+    }
+  },
+  "matchToast": {
+    "newMatch": "Nueva coincidencia",
+    "close": "Cerrar",
+    "viewOnOrderbook": "Ver en el libro de órdenes",
+    "viewComingSoon": "Enlace directo próximamente",
+    "anySide": "CUALQUIERA"
+  },
+  "themeToggle": {
+    "switchToDark": "Cambiar a tema oscuro",
+    "switchToLight": "Cambiar a tema claro"
+  },
+  "userMenu": {
+    "signOut": "Cerrar sesión",
+    "signingOut": "Cerrando sesión…",
+    "signedInVia": {
+      "nostr": "Sesión iniciada con Nostr",
+      "email": "Sesión iniciada por correo"
+    },
+    "avatarAlt": "Foto de perfil"
   },
   "crossedPairs": {
     "title": "Órdenes cruzadas",

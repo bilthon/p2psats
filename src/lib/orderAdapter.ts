@@ -4,10 +4,8 @@
 // Returns null when the order cannot be meaningfully represented in the UI
 // (e.g. unknown fiat currency).
 
-import type { Order, PaymentMethod, RepProps, SourceId } from './types'
-import type { RawNip69Order } from './nip69/parseOrder'
+import type { Order, PaymentMethod, RepProps, SourceId, RawNip69Order, Currency } from '@p2psats/shared'
 import { CCY_LIST, PAYMENT_METHODS, REF_RATES, SOURCES } from './data'
-import type { Currency } from './types'
 
 // All recognised platform identifiers. Any raw.platform not in this set falls
 // back to the 'nostr' catch-all source.
