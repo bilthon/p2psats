@@ -64,6 +64,11 @@ function goHome() {
 function onCurrencyChange(c: Currency) {
   store.setCurrency(c)
 }
+
+// Build stamp surfaced in the footer. Values come from vite.config.ts `define`
+// (see __APP_VERSION__/__APP_COMMIT__ in src/vite-env.d.ts).
+const buildVersion = __APP_VERSION__
+const buildCommit = __APP_COMMIT__
 </script>
 
 <template>
@@ -161,6 +166,10 @@ function onCurrencyChange(c: Currency) {
         <span>{{ t('footer.aggregated') }}</span>
         <span class="pb-foot-sep">·</span>
         <span>{{ t('footer.referenceRate') }}</span>
+        <span class="pb-foot-sep">·</span>
+        <span class="pb-foot-build" :title="`v${buildVersion} · ${buildCommit}`">
+          v{{ buildVersion }} · {{ buildCommit }}
+        </span>
       </div>
     </footer>
   </div>
