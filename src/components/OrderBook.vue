@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { Currency, Order } from '@p2psats/shared'
+import type { Order } from '@p2psats/shared'
+import type { FiatCode } from '@/lib/currency'
 import OrderTable from './OrderTable.vue'
 
 const { t } = useI18n()
@@ -9,7 +10,7 @@ const { t } = useI18n()
 const props = defineProps<{
   buys: Order[]
   sells: Order[]
-  currency: Currency
+  currency: FiatCode
   crossedBuyIds: Set<string>
   crossedSellIds: Set<string>
 }>()

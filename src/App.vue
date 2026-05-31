@@ -12,7 +12,7 @@ import RelayStatus from '@/components/RelayStatus.vue'
 import ThemeToggle from '@/components/ThemeToggle.vue'
 import MatchToast from '@/components/MatchToast.vue'
 import UserMenu from '@/components/UserMenu.vue'
-import type { Currency } from '@p2psats/shared'
+import type { FiatCode } from '@/lib/currency'
 import logoUrl from '@/assets/img/p2psats.png'
 import { OG_LOCALE } from '@/i18n'
 
@@ -61,7 +61,7 @@ function goHome() {
   void router.push('/')
 }
 
-function onCurrencyChange(c: Currency) {
+function onCurrencyChange(c: FiatCode) {
   store.setCurrency(c)
 }
 

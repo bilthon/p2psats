@@ -5,7 +5,8 @@
 // (e.g. unknown fiat currency).
 
 import type { Order, PaymentMethod, RepProps, SourceId, RawNip69Order, Currency } from '@p2psats/shared'
-import { CCY_LIST, PAYMENT_METHODS, REF_RATES, SOURCES } from './data'
+import { PAYMENT_METHODS, REF_RATES, SOURCES } from './data'
+import { FIAT_CODE_SET } from './currency'
 
 // All recognised platform identifiers. Any raw.platform not in this set falls
 // back to the 'nostr' catch-all source.
@@ -109,9 +110,9 @@ export function toVueOrder(
   // Canceled / in-progress / success / expired orders are dropped here.
   if (raw.status !== 'pending') return null
 
-  // Filter to known currencies only
-  const ccy = raw.fiatCode as Currency
-  if (!CCY_LIST.includes(ccy)) return null
+  const fiatCode = raw.fiatCode
+  if (!FIAT_CODE_SET.has(fiatCode)) return null
+  const ccy = fiatCode as Currency
 
   // Resolve source identifier
   const sourceId: SourceId = KNOWN_SOURCES.has(raw.platform as SourceId)
@@ -122,7 +123,7 @@ export function toVueOrder(
 
   // Derive price from reference rate + premium. Prefer the live rate (yadio
   // via the btcRates store), fall back to the static REF_RATES on first load.
-  const refRate = liveRate ?? REF_RATES[ccy]
+  const refRate = liveRate ?? REF_RATES[ccy] ?? 100_000
   const price = Math.round(refRate * (1 + raw.premium / 100))
 
   // Market-priced orders (lnp2pbot) publish `amt: 0` and only commit a fiat

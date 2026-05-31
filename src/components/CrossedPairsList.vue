@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { fmtFiat } from '@/lib/data'
-import type { CrossResult, Currency } from '@p2psats/shared'
+import type { CrossResult } from '@p2psats/shared'
+import type { FiatCode } from '@/lib/currency'
 import MethodChips from './MethodChips.vue'
 import SourceDot from './SourceDot.vue'
 
 defineProps<{
   crosses: CrossResult
-  currency: Currency
+  currency: FiatCode
 }>()
 
 const { t } = useI18n()

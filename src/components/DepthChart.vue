@@ -13,7 +13,8 @@ import {
 import VChart from 'vue-echarts'
 import { fmtFiat, fmtSatsCompact, getUserLocale } from '@/lib/data'
 import { useIntlLocale } from '@/i18n/composables'
-import type { CrossResult, Currency, Order } from '@p2psats/shared'
+import type { CrossResult, Order } from '@p2psats/shared'
+import type { FiatCode } from '@/lib/currency'
 import { useBtcRatesStore } from '@/services/btcRates'
 import { useAppStore } from '@/stores/appStore'
 import SatSymbol from './SatSymbol.vue'
@@ -30,7 +31,7 @@ use([
 
 const props = defineProps<{
   orders: Order[]
-  currency: Currency
+  currency: FiatCode
   crosses: CrossResult
 }>()
 
@@ -138,7 +139,7 @@ interface Level {
   cum: number
 }
 
-function buildLevels(orders: Order[], side: 'buy' | 'sell', currency: Currency): Level[] {
+function buildLevels(orders: Order[], side: 'buy' | 'sell', currency: FiatCode): Level[] {
   const filtered = orders.filter((o) => o.side === side && o.currency === currency)
   // High-nominal-per-BTC currencies (millions/billions per BTC) bucket to the
   // nearest 1000; mid-nominal ones to the nearest 10; the rest to the nearest 1.

@@ -2,7 +2,8 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { fmtFiat, fmtSatsCompact, fmtTimeShort } from '@/lib/data'
-import type { Currency, Order } from '@p2psats/shared'
+import type { Order } from '@p2psats/shared'
+import type { FiatCode } from '@/lib/currency'
 import MethodChips from './MethodChips.vue'
 import SourceDot from './SourceDot.vue'
 import ReputationBar from './ReputationBar.vue'
@@ -16,7 +17,7 @@ const props = defineProps<{
   title: string
   side: 'buy' | 'sell'
   orders: Order[]
-  currency: Currency
+  currency: FiatCode
   rowH: number
   showPremium: boolean
   crossedIds: Set<string>
