@@ -24,7 +24,7 @@ P2P sats unifies the view to (hopefully) make the market stronger, especially fo
 - Depth chart with bid/ask area and a Yadio reference price line
 - Spread, mid-price, best bid/ask, total depth on both sides
 - Crossed-pair detection (cross-platform arbitrage candidates)
-- 9 quote currencies (USD, EUR, BRL, ARS, MXN, VES, ZAR, RUB, PEN)
+- ~140 quote currencies (full Yadio coverage; list is fetched at build time)
 - 3 locales: English, Spanish (es-419), Brazilian Portuguese (pt-BR)
 - Statically prerendered (vite-ssg) for fast first paint and SEO
 - Mobile-friendly responsive layout
@@ -55,10 +55,22 @@ npm run dev        # http://localhost:5173
 ### Other scripts
 
 ```bash
-npm run type-check   # vue-tsc
-npm run build        # vue-tsc + vite-ssg prerender (4 static HTML pages)
-npm run preview      # serve dist/
+npm run type-check         # vue-tsc
+npm run build              # vue-tsc + vite-ssg prerender (4 static HTML pages)
+npm run preview            # serve dist/
+npm run currencies:sync    # refresh src/data/currencies.json from Yadio
+npm run currencies:check   # CI guard: fail if the committed JSON drifts
 ```
+
+### Currency list
+
+The fiat picker reads from `src/data/currencies.json`, a committed snapshot of [Yadio's](https://yadio.io) currency list filtered to circulating ISO 4217 codes (metals, stablecoins, and withdrawn codes are dropped in `scripts/fetch-currencies.ts`). A weekly GitHub Action (`.github/workflows/currencies-sync.yml`) re-runs the script and opens a PR when upstream drifts. To refresh manually:
+
+```bash
+npm run currencies:sync
+```
+
+Yadio is never called at runtime — keeping it out of the request path means a Yadio outage doesn't break the picker.
 
 ### Environment
 
@@ -84,9 +96,13 @@ src/
     nip69/      NIP-69 event parser
     orderAdapter.ts   raw NIP-69 -> UI Order
     arbitrage.ts      crossed-pair detection
+    currency.ts       FiatCode + Yadio-sourced FIATS list
     data.ts           source / relay / payment-method registry
+  data/         currencies.json (build-time Yadio snapshot)
   stores/       Pinia app store
   i18n/         vue-i18n setup + locale JSON files
+scripts/
+  fetch-currencies.ts   --write / --check modes for src/data/currencies.json
 public/
   og.svg, og.png    social card (source + rendered)
 ```
