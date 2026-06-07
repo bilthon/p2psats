@@ -12,7 +12,7 @@ import OrderBook from '@/components/OrderBook.vue'
 import CrossedPairsList from '@/components/CrossedPairsList.vue'
 import OrderDetailDialog from '@/components/OrderDetailDialog.vue'
 import SatSymbol from '@/components/SatSymbol.vue'
-import type { Order } from '@p2psats/shared'
+import type { Currency, Order } from '@p2psats/shared'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -79,7 +79,7 @@ watch(
       <div class="pb-stat-value">
         {{ store.mid ? fmtFiat(store.mid, store.currency) : '—' }}
       </div>
-      <div class="pb-stat-sub">{{ t('home.stats.vsRef', { ref: fmtFiat(REF_RATES[store.currency], store.currency) }) }}</div>
+      <div class="pb-stat-sub">{{ t('home.stats.vsRef', { ref: fmtFiat(REF_RATES[store.currency as Currency] ?? 0, store.currency) }) }}</div>
     </div>
 
     <div class="pb-stat">

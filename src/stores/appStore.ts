@@ -9,7 +9,8 @@ import { matchesRule } from '@p2psats/shared'
 import { useNostrOrderbookStore } from '@/services/nostrOrderbook'
 import { useBtcRatesStore } from '@/services/btcRates'
 import { toVueOrder } from '@/lib/orderAdapter'
-import type { Alert, Currency, Order } from '@p2psats/shared'
+import type { Alert, Order } from '@p2psats/shared'
+import type { FiatCode } from '@/lib/currency'
 import { setLocale as i18nSetLocale, detectInitialLocale, type AppLocale } from '@/i18n'
 import { apiClient, ApiError } from '@/services/apiClient'
 import type { AlertResponseDto, CreateAlertPayload, NostrEvent } from '@/services/apiClient'
@@ -136,7 +137,7 @@ export const useAppStore = defineStore('app', () => {
 
   // ── Persisted state ──────────────────────────────────────────────────────
   const locale = ref<AppLocale>(detectInitialLocale())
-  const currency = ref<Currency>(readStorage<Currency>(PE_KEYS.currency, 'USD'))
+  const currency = ref<FiatCode>(readStorage<FiatCode>(PE_KEYS.currency, 'USD'))
 
   // Theme — persisted under pe.theme, respects prefers-color-scheme on first visit.
   // During SSG prerender (Node) window is undefined — default to 'light'.
@@ -283,7 +284,7 @@ export const useAppStore = defineStore('app', () => {
     setTheme(theme.value === 'light' ? 'dark' : 'light')
   }
 
-  function setCurrency(c: Currency) {
+  function setCurrency(c: FiatCode) {
     currency.value = c
     writeStorage(PE_KEYS.currency, c)
   }

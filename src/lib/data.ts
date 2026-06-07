@@ -44,25 +44,6 @@ export const FIAT_FORMAT: Record<Currency, { symbol: string; decimals: number }>
 }
 
 
-export const CCY_LIST: Currency[] = [
-  'USD', 'EUR', 'BRL', 'ARS', 'MXN', 'VES', 'ZAR', 'RUB', 'PEN',
-  'CLP', 'COP', 'PYG',
-]
-
-export const CCY_LABEL: Record<Currency, string> = {
-  USD: 'US Dollar',
-  EUR: 'Euro',
-  BRL: 'Brazilian Real',
-  ARS: 'Argentine Peso',
-  MXN: 'Mexican Peso',
-  VES: 'Bolívar Soberano',
-  ZAR: 'South African Rand',
-  RUB: 'Russian Ruble',
-  PEN: 'Peruvian Sol',
-  CLP: 'Chilean Peso',
-  COP: 'Colombian Peso',
-  PYG: 'Paraguayan Guaraní',
-}
 
 export const SOURCES: Source[] = [
   { id: 'mostro',    label: 'mostro',   relay: 'relay.mostro.network',   color: '#6366F1' },
@@ -121,9 +102,9 @@ const MAKER_HANDLES = [
 
 // Build a mock order set for a given currency. Premium is %-deviation from REF.
 // Retained for unit tests and the ?demo=1 flag; real orders come via orderAdapter.ts.
-export function buildMockOrders(currency: Currency, count = 22, seed = 42): Order[] {
+export function buildMockOrders(currency: string, count = 22, seed = 42): Order[] {
   const rng = mulberry32(seed + currency.charCodeAt(0) * 7)
-  const ref = REF_RATES[currency]
+  const ref = REF_RATES[currency as Currency] ?? 100_000
   const orders: Order[] = []
   const methodsForCcy = PAYMENT_METHODS.filter(
     (m) => m.regions === '*' || (m.regions as string[]).includes(currency),
@@ -167,7 +148,7 @@ export function buildMockOrders(currency: Currency, count = 22, seed = 42): Orde
       side,
       price,
       premium,
-      currency,
+      currency: currency as Currency,
       minFiat: minF,
       maxFiat: maxF,
       amountSats,
@@ -193,8 +174,8 @@ export function buildMockOrders(currency: Currency, count = 22, seed = 42): Orde
 }
 
 // ── Format helpers ────────────────────────────────────────────────────────────
-export function fmtFiat(n: number, ccy: Currency, opts: { bare?: boolean } = {}): string {
-  const f = FIAT_FORMAT[ccy] ?? FIAT_FORMAT['USD']
+export function fmtFiat(n: number, ccy: string, opts: { bare?: boolean } = {}): string {
+  const f = FIAT_FORMAT[ccy as Currency] ?? FIAT_FORMAT['USD']
   const v = Math.round(n)
   const formatted = v.toLocaleString(getUserLocale(), { maximumFractionDigits: f.decimals })
   return opts.bare ? formatted : `${f.symbol}${formatted}`
@@ -236,7 +217,7 @@ export function fmtTimeShort(min: number): string {
   return Math.floor(h / 24) + 'd'
 }
 
-export function midPrice(orders: Order[], currency: Currency): number | null {
+export function midPrice(orders: Order[], currency: string): number | null {
   const buys = orders.filter((o) => o.side === 'buy' && o.currency === currency).map((o) => o.price)
   const sells = orders
     .filter((o) => o.side === 'sell' && o.currency === currency)
@@ -245,7 +226,7 @@ export function midPrice(orders: Order[], currency: Currency): number | null {
   return (Math.max(...buys) + Math.min(...sells)) / 2
 }
 
-export function methodsForCurrency(currency: Currency): PaymentMethod[] {
+export function methodsForCurrency(currency: string): PaymentMethod[] {
   return PAYMENT_METHODS.filter(
     (m) => m.regions === '*' || (m.regions as string[]).includes(currency),
   )

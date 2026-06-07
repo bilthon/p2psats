@@ -58,7 +58,9 @@ One pill per source (mostro / lnp2pbot / robosats / peach). Pill contains a colo
 - peach: `#EC4899` (pink)
 
 ### Currency switcher
-Trigger button reads `BTC / USD` (the quote currency in bold). Clicking opens a dropdown menu listing 9 supported fiat currencies (USD, EUR, BRL, ARS, MXN, VES, ZAR, RUB, PEN). Each menu item: 3-letter code in mono + full name + ✓ on the active row. Footer note: "📌 Saved to this browser".
+Trigger button reads `BTC / USD` (the quote currency in bold). Clicking opens a dropdown with a search input and a scrollable list of ~140 fiat currencies (the Yadio coverage matched by lnp2pbot and Mostro). The empty-query view pins the original 12 currencies (USD, EUR, BRL, ARS, MXN, VES, ZAR, RUB, PEN, CLP, COP, PYG) plus the currently-selected one, followed by 50 alphabetical entries; typing filters the full list by code or name. Each menu item: 3-letter code in mono + full name + ✓ on the active row. Footer note: "📌 Saved to this browser".
+
+The currency list is sourced from `src/data/currencies.json`, generated at build time by `scripts/fetch-currencies.ts` (no runtime dependency on Yadio). `src/lib/currency.ts` exposes the `FiatCode` type alias (a plain string) and `FIATS`/`FIAT_NAME`/`FIAT_CODE_SET` helpers; the tight `Currency` union from `@p2psats/shared` is retained only as the key type for the local `REF_RATES`/`FIAT_FORMAT` fallback maps.
 
 ## Interactions & Behavior
 

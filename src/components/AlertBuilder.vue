@@ -8,10 +8,11 @@ import { DEFAULT_RULE } from '@p2psats/shared'
 import { useAppStore } from '@/stores/appStore'
 import { apiClient, ApiError } from '@/services/apiClient'
 import type { NostrEvent } from '@/services/apiClient'
-import type { Alert, Currency } from '@p2psats/shared'
+import type { Alert } from '@p2psats/shared'
+import type { FiatCode } from '@/lib/currency'
 
 const props = defineProps<{
-  currency: Currency
+  currency: FiatCode
   /** Async handler called with the constructed Alert; should throw on backend errors. */
   onSave: (alert: Alert) => Promise<void>
 }>()
@@ -178,7 +179,7 @@ async function handleSave() {
     id: 'a_' + Math.random().toString(36).slice(2, 8),
     name: name.value || undefined,
     side: side.value,
-    currency: props.currency,
+    currency: props.currency as Alert['currency'],
     premium: { op: premOp.value, value: premValue.value },
     methods: [],
     sources: [...sources.value],

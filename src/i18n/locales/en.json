@@ -61,6 +61,7 @@
   },
   "currencySwitcher": {
     "heading": "Quote currency",
+    "search": "Search currencies…",
     "saved": "Saved to this browser"
   },
   "languageSwitcher": {

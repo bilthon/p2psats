@@ -1,0 +1,45 @@
+name: Currency list sync
+
+on:
+  pull_request:
+  push:
+    branches: [master, main]
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+jobs:
+  drift-check:
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm run currencies:check
+
+  scheduled-sync:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: currencies-sync
+      cancel-in-progress: false
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm run currencies:sync
+      - uses: peter-evans/create-pull-request@v6
+        with:
+          branch: chore/currencies-sync
+          commit-message: 'chore: sync currency list from Yadio'
+          title: 'chore: sync currency list from Yadio'
+          body: 'Automated weekly sync of `src/data/currencies.json` from the Yadio API.'
+          add-paths: src/data/currencies.json

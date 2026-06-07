@@ -2,13 +2,14 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { fmtFiat } from '@/lib/data'
-import type { CrossResult, Currency } from '@p2psats/shared'
+import type { CrossResult } from '@p2psats/shared'
+import type { FiatCode } from '@/lib/currency'
 
 const { t } = useI18n()
 
 const props = defineProps<{
   crosses: CrossResult
-  currency: Currency
+  currency: FiatCode
 }>()
 
 const emit = defineEmits<{ jumpTo: [] }>()

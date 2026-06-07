@@ -1,7 +1,7 @@
 {
   "name": "p2psats",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
   "type": "module",
   "license": "MIT",
   "engines": {
@@ -11,7 +11,9 @@
     "dev": "vite",
     "build": "vue-tsc -b && vite-ssg build",
     "preview": "vite preview",
-    "type-check": "vue-tsc --noEmit"
+    "type-check": "vue-tsc --noEmit",
+    "currencies:sync": "node --experimental-strip-types scripts/fetch-currencies.ts --write",
+    "currencies:check": "node --experimental-strip-types scripts/fetch-currencies.ts --check"
   },
   "dependencies": {
     "@p2psats/shared": "^2.0.0",
