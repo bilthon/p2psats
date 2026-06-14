@@ -15,7 +15,7 @@ const { t } = useI18n()
 const store = useAppStore()
 const { signedIn } = storeToRefs(store)
 const route = useRoute()
-const siteUrl = import.meta.env.VITE_SITE_URL ?? 'https://p2psats.com'
+const siteUrl = import.meta.env.VITE_SITE_URL ?? 'https://p2psats.app'
 
 useHead(computed(() => {
   const title = t('seo.alerts.title')

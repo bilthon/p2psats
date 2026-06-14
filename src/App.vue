@@ -20,7 +20,7 @@ const { t } = useI18n()
 const store = useAppStore()
 
 // Site-wide head defaults. Individual views override title/description/canonical.
-const siteUrl = import.meta.env.VITE_SITE_URL ?? 'https://p2psats.com'
+const siteUrl = import.meta.env.VITE_SITE_URL ?? 'https://p2psats.app'
 const ogImageUrl = `${siteUrl}/og.png`
 
 useHead(computed(() => ({
