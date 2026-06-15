@@ -16,7 +16,7 @@ import type { Currency, Order } from '@p2psats/shared'
 
 const { t } = useI18n()
 const route = useRoute()
-const siteUrl = import.meta.env.VITE_SITE_URL ?? 'https://p2psats.com'
+const siteUrl = import.meta.env.VITE_SITE_URL ?? 'https://p2psats.app'
 
 useHead(computed(() => {
   const title = t('seo.home.title')

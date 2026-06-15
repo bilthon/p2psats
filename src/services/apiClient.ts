@@ -27,7 +27,7 @@
  *
  * Examples:
  *   - Local dev:   http://localhost:3000/api
- *   - Production:  https://api.p2psats.com/api  (or https://p2psats.com/api
+ *   - Production:  https://api.p2psats.app/api  (or https://p2psats.app/api
  *                  if you serve the frontend and the API from the same host
  *                  via an nginx location)
  *

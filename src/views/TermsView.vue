@@ -9,8 +9,8 @@ const route = useRoute()
 const siteUrl = import.meta.env.VITE_SITE_URL ?? 'https://p2psats.app'
 
 useHead(computed(() => {
-  const title = t('seo.about.title')
-  const description = t('seo.about.description')
+  const title = t('seo.terms.title')
+  const description = t('seo.terms.description')
   const canonical = siteUrl + route.path
   return {
     title,
@@ -25,18 +25,33 @@ useHead(computed(() => {
     link: [{ rel: 'canonical', href: canonical }],
   }
 }))
+
+// Update this date whenever the terms change.
+const effectiveDate = '2026-06-06'
 </script>
 
 <template>
   <article class="pb-page">
-    <h1 class="pb-page-title">{{ t('about.title') }}</h1>
+    <h1 class="pb-page-title">{{ t('terms.title') }}</h1>
 
-    <p class="pb-page-lead">{{ t('about.lead') }}</p>
+    <p class="pb-page-lead">{{ t('terms.lead') }}</p>
 
-    <p>{{ t('about.p1') }}</p>
+    <h2>{{ t('terms.serviceTitle') }}</h2>
+    <ul>
+      <li>{{ t('terms.service.readOnly') }}</li>
+      <li>{{ t('terms.service.noFunds') }}</li>
+      <li>{{ t('terms.service.noAdvice') }}</li>
+    </ul>
 
-    <p>{{ t('about.p2') }}</p>
+    <h2>{{ t('terms.warrantyTitle') }}</h2>
+    <ul>
+      <li>{{ t('terms.warranty.asIs') }}</li>
+      <li>{{ t('terms.warranty.uptime') }}</li>
+    </ul>
 
-    <p>{{ t('about.p3') }}</p>
+    <h2>{{ t('terms.suspensionTitle') }}</h2>
+    <p>{{ t('terms.suspension') }}</p>
+
+    <p class="pb-page-meta">{{ t('terms.effectiveDate') }} {{ effectiveDate }}</p>
   </article>
 </template>

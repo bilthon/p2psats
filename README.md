@@ -4,7 +4,7 @@ Live peer-to-peer Bitcoin order book aggregated from Nostr relays.
 
 ![P2P sats — live peer-to-peer Bitcoin order book aggregated from Nostr relays](./public/og.png)
 
-**Live site:** https://p2psats.com
+**Live site:** https://p2psats.app
 
 ## What it is
 
@@ -79,7 +79,7 @@ Copy `.env.example` to `.env` (or `.env.local`) and fill in the values. Only `VI
 | Variable | Required? | Purpose |
 |---|---|---|
 | `VITE_API_URL` | required for alerts | Backend REST API base URL consumed by `apiClient.ts`. **Must include the `/api` prefix** (every backend route is mounted under `/api`). Defaults to `http://localhost:3000/api` when unset. |
-| `VITE_SITE_URL` | optional | Canonical URL used in OG meta tags. Defaults to `https://p2psats.com`. Override in preview / staging so OG cards point at the right host. |
+| `VITE_SITE_URL` | optional | Canonical URL used in OG meta tags. Defaults to `https://p2psats.app`. Override in preview / staging so OG cards point at the right host. |
 | `VITE_CONTACT_NPUB` | optional | Nostr pubkey shown on `/contact`. Leave blank to render "not configured". |
 | `VITE_CONTACT_EMAIL` | optional | Email shown on `/contact`. Leave blank to render "not configured". |
 
