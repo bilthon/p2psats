@@ -12,6 +12,8 @@
     "home": "Início",
     "about": "Sobre",
     "contact": "Contato",
+    "privacy": "Privacidade",
+    "terms": "Termos",
     "aggregated": "Agregado de relays nostr públicos. Somente leitura (este site não aceita ordens).",
     "referenceRate": "Taxa de referência do yadio."
   },
@@ -136,6 +138,71 @@
       "crossesMark": "O preço cruza uma ordem do outro lado"
     }
   },
+  "privacy": {
+    "title": "Política de Privacidade",
+    "lead": "Esta página explica quais dados o p2psats.app coleta, por quê e quais são seus direitos sobre eles. Versão curta: coletamos apenas o necessário para o serviço de alertas, não compartilhamos nada para fins publicitários e você pode solicitar a exclusão a qualquer momento.",
+    "collectTitle": "O que coletamos",
+    "collect": {
+      "email": "Endereço de e-mail — fornecido ao entrar ou vincular um canal de notificação por e-mail.",
+      "nostr": "Chave pública Nostr (npub/hex) — fornecida ao entrar com Nostr ou vincular um canal de DM Nostr.",
+      "accountId": "ID de conta interno — gerado no cadastro, usado para associar seus dados.",
+      "alerts": "Configurações de alertas — os filtros e canais que você configurou.",
+      "dispatchLogs": "Registros de envio de alertas — registros de notificações enviadas (data/hora, canal, ID do alerta, ID da ordem). Usados para evitar duplicatas e diagnosticar falhas de entrega."
+    },
+    "whyTitle": "Por que coletamos",
+    "why": {
+      "auth": "Autenticação — para permitir que você entre e acesse seus alertas.",
+      "dispatch": "Entrega de alertas — para enviar notificações ao endereço de e-mail ou identidade Nostr que você configurou."
+    },
+    "cookiesTitle": "Cookies e análises",
+    "cookies": "Definimos apenas um cookie: __session, um cookie de autenticação HTTP-only que mantém você conectado. Para entender como o aplicativo é usado e melhorá-lo, executamos nossa própria instância auto-hospedada do Umami, que coleta apenas dados de uso agregados e anônimos e não define cookies de rastreamento. Esses dados permanecem em nossa infraestrutura: nunca são compartilhados com terceiros, e não usamos análises ou rastreadores publicitários de terceiros.",
+    "subprocessorsTitle": "Subprocessadores",
+    "subprocessors": {
+      "resend": "Resend (resend.com) — gerencia o e-mail transacional: links mágicos de entrada e notificações de alertas por e-mail.",
+      "yadio": "Yadio (yadio.io) — fornece as taxas de câmbio de fiat em tempo real. Seu navegador as busca diretamente em yadio.io (a cada 5 minutos, aproximadamente), então seu endereço IP fica visível para a yadio ao carregar as taxas. Nenhum dado da sua conta é enviado — apenas a requisição da taxa.",
+      "hosting": "O backend e o banco de dados (MySQL) são auto-hospedados. Nenhum dado é enviado a serviços de análise ou publicidade de terceiros."
+    },
+    "retentionTitle": "Retenção de dados",
+    "retention": {
+      "alerts": "As configurações de alertas são mantidas até você desativá-las ou excluí-las.",
+      "logs": "Os registros de envio são mantidos por aproximadamente 90 dias para confiabilidade do serviço e depois excluídos."
+    },
+    "rightsTitle": "Seus direitos",
+    "rights": {
+      "intro": "Você tem direito de acessar e excluir os dados pessoais que temos sobre você.",
+      "access": "Acesso — você pode nos perguntar quais dados temos e receber uma cópia.",
+      "deletion": "Exclusão — você pode nos pedir para excluir sua conta e todos os dados associados.",
+      "deletionNote": "A exclusão de conta por conta própria ainda não está disponível na interface. Enquanto isso, envie-nos um e-mail para solicitar a exclusão e nós a processaremos manualmente.",
+      "response": "Responderemos a qualquer solicitação de dados em até 30 dias (Artigo 12 da LGPD)."
+    },
+    "contactTitle": "Contato",
+    "contact": {
+      "pre": "Para qualquer solicitação relacionada à privacidade, envie-nos um e-mail para ",
+      "post": ".",
+      "fallbackPre": "Para qualquer solicitação relacionada à privacidade, entre em contato pelos canais na ",
+      "fallbackLinkLabel": "página de contato",
+      "fallbackPost": "."
+    },
+    "effectiveDate": "Data de vigência:"
+  },
+  "terms": {
+    "title": "Termos de Serviço",
+    "lead": "Ao usar o p2psats.app você concorda com estes termos. Eles são intencionalmente breves.",
+    "serviceTitle": "O que é este serviço",
+    "service": {
+      "readOnly": "O P2P sats é um agregador somente leitura. Ele coleta dados de ordens disponíveis publicamente em relays Nostr e os exibe. Não aceita, roteia nem executa ordens.",
+      "noFunds": "Este site nunca toca seus fundos. Toda negociação ocorre na plataforma que publicou a ordem.",
+      "noAdvice": "Nada neste site constitui conselho financeiro ou de investimento."
+    },
+    "warrantyTitle": "Sem garantia",
+    "warranty": {
+      "asIs": "O serviço é fornecido no estado em que se encontra, sem garantia de qualquer tipo.",
+      "uptime": "Operamos com base no melhor esforço. Não há SLA de disponibilidade. O serviço pode ficar indisponível a qualquer momento sem aviso prévio."
+    },
+    "suspensionTitle": "Suspensão de conta",
+    "suspension": "Reservamo-nos o direito de suspender ou encerrar contas que façam uso abusivo do serviço (ex.: scraping automatizado, spam ou contornar limites de taxa).",
+    "effectiveDate": "Data de vigência:"
+  },
   "seo": {
     "home": {
       "title": "Livro de ordens P2P de Bitcoin ao vivo · P2P sats",
@@ -152,6 +219,14 @@
     "contact": {
       "title": "Contato · P2P sats",
       "description": "Fale com a equipe do P2P sats via Nostr ou e-mail. Reporte bugs, envie sugestões ou converse sobre Bitcoin peer-to-peer."
+    },
+    "privacy": {
+      "title": "Política de Privacidade · P2P sats",
+      "description": "Política de privacidade do P2P sats: quais dados coletamos, por quê, subprocessadores, cookies e como solicitar a exclusão."
+    },
+    "terms": {
+      "title": "Termos de Serviço · P2P sats",
+      "description": "Termos de serviço do P2P sats: agregador somente leitura, sem fundos, sem aconselhamento financeiro, serviço no estado em que se encontra."
     }
   },
   "signIn": {

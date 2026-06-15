@@ -24,6 +24,16 @@ export const routes: RouteRecordRaw[] = [
     name: "contact",
     component: () => import("./views/ContactView.vue"),
   },
+  {
+    path: "/privacy",
+    name: "privacy",
+    component: () => import("./views/PrivacyView.vue"),
+  },
+  {
+    path: "/terms",
+    name: "terms",
+    component: () => import("./views/TermsView.vue"),
+  },
   // Auth routes — added in task #12 (API client + auth UI)
   {
     path: "/signin",

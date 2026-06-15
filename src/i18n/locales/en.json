@@ -12,6 +12,8 @@
     "home": "Home",
     "about": "About",
     "contact": "Contact",
+    "privacy": "Privacy",
+    "terms": "Terms",
     "aggregated": "Aggregated from public nostr relays. Read-only (this site doesn't take orders).",
     "referenceRate": "Reference rate from yadio."
   },
@@ -136,6 +138,71 @@
       "crossesMark": "Price crosses an order on the other side"
     }
   },
+  "privacy": {
+    "title": "Privacy Policy",
+    "lead": "This page explains what data p2psats.app collects, why, and what rights you have over it. Short version: we collect only what's needed to run the alert service, share nothing for advertising, and you can request deletion at any time.",
+    "collectTitle": "What we collect",
+    "collect": {
+      "email": "Email address — provided when you sign in or link an email notification channel.",
+      "nostr": "Nostr public key (npub/hex) — provided when you sign in with Nostr or link a Nostr DM channel.",
+      "accountId": "Internal account ID — generated at sign-up, used to tie your data together.",
+      "alerts": "Alert configurations — the filters and channels you set up.",
+      "dispatchLogs": "Alert dispatch logs — records of notifications sent (timestamp, channel, alert ID, order ID). Used to prevent duplicate deliveries and diagnose delivery failures."
+    },
+    "whyTitle": "Why we collect it",
+    "why": {
+      "auth": "Authentication — to let you sign in and access your alerts.",
+      "dispatch": "Alert delivery — to send notifications to the email address or Nostr identity you configured."
+    },
+    "cookiesTitle": "Cookies & analytics",
+    "cookies": "We set one cookie: __session, an HTTP-only authentication cookie used to keep you signed in. To understand how the app is used and improve it, we run our own self-hosted Umami instance, which collects only aggregate, anonymous usage data and sets no tracking cookies. This data stays on our infrastructure — it is never shared with third parties, and we use no third-party analytics or advertising trackers.",
+    "subprocessorsTitle": "Sub-processors",
+    "subprocessors": {
+      "resend": "Resend (resend.com) — handles transactional email: sign-in magic links and email alert notifications.",
+      "yadio": "Yadio (yadio.io) — provides live fiat exchange rates. These are fetched directly by your browser from yadio.io (about every 5 minutes), so your IP address is visible to yadio when rates load. No account data is sent — only the rate request itself.",
+      "hosting": "The backend and database (MySQL) are self-hosted. No data is sent to third-party analytics or advertising services."
+    },
+    "retentionTitle": "Data retention",
+    "retention": {
+      "alerts": "Alert configurations are kept until you disable or delete them.",
+      "logs": "Dispatch logs are retained for approximately 90 days for service reliability, then purged."
+    },
+    "rightsTitle": "Your rights",
+    "rights": {
+      "intro": "You have the right to access and delete the personal data we hold about you.",
+      "access": "Access — you can ask us what data we hold and receive a copy.",
+      "deletion": "Deletion — you can ask us to delete your account and all associated data.",
+      "deletionNote": "Self-serve account deletion is not yet available in the UI. Until it is, email us to request deletion and we will process it manually.",
+      "response": "We will respond to any data request within 30 days (GDPR Article 12)."
+    },
+    "contactTitle": "Contact",
+    "contact": {
+      "pre": "For any privacy-related request, email us at ",
+      "post": ".",
+      "fallbackPre": "For any privacy-related request, reach us via the channels on the ",
+      "fallbackLinkLabel": "contact page",
+      "fallbackPost": "."
+    },
+    "effectiveDate": "Effective date:"
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "lead": "By using p2psats.app you agree to these terms. They are intentionally short.",
+    "serviceTitle": "What this service is",
+    "service": {
+      "readOnly": "P2P sats is a read-only aggregator. It pulls publicly available order data from Nostr relays and displays it. It does not take, route, or execute orders.",
+      "noFunds": "This site never touches your funds. All trading happens on the platform that posted the order.",
+      "noAdvice": "Nothing on this site constitutes financial or investment advice."
+    },
+    "warrantyTitle": "No warranty",
+    "warranty": {
+      "asIs": "The service is provided as-is, without warranty of any kind.",
+      "uptime": "We operate on a best-effort basis. There is no uptime SLA. The service may be unavailable at any time without notice."
+    },
+    "suspensionTitle": "Account suspension",
+    "suspension": "We reserve the right to suspend or terminate accounts that abuse the service (e.g. automated scraping, spam, or circumventing rate limits).",
+    "effectiveDate": "Effective date:"
+  },
   "seo": {
     "home": {
       "title": "Live P2P Bitcoin Order Book · P2P sats",
@@ -152,6 +219,14 @@
     "contact": {
       "title": "Contact · P2P sats",
       "description": "Reach the P2P sats team via Nostr or email. Report bugs, share feedback, or talk peer-to-peer Bitcoin."
+    },
+    "privacy": {
+      "title": "Privacy Policy · P2P sats",
+      "description": "P2P sats privacy policy: what data we collect, why, sub-processors, cookies, and how to request deletion."
+    },
+    "terms": {
+      "title": "Terms of Service · P2P sats",
+      "description": "P2P sats terms of service: read-only aggregator, no funds touched, no financial advice, as-is service."
     }
   },
   "signIn": {

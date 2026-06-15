@@ -160,6 +160,8 @@ const buildCommit = __APP_COMMIT__
           <RouterLink to="/" class="pb-foot-link">{{ t('footer.home') }}</RouterLink>
           <RouterLink to="/about" class="pb-foot-link">{{ t('footer.about') }}</RouterLink>
           <RouterLink to="/contact" class="pb-foot-link">{{ t('footer.contact') }}</RouterLink>
+          <RouterLink to="/privacy" class="pb-foot-link">{{ t('footer.privacy') }}</RouterLink>
+          <RouterLink to="/terms" class="pb-foot-link">{{ t('footer.terms') }}</RouterLink>
         </nav>
       </div>
       <div class="pb-foot-row pb-foot-row--bottom">
