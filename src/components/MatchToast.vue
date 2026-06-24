@@ -18,7 +18,7 @@ import { useI18n } from 'vue-i18n'
 import { useAppStore } from '@/stores/appStore'
 import { matchesRule } from '@p2psats/shared'
 import { playChime } from '@/lib/chime'
-import type { Order, Alert } from '@p2psats/shared'
+import type { Alert, Order } from '@p2psats/shared'
 
 const { t } = useI18n()
 const store = useAppStore()
