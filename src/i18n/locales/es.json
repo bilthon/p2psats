@@ -304,7 +304,11 @@
       "alertName": "Nombre de la alerta (opcional)",
       "alertNamePlaceholder": "ej. Compras PIX baratas",
       "premiumIncrease": "Aumentar premium",
-      "premiumDecrease": "Disminuir premium"
+      "premiumDecrease": "Disminuir premium",
+      "methods": "Palabras clave de método de pago (cualquiera)",
+      "methodsPlaceholder": "ej. yape, pix…",
+      "methodsHint": "Ingresa palabras clave — coinciden en cualquier parte de la descripción del método de pago, sin distinción de mayúsculas.",
+      "methodsRemove": "Eliminar {kw}"
     },
     "actions": {
       "reset": "Restablecer",

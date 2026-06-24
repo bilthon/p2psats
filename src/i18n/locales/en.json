@@ -304,7 +304,11 @@
       "alertName": "Alert name (optional)",
       "alertNamePlaceholder": "e.g. Cheap PIX buys",
       "premiumIncrease": "Increase premium",
-      "premiumDecrease": "Decrease premium"
+      "premiumDecrease": "Decrease premium",
+      "methods": "Payment method keywords (any)",
+      "methodsPlaceholder": "e.g. yape, pix…",
+      "methodsHint": "Enter keywords — they match anywhere in the order's payment description, case-insensitive.",
+      "methodsRemove": "Remove {kw}"
     },
     "actions": {
       "reset": "Reset",

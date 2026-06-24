@@ -169,5 +169,6 @@ export function toVueOrder(
     ageMin,
     kind: 38383,
     expiresIn,
+    pmRaw: raw.pmRaw,
   }
 }

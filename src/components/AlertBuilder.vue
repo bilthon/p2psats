@@ -11,6 +11,10 @@ import type { NostrEvent } from '@/services/apiClient'
 import type { Alert } from '@p2psats/shared'
 import type { FiatCode } from '@/lib/currency'
 
+// ---------------------------------------------------------------------------
+// Methods keyword input state
+// ---------------------------------------------------------------------------
+
 const props = defineProps<{
   currency: FiatCode
   /** Async handler called with the constructed Alert; should throw on backend errors. */
@@ -66,6 +70,8 @@ const premOp = ref<'<=' | '>='>('<=')
 const premValue = ref<number>(DEFAULT_RULE.premium.value)
 const name = ref('')
 const sources = ref<string[]>([])
+const methods = ref<string[]>([])
+const methodInput = ref('')
 const amountMin = ref<number | null>(null)
 const amountMax = ref<number | null>(null)
 const showAdvanced = ref(false)
@@ -156,12 +162,38 @@ function toggleSource(id: string) {
   }
 }
 
+function addMethodKeyword() {
+  const kw = methodInput.value.trim().toLowerCase()
+  if (!kw) return
+  // Dedupe
+  if (!methods.value.includes(kw)) {
+    methods.value = [...methods.value, kw]
+  }
+  methodInput.value = ''
+}
+
+function removeMethodKeyword(kw: string) {
+  methods.value = methods.value.filter((m) => m !== kw)
+}
+
+function onMethodInputKeydown(e: KeyboardEvent) {
+  if (e.key === 'Enter' || e.key === ',') {
+    e.preventDefault()
+    addMethodKeyword()
+  } else if (e.key === 'Backspace' && methodInput.value === '' && methods.value.length > 0) {
+    // Remove last keyword on Backspace when input is empty
+    methods.value = methods.value.slice(0, -1)
+  }
+}
+
 function resetForm() {
   side.value = 'buy'
   premOp.value = '<='
   premValue.value = DEFAULT_RULE.premium.value
   name.value = ''
   sources.value = []
+  methods.value = []
+  methodInput.value = ''
   amountMin.value = null
   amountMax.value = null
   showAdvanced.value = false
@@ -181,7 +213,7 @@ async function handleSave() {
     side: side.value,
     currency: props.currency as Alert['currency'],
     premium: { op: premOp.value, value: premValue.value },
-    methods: [],
+    methods: [...methods.value],
     sources: [...sources.value],
     amountMin: amountMin.value,
     amountMax: amountMax.value,
@@ -314,7 +346,7 @@ function stepPremValue(delta: number) {
 
 const premSign = computed(() => (premValue.value > 0 ? '+' : ''))
 
-const advancedCount = computed(() => sources.value.length)
+const advancedCount = computed(() => sources.value.length + methods.value.length)
 
 const summaryText = computed(() => {
   const sideLabel = t(
@@ -544,6 +576,35 @@ const summaryText = computed(() => {
 
     <!-- Advanced filters -->
     <div v-if="showAdvanced" class="pb-advanced">
+      <!-- Payment method keywords -->
+      <div class="pb-field">
+        <span class="pb-field-label">{{ t('alertBuilder.fields.methods') }}</span>
+        <div class="pb-method-tag-box">
+          <span
+            v-for="kw in methods"
+            :key="kw"
+            class="pb-chip pb-chip--on pb-chip--keyword"
+          >
+            {{ kw }}
+            <button
+              type="button"
+              class="pb-chip-remove"
+              :aria-label="t('alertBuilder.fields.methodsRemove', { kw })"
+              @click="removeMethodKeyword(kw)"
+            >×</button>
+          </span>
+          <input
+            v-model="methodInput"
+            type="text"
+            class="pb-method-input"
+            :placeholder="methods.length === 0 ? t('alertBuilder.fields.methodsPlaceholder') : ''"
+            @keydown="onMethodInputKeydown"
+            @blur="addMethodKeyword"
+          />
+        </div>
+        <p class="pb-method-hint">{{ t('alertBuilder.fields.methodsHint') }}</p>
+      </div>
+
       <div class="pb-field">
         <span class="pb-field-label">{{ t('alertBuilder.fields.sources') }}</span>
         <div class="pb-chip-row">
@@ -788,5 +849,63 @@ const summaryText = computed(() => {
 
 @keyframes pb-spin {
   to { transform: rotate(360deg); }
+}
+
+/* ── Method keyword tag input ── */
+.pb-method-tag-box {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  min-height: 34px;
+  padding: 4px 8px;
+  border: 1px solid var(--border, #d1d5db);
+  border-radius: 6px;
+  background: var(--surface, #fff);
+  cursor: text;
+}
+
+.pb-chip--keyword {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px 2px 10px;
+  font-size: 12px;
+}
+
+.pb-chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.7;
+  padding: 0;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.pb-chip-remove:hover {
+  opacity: 1;
+}
+
+.pb-method-input {
+  flex: 1;
+  min-width: 80px;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 13px;
+  color: var(--ink);
+  padding: 2px 0;
+}
+
+.pb-method-hint {
+  margin: 4px 0 0;
+  font-size: 11.5px;
+  color: var(--ink-mute);
+  line-height: 1.4;
 }
 </style>

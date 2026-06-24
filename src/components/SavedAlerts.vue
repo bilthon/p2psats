@@ -87,6 +87,11 @@ async function onToggle(id: string) {
           <span v-if="a.sources.length > 0" class="pb-alert-tag"
             >{{ a.sources.length }} source{{ a.sources.length > 1 ? 's' : '' }}</span
           >
+          <span
+            v-for="kw in a.methods"
+            :key="kw"
+            class="pb-alert-tag pb-alert-tag--method"
+          >{{ kw }}</span>
           <!-- Channel badges -->
           <span
             v-if="a.emailEnabled"
@@ -147,6 +152,12 @@ async function onToggle(id: string) {
   background: oklch(0.65 0.18 310 / 0.12);
   color: oklch(0.48 0.18 310);
   border: 1px solid oklch(0.65 0.18 310 / 0.25);
+}
+
+/* Method keyword tags: slightly different tint to distinguish from other tags */
+.pb-alert-tag--method {
+  font-style: italic;
+  opacity: 0.9;
 }
 
 /* Dark theme overrides */
