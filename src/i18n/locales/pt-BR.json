@@ -40,7 +40,7 @@
   "about": {
     "title": "Sobre",
     "lead": "Sem privacidade não existe liberdade. Poder transacionar sem ser vigiado, fichado ou barrado por intermediários sedentos por dados não é capricho: é o que sustenta um mercado livre e, no fim das contas, uma sociedade livre.",
-    "p1": "O P2P sats é uma ferramenta pensada para o mercado peer-to-peer de Bitcoin. Ele coleta as ordens ao vivo publicadas em relays públicos do Nostr (onde plataformas como Mostro, lnp2pbot, RoboSats e Peach divulgam suas ofertas via NIP-69) e junta tudo num único livro de ordens.",
+    "p1": "O P2P sats é uma ferramenta pensada para o mercado peer-to-peer de Bitcoin. Ele coleta as ordens ao vivo publicadas em relays públicos do Nostr (onde plataformas como Mostro, RoboSats e Peach divulgam suas ofertas via NIP-69) e junta tudo num único livro de ordens.",
     "p2": "Hoje esse mercado é fragmentado: liquidez, preços e formas de pagamento ficam espalhados entre aplicativos e bots, cada um com sua fatia isolada do fluxo. E essa fragmentação sai cara para todo mundo (preços piores, ordens que demoram para casar, oportunidades de arbitragem que ninguém aproveita). Reunindo tudo num só lugar, o P2P sats ajuda traders a se encontrarem e a comparar preços entre plataformas, com a meta clara de aumentar a liquidez e tornar o mercado mais eficiente como um todo.",
     "p3": "Aqui não tem conta, não tem ordem, não tem dinheiro passando. É só uma janela para o que já está público nos relays (leitura, nada além disso). Para fechar negócio, é direto na plataforma que publicou a ordem."
   },
@@ -206,7 +206,7 @@
   "seo": {
     "home": {
       "title": "Livro de ordens P2P de Bitcoin ao vivo · P2P sats",
-      "description": "Livro de ordens peer-to-peer de Bitcoin em tempo real, agregado de relays Nostr via NIP-69. Compare preços entre Mostro, lnp2pbot, RoboSats e Peach."
+      "description": "Livro de ordens peer-to-peer de Bitcoin em tempo real, agregado de relays Nostr via NIP-69. Compare preços entre Mostro, RoboSats e Peach."
     },
     "alerts": {
       "title": "Alertas de ordens P2P · P2P sats",

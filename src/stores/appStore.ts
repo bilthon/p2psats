@@ -153,7 +153,7 @@ export const useAppStore = defineStore('app', () => {
 
   const theme = ref<'light' | 'dark'>(detectInitialTheme())
   const activeSources = ref<string[]>(
-    readStorage<string[]>(PE_KEYS.sources, ['mostro', 'lnp2pbot', 'robosats', 'peach']),
+    readStorage<string[]>(PE_KEYS.sources, ['mostro', 'robosats', 'peach']),
   )
   // Alerts are backend-owned: populated after sign-in via apiClient.alerts.list().
   const alerts = ref<Alert[]>([])

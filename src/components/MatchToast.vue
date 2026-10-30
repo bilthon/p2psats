@@ -152,7 +152,6 @@ function sideClass(side: Order['side']): string {
 // ── Source display name cap ────────────────────────────────────────────────────
 const SOURCE_CAP: Record<string, string> = {
   mostro: 'Mostro',
-  lnp2pbot: 'lnp2pbot',
   robosats: 'RoboSats',
   peach: 'Peach',
   hodlhodl: 'HodlHodl',

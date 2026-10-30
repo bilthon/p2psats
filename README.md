@@ -8,7 +8,7 @@ Live peer-to-peer Bitcoin order book aggregated from Nostr relays.
 
 ## What it is
 
-P2P sats is a read-only aggregator of peer-to-peer Bitcoin orders. It connects to public Nostr relays where platforms like RoboSats, HodlHodl lnp2pbot, Mostro and Peach broadcast their offers under [NIP-69](https://github.com/nostr-protocol/nips/blob/master/69.md), parses the events, and renders everything as a unified order book with depth chart, spread, and crossed-pair detection.
+P2P sats is a read-only aggregator of peer-to-peer Bitcoin orders. It connects to public Nostr relays where platforms like RoboSats, HodlHodl, Mostro and Peach broadcast their offers under [NIP-69](https://github.com/nostr-protocol/nips/blob/master/69.md), parses the events, and renders everything as a unified order book with depth chart, spread, and crossed-pair detection.
 
 No accounts. No orders posted from here. No funds touched. Just a window into what's already public on the relays.
 
@@ -20,7 +20,7 @@ P2P sats unifies the view to (hopefully) make the market stronger, especially fo
 
 ## Features
 
-- Live aggregation from four NIP-69 relays (Mostro, lnp2pbot, RoboSats, Peach)
+- Live aggregation from three NIP-69 relays (Mostro, RoboSats, Peach)
 - Depth chart with bid/ask area and a Yadio reference price line
 - Spread, mid-price, best bid/ask, total depth on both sides
 - Crossed-pair detection (cross-platform arbitrage candidates)
@@ -34,7 +34,6 @@ P2P sats unifies the view to (hopefully) make the market stronger, especially fo
 | Platform | Relay | Status |
 |---|---|---|
 | Mostro | `relay.mostro.network` | active |
-| lnp2pbot | `relay.lnp2pbot.com` | active |
 | RoboSats | `nostr.robosats.org` | active |
 | Peach | `relay.peachbitcoin.com` | active |
 
@@ -142,7 +141,7 @@ Before opening a PR, please run `npm run type-check && npm run build` so the pre
 
 - [**p2p.band**](https://p2p.band) by [KoalaSat](https://njump.me/npub1v3tgrwwsv7c6xckyhm5dmluc05jxd4yeqhpxew87chn0kua0tjzqc6yvjh) does something very similar. P2P sats was built independently; the more frontends on this public data, the better.
 - The [NIP-69 spec](https://github.com/nostr-protocol/nips/blob/master/69.md), without which none of this would exist.
-- The RoboSats, lnp2pbot, Mostro and Peach teams, for publishing their order data openly to Nostr.
+- The RoboSats, Mostro and Peach teams, for publishing their order data openly to Nostr.
 
 ## License
 

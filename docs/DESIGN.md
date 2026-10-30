@@ -4,7 +4,7 @@
 
 ## Overview
 
-**P2P Explorer** is a read-only aggregator for peer-to-peer Bitcoin trading orders that are published over the nostr protocol (NIP-69). It subscribes to public relays operated by mostro, lnp2pbot, robosats, and peach, merges their order events into a single book per fiat currency, and shows price discovery, depth, cross-platform arbitrage opportunities, and a NIP-69-driven email alerts system.
+**P2P Explorer** is a read-only aggregator for peer-to-peer Bitcoin trading orders that are published over the nostr protocol (NIP-69). It subscribes to public relays operated by mostro, robosats, and peach, merges their order events into a single book per fiat currency, and shows price discovery, depth, cross-platform arbitrage opportunities, and a NIP-69-driven email alerts system.
 
 Two top-level pages, switched via a segmented nav:
 1. **Order book** — stats, depth chart, full table of bids/asks, crossed-pair detection.
@@ -51,14 +51,13 @@ Layout (top to bottom, all in a single-column 1440px max-width column with 28px 
 38×38px black rounded square (border-radius 9px) containing a stylized SVG glyph (two vertical bars + two dots representing bids/asks). Wordmark "P2P Explorer" (Inter Tight 600, 18px) above tag "nostr orderbook · NIP-69" (mono 11px, muted).
 
 ### Relay status pills
-One pill per source (mostro / lnp2pbot / robosats / peach). Pill contains a colored dot + label. When the source is enabled, the dot pulses (animated CSS scale + opacity). Click to toggle that source on/off. Source colors:
+One pill per source (mostro / robosats / peach). Pill contains a colored dot + label. When the source is enabled, the dot pulses (animated CSS scale + opacity). Click to toggle that source on/off. Source colors:
 - mostro: `#6366F1` (indigo)
-- lnp2pbot: `#10B981` (green)
 - robosats: `#F59E0B` (amber)
 - peach: `#EC4899` (pink)
 
 ### Currency switcher
-Trigger button reads `BTC / USD` (the quote currency in bold). Clicking opens a dropdown with a search input and a scrollable list of ~140 fiat currencies (the Yadio coverage matched by lnp2pbot and Mostro). The empty-query view pins the original 12 currencies (USD, EUR, BRL, ARS, MXN, VES, ZAR, RUB, PEN, CLP, COP, PYG) plus the currently-selected one, followed by 50 alphabetical entries; typing filters the full list by code or name. Each menu item: 3-letter code in mono + full name + ✓ on the active row. Footer note: "📌 Saved to this browser".
+Trigger button reads `BTC / USD` (the quote currency in bold). Clicking opens a dropdown with a search input and a scrollable list of ~140 fiat currencies (the Yadio coverage matched by Mostro). The empty-query view pins the original 12 currencies (USD, EUR, BRL, ARS, MXN, VES, ZAR, RUB, PEN, CLP, COP, PYG) plus the currently-selected one, followed by 50 alphabetical entries; typing filters the full list by code or name. Each menu item: 3-letter code in mono + full name + ✓ on the active row. Footer note: "📌 Saved to this browser".
 
 The currency list is sourced from `src/data/currencies.json`, generated at build time by `scripts/fetch-currencies.ts` (no runtime dependency on Yadio). `src/lib/currency.ts` exposes the `FiatCode` type alias (a plain string) and `FIATS`/`FIAT_NAME`/`FIAT_CODE_SET` helpers; the tight `Currency` union from `@p2psats/shared` is retained only as the key type for the local `REF_RATES`/`FIAT_FORMAT` fallback maps.
 

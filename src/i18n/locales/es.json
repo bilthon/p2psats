@@ -40,7 +40,7 @@
   "about": {
     "title": "Acerca de",
     "lead": "Sin privacidad no hay libertad. Poder mover valor sin que te vigilen, te perfilen ni te dejen afuera por capricho de un intermediario ávido de datos no es un lujo: es el cimiento de cualquier mercado libre y, a fin de cuentas, de cualquier sociedad libre.",
-    "p1": "P2P sats es una herramienta para el mercado de Bitcoin peer-to-peer. Toma órdenes en vivo desde relés públicos de Nostr (donde plataformas como Mostro, lnp2pbot, RoboSats y Peach publican sus ofertas usando NIP-69) y las reúne todas en un solo libro de órdenes.",
+    "p1": "P2P sats es una herramienta para el mercado de Bitcoin peer-to-peer. Toma órdenes en vivo desde relés públicos de Nostr (donde plataformas como Mostro, RoboSats y Peach publican sus ofertas usando NIP-69) y las reúne todas en un solo libro de órdenes.",
     "p2": "Hoy ese mercado está pulverizado: la liquidez, los precios y los métodos de pago se reparten entre apps y bots, cada uno con su porción aislada del flujo. Y esa fragmentación nos sale cara a todos (peores precios, órdenes que tardan en cruzarse, arbitrajes que se quedan en el aire). Al juntar todo en un mismo lugar, P2P sats ayuda a que los traders se encuentren y comparen precios entre plataformas, con la meta clara de sumar liquidez y hacer el mercado más eficiente en conjunto.",
     "p3": "Aquí no hay cuentas, no hay órdenes, no hay fondos pasando por nuestras manos. Es solo una ventana a lo que ya es público en los relés (lectura y nada más). Para operar en serio, hay que ir a la plataforma que publicó la orden."
   },
@@ -206,7 +206,7 @@
   "seo": {
     "home": {
       "title": "Libro de órdenes P2P de Bitcoin en vivo · P2P sats",
-      "description": "Libro de órdenes peer-to-peer de Bitcoin agregado desde relés Nostr vía NIP-69. Compara precios entre Mostro, lnp2pbot, RoboSats y Peach."
+      "description": "Libro de órdenes peer-to-peer de Bitcoin agregado desde relés Nostr vía NIP-69. Compara precios entre Mostro, RoboSats y Peach."
     },
     "alerts": {
       "title": "Alertas de órdenes P2P · P2P sats",

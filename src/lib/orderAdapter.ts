@@ -12,7 +12,6 @@ import { FIAT_CODE_SET } from './currency'
 // back to the 'nostr' catch-all source.
 const KNOWN_SOURCES = new Set<SourceId>([
   'mostro',
-  'lnp2pbot',
   'robosats',
   'peach',
   'hodlhodl',

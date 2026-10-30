@@ -47,7 +47,6 @@ export const FIAT_FORMAT: Record<Currency, { symbol: string; decimals: number }>
 
 export const SOURCES: Source[] = [
   { id: 'mostro',    label: 'mostro',   relay: 'relay.mostro.network',   color: '#6366F1' },
-  { id: 'lnp2pbot',  label: 'lnp2pbot', relay: 'relay.lnp2pbot.com',     color: '#10B981' },
   { id: 'robosats',  label: 'robosats', relay: 'nostr.robosats.org',     color: '#F59E0B' },
   { id: 'peach',     label: 'peach',    relay: 'relay.peachbitcoin.com', color: '#EC4899' },
   { id: 'hodlhodl',  label: 'hodlhodl', relay: '—',                      color: '#8B5CF6' },
