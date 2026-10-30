@@ -42,7 +42,7 @@ Adding a new platform is mostly a matter of identifying its NIP-69 relay and add
 
 ## Quick start
 
-Requires Node 22.12+ (see `.nvmrc`).
+Requires Node 22.23.4+ (see `.nvmrc`; earlier 22.x releases are vulnerable to the Node2Shell Brotli RCE, CVE-2026-111497).
 
 ```bash
 git clone git@github.com:bilthon/p2psats.git
