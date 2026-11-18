@@ -306,6 +306,18 @@ button { font-family: inherit; cursor: pointer; }
 .pb-ccy-name { font-size: 13px; color: var(--ink-soft); }
 .pb-ccy-check { color: var(--accent); font-weight: 600; }
 
+/* ── Homepage heading ─────────────────────────────────── */
+.pb-home-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  margin: 0;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
 /* ── Stats strip ──────────────────────────────────────── */
 .pb-stats {
   display: grid;

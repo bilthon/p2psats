@@ -18,6 +18,7 @@
     "referenceRate": "Reference rate from yadio."
   },
   "home": {
+    "heading": "Compare live P2P Bitcoin offers and spreads",
     "stats": {
       "midPrice": "Mid price",
       "bestBid": "Best bid",

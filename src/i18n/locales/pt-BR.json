@@ -18,6 +18,7 @@
     "referenceRate": "Taxa de referência do yadio."
   },
   "home": {
+    "heading": "Compare ofertas e spreads de Bitcoin P2P ao vivo",
     "stats": {
       "midPrice": "Preço médio",
       "bestBid": "Melhor oferta",
