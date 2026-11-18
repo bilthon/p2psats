@@ -18,6 +18,10 @@ const { t } = useI18n()
 const route = useRoute()
 const siteUrl = import.meta.env.VITE_SITE_URL ?? 'https://p2psats.app'
 
+function jsonLd(data: unknown): string {
+  return JSON.stringify(data).replace(/</g, '\\u003c')
+}
+
 useHead(computed(() => {
   const title = t('seo.home.title')
   const description = t('seo.home.description')
@@ -33,6 +37,28 @@ useHead(computed(() => {
       { name: 'twitter:description', content: description },
     ],
     link: [{ rel: 'canonical', href: canonical }],
+    script: [
+      {
+        key: 'ld-webapp',
+        type: 'application/ld+json',
+        textContent: jsonLd({
+          '@context': 'https://schema.org',
+          '@type': 'WebApplication',
+          name: 'P2P sats',
+          url: canonical,
+          description,
+          applicationCategory: 'FinanceApplication',
+          operatingSystem: 'Web',
+          isAccessibleForFree: true,
+          offers: {
+            '@type': 'Offer',
+            price: '0',
+            priceCurrency: 'USD',
+          },
+          image: `${siteUrl}/og.png`,
+        }),
+      },
+    ],
   }
 }))
 const store = useAppStore()
@@ -72,6 +98,8 @@ watch(
 </script>
 
 <template>
+  <h1 class="pb-home-title">{{ t('home.heading') }}</h1>
+
   <!-- Stats strip -->
   <section class="pb-stats">
     <div class="pb-stat">

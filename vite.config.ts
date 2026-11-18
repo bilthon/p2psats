@@ -7,6 +7,7 @@ import VueI18nPlugin from "@intlify/unplugin-vue-i18n/vite";
 import path from "node:path";
 // Import vite-ssg to register the ssgOptions module augmentation on Vite's UserConfig
 import type {} from "vite-ssg";
+import { writeSeoFiles } from "./scripts/write-seo-files";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 
@@ -60,11 +61,17 @@ export default defineConfig({
     },
   },
   ssgOptions: {
-    // Prerender only the four real content pages. /book is a redirect;
-    // /signin and /auth/verify are client-only flows that rely on URL
-    // query params or live backend calls and should not be pre-rendered.
+    // Prerender public pages only. /book is a redirect; /signin and
+    // /auth/verify are client-only flows that rely on URL query params or
+    // live backend calls and should not be pre-rendered. robots.txt and
+    // sitemap.xml are written from the generated HTML in onFinished, so the
+    // sitemap stays aligned with whatever was actually prerendered.
     includedRoutes(paths) {
       return paths.filter((p) => !["/book", "/signin", "/auth/verify"].includes(p));
+    },
+    onFinished() {
+      const urls = writeSeoFiles(path.resolve(__dirname, "dist"));
+      console.log(`[seo] wrote dist/robots.txt and dist/sitemap.xml (${urls.length} urls)`);
     },
     script: "async",
     formatting: "minify",
